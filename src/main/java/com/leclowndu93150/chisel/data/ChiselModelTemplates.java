@@ -346,6 +346,63 @@ public class ChiselModelTemplates {
         };
     }
 
+    // Pane block model for textures with -side and -top suffixes (like glasspanedyed)
+    public static ModelTemplate paneBlockSideTop() {
+        return (prov, block) -> {
+            String name = "block/" + name(block);
+            String basePath = "block/" + texturePath(block);
+            ResourceLocation sideTexture = Chisel.id(basePath + "-side");
+            ResourceLocation topTexture = Chisel.id(basePath + "-top");
+            paneBlockInternalSideTop(prov, block, name, sideTexture, topTexture);
+        };
+    }
+
+    private static void paneBlockInternalSideTop(BlockStateProvider prov, Block block, String name, ResourceLocation side, ResourceLocation top) {
+        MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
+
+        builder.part().modelFile(prov.models().withExistingParent(name + "_post", Chisel.id("block/pane/post"))
+                        .texture("pane", side)
+                        .texture("edge", top))
+                .addModel()
+                .condition(CrossCollisionBlock.NORTH, false)
+                .condition(CrossCollisionBlock.EAST, false)
+                .condition(CrossCollisionBlock.SOUTH, false)
+                .condition(CrossCollisionBlock.WEST, false)
+                .end();
+
+        // North
+        builder.part().modelFile(prov.models().withExistingParent(name + "_n", Chisel.id("block/pane/n"))
+                        .texture("pane", side)
+                        .texture("edge", top))
+                .addModel()
+                .condition(CrossCollisionBlock.NORTH, true)
+                .end();
+
+        // East
+        builder.part().modelFile(prov.models().withExistingParent(name + "_e", Chisel.id("block/pane/e"))
+                        .texture("pane", side)
+                        .texture("edge", top))
+                .addModel()
+                .condition(CrossCollisionBlock.EAST, true)
+                .end();
+
+        // South
+        builder.part().modelFile(prov.models().withExistingParent(name + "_s", Chisel.id("block/pane/s"))
+                        .texture("pane", side)
+                        .texture("edge", top))
+                .addModel()
+                .condition(CrossCollisionBlock.SOUTH, true)
+                .end();
+
+        // West
+        builder.part().modelFile(prov.models().withExistingParent(name + "_w", Chisel.id("block/pane/w"))
+                        .texture("pane", side)
+                        .texture("edge", top))
+                .addModel()
+                .condition(CrossCollisionBlock.WEST, true)
+                .end();
+    }
+
     private static void paneBlockInternal(BlockStateProvider prov, Block block, String name, ResourceLocation texture, ResourceLocation edge) {
         MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
 

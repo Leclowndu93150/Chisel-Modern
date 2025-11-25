@@ -36,7 +36,7 @@ public class LenientExistingFileHelper extends ExistingFileHelper {
             }
             return true; // Pretend it exists to continue datagen
         }
-        return true;
+        return exists;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class LenientExistingFileHelper extends ExistingFileHelper {
             }
             return true; // Pretend it exists to continue datagen
         }
-        return true;
+        return exists;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class LenientExistingFileHelper extends ExistingFileHelper {
             }
             return true; // Pretend it exists to continue datagen
         }
-        return true;
+        return exists;
     }
 
     /**

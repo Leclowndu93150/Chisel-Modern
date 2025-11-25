@@ -127,13 +127,37 @@ public class VariantTemplates {
         COBBLESTONE = List.copyOf(cobble);
     }
 
+    // ==================== MOSSY COBBLESTONE VARIANTS ====================
+    /**
+     * Creates a mossy model template for a given base block and variant.
+     * Uses overlay system: base cobblestone texture + moss overlay.
+     */
+    private static ModelTemplate mossyModel(String base, VariationData variant) {
+        if (variant.name().equals("circularct")) {
+            return mossyCtm(base, "circular");
+        } else if (variant.name().equals("pillar") || variant.name().equals("twisted")) {
+            return mossyColumn(base);
+        } else {
+            return mossy(base);
+        }
+    }
+
+    public static final List<VariationData> COBBLESTONE_MOSSY;
+    static {
+        List<VariationData> mossy = new ArrayList<>();
+        for (VariationData v : COBBLESTONE) {
+            mossy.add(new VariationData(v.name(), v.localizedName(), mossyModel("cobblestone", v), v.tooltip(), v.textureOverride()));
+        }
+        COBBLESTONE_MOSSY = List.copyOf(mossy);
+    }
+
     // ==================== PILLAR VARIANTS ====================
     public static final List<VariationData> PILLAR = List.of(
             new VariationData("plainplain", "Plain-Capped Plain Pillar", columnPillar()),
             new VariationData("plaingreek", "Greek-Capped Plain Pillar", columnPillar()),
             new VariationData("greekplain", "Plain-Capped Greek Pillar", columnPillar()),
             new VariationData("greekgreek", "Greek-Capped Greek Pillar", columnPillar()),
-            new VariationData("convexplain", "Convexed Pillar", cubeAll("-top")),
+            new VariationData("convex_plain", "Convexed Pillar", cubeAll("-top")),
             new VariationData("carved", "Scribed Pillar", cubeColumn()),
             new VariationData("ornamental", "Ornamental Pillar", cubeColumn())
     );

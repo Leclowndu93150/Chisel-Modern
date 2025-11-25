@@ -1,39 +1,104 @@
 package com.leclowndu93150.chisel.data.provider;
 
+import com.google.gson.JsonObject;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
+import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselItems;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Data provider for generating item model JSON files.
+ * Generates simple JSON directly without validation to avoid issues with missing parent models.
  */
-public class ChiselItemModelProvider extends ItemModelProvider {
+public class ChiselItemModelProvider implements DataProvider {
 
-    public ChiselItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, Chisel.MODID, existingFileHelper);
+    private final PackOutput output;
+
+    public ChiselItemModelProvider(PackOutput output) {
+        this.output = output;
     }
 
     @Override
-    protected void registerModels() {
-        // Generate item models for all block items (inherit from block model)
+    public CompletableFuture<?> run(CachedOutput cache) {
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+
+        // Generate item models for all block items
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
-            for (DeferredItem<BlockItem> item : blockType.getAllItems()) {
-                String name = item.getId().getPath();
-                withExistingParent(name, Chisel.id("block/" + name));
+            for (var entry : blockType.getBlocks().entrySet()) {
+                String variantName = entry.getKey();
+                DeferredBlock<?> block = entry.getValue();
+                DeferredItem<BlockItem> item = blockType.getItem(variantName);
+
+                if (item != null) {
+                    String registryPath = item.getId().getPath();
+                    JsonObject json;
+
+                    // Pane blocks need flat item models using the side texture
+                    if (block.get() instanceof BlockCarvablePane) {
+                        String texturePath = "chisel:block/" + blockType.getName() + "/" + variantName + "-side";
+                        json = createGeneratedItemModel(texturePath);
+                    } else {
+                        // Regular blocks inherit from block model
+                        json = createBlockItemModel("chisel:block/" + registryPath);
+                    }
+
+                    Path path = output.getOutputFolder().resolve("assets/chisel/models/item/" + registryPath + ".json");
+                    futures.add(DataProvider.saveStable(cache, json, path));
+                }
             }
         }
 
         // Generate item models for chisel tools
-        basicItem(ChiselItems.IRON_CHISEL.get());
-        basicItem(ChiselItems.DIAMOND_CHISEL.get());
-        basicItem(ChiselItems.HITECH_CHISEL.get());
-        basicItem(ChiselItems.OFFSET_TOOL.get());
+        futures.add(saveToolItemModel(cache, "iron_chisel"));
+        futures.add(saveToolItemModel(cache, "diamond_chisel"));
+        futures.add(saveToolItemModel(cache, "hitech_chisel"));
+        futures.add(saveToolItemModel(cache, "offset_tool"));
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    private CompletableFuture<?> saveToolItemModel(CachedOutput cache, String name) {
+        JsonObject json = createGeneratedItemModel("chisel:item/" + name);
+        Path path = output.getOutputFolder().resolve("assets/chisel/models/item/" + name + ".json");
+        return DataProvider.saveStable(cache, json, path);
+    }
+
+    /**
+     * Creates a simple item model that inherits from a block model.
+     */
+    private JsonObject createBlockItemModel(String parentModel) {
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", parentModel);
+        return json;
+    }
+
+    /**
+     * Creates a flat item model using item/generated with a texture layer.
+     */
+    private JsonObject createGeneratedItemModel(String texture) {
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", "minecraft:item/generated");
+        JsonObject textures = new JsonObject();
+        textures.addProperty("layer0", texture);
+        json.add("textures", textures);
+        return json;
+    }
+
+    @Override
+    public String getName() {
+        return "Chisel Item Models";
     }
 }

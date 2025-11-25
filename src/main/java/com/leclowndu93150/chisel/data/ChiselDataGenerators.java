@@ -39,7 +39,7 @@ public class ChiselDataGenerators {
 
         // Client-side data (use lenient helper for models)
         generator.addProvider(event.includeClient(), new ChiselBlockStateProvider(output, lenientHelper));
-        generator.addProvider(event.includeClient(), new ChiselItemModelProvider(output, lenientHelper));
+        generator.addProvider(event.includeClient(), new ChiselItemModelProvider(output));
         generator.addProvider(event.includeClient(), new ChiselLanguageProvider(output));
 
         // Server-side data (use original helper for tags)
