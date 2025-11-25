@@ -4,6 +4,7 @@ import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.data.ChiselModelTemplates;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
@@ -19,7 +20,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-/**t
+/**
  * Fluent builder for registering chisel block types with their variants.
  * Replaces the Registrate-based ChiselBlockFactory from 1.18.
  */
@@ -40,10 +41,11 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     private TagKey<Block> carvingGroupTag;
     @Nullable
     private MapColor mapColor;
+    @Nullable
+    private ChiselModelTemplates.ModelTemplate defaultModelTemplate;
 
     private BiFunction<BlockBehaviour.Properties, VariationData, T> blockFactory;
 
-    // Registered blocks and items
     private final Map<String, DeferredBlock<T>> registeredBlocks = new LinkedHashMap<>();
     private final Map<String, DeferredItem<BlockItem>> registeredItems = new LinkedHashMap<>();
 
@@ -62,7 +64,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
      * Add a vanilla block to be included in this carving group.
      */
     public ChiselBlockType<T> addVanillaBlock(Block block) {
-        ResourceLocation key = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
+        ResourceLocation key = BuiltInRegistries.BLOCK.getKey(block);
         if (key != null) {
             vanillaBlocks.add(key);
         }
@@ -174,13 +176,28 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     }
 
     /**
+     * Set a default model template for all variations that don't specify one.
+     */
+    public ChiselBlockType<T> defaultModelTemplate(ChiselModelTemplates.ModelTemplate template) {
+        this.defaultModelTemplate = template;
+        return this;
+    }
+
+    /**
+     * Get the default model template for this block type.
+     */
+    @Nullable
+    public ChiselModelTemplates.ModelTemplate getDefaultModelTemplate() {
+        return defaultModelTemplate;
+    }
+
+    /**
      * Build and register all blocks.
      */
     public ChiselBlockType<T> build() {
         for (VariationData variation : variations) {
             String registryName = name.replace("/", "_") + "/" + variation.name();
 
-            // Create properties
             BlockBehaviour.Properties props;
             if (customProperties != null) {
                 props = customProperties;
@@ -190,7 +207,6 @@ public class ChiselBlockType<T extends Block & ICarvable> {
                 props = BlockBehaviour.Properties.of();
             }
 
-            // Apply map color if set
             if (mapColor != null) {
                 props = props.mapColor(mapColor);
             }
@@ -198,20 +214,16 @@ public class ChiselBlockType<T extends Block & ICarvable> {
             final VariationData finalVariation = variation;
             final BlockBehaviour.Properties finalProps = props;
 
-            // Register block
             DeferredBlock<T> block = ChiselRegistries.BLOCKS.register(registryName,
                     () -> blockFactory.apply(finalProps, finalVariation));
             registeredBlocks.put(variation.name(), block);
 
-            // Register block item
             DeferredItem<BlockItem> item = ChiselRegistries.ITEMS.registerSimpleBlockItem(registryName, block);
             registeredItems.put(variation.name(), item);
         }
 
         return this;
     }
-
-    // Getters
 
     public String getName() {
         return name;

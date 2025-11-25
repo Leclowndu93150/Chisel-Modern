@@ -214,7 +214,6 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
 
                     mergeOutput(result);
 
-                    // Send FX packet to clients
                     if (level instanceof ServerLevel serverLevel) {
                         BlockState resultState = result.getItem() instanceof BlockItem blockItem
                                 ? blockItem.getBlock().defaultBlockState()

@@ -7,9 +7,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-/**
- * Registration class for Chisel items (chisel tools).
- */
 public class ChiselItems {
 
     public static final DeferredItem<ItemChisel> IRON_CHISEL = ChiselRegistries.ITEMS.register("iron_chisel",
@@ -27,10 +24,6 @@ public class ChiselItems {
     public static final DeferredItem<BlockItem> AUTO_CHISEL = ChiselRegistries.ITEMS.register("auto_chisel",
             () -> new BlockItem(ChiselBlocks.AUTO_CHISEL.get(), new Item.Properties()));
 
-    /**
-     * Called during mod initialization to trigger static initialization.
-     */
     public static void init() {
-        // Static initialization is triggered by loading this class
     }
 }

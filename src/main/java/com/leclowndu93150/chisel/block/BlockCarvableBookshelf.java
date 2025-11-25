@@ -48,6 +48,6 @@ public class BlockCarvableBookshelf extends Block implements ICarvable {
 
     @Override
     public float getEnchantPowerBonus(BlockState state, LevelReader level, BlockPos pos) {
-        return 1.0F; // Same as vanilla bookshelf
+        return 1.0F;
     }
 }

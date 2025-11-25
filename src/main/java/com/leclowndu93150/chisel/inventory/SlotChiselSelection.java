@@ -2,85 +2,118 @@ package com.leclowndu93150.chisel.inventory;
 
 import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.function.Supplier;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * Selection slot for the chisel GUI that displays available variations.
- * These slots are read-only and handle the crafting logic when clicked.
+ * When clicked, crafts items from the input slot into the selected variation.
  */
 public class SlotChiselSelection extends Slot {
 
-    private final ChiselMenu menu;
-    private final Supplier<ItemStack> chiselSupplier;
+    private final ChiselMenu container;
 
-    public SlotChiselSelection(ChiselMenu menu, InventoryChiselSelection inventory, int slot, int x, int y, Supplier<ItemStack> chiselSupplier) {
-        super(inventory, slot, x, y);
-        this.menu = menu;
-        this.chiselSupplier = chiselSupplier;
+    public SlotChiselSelection(ChiselMenu container, InventoryChiselSelection inv, int slot, int x, int y) {
+        super(inv, slot, x, y);
+        this.container = container;
     }
 
     @Override
     public boolean mayPlace(ItemStack stack) {
-        // Selection slots are read-only - no direct placement
         return false;
     }
 
     @Override
     public boolean mayPickup(Player player) {
-        return hasItem() && !menu.getInputSlot().getItem().isEmpty();
+        return player.containerMenu.getCarried().isEmpty();
+    }
+
+    /**
+     * Performs the crafting operation.
+     *
+     * @param container The chisel container
+     * @param player The player performing the craft
+     * @param target The target item type to craft into
+     * @param simulate If true, only simulate the craft without modifying items
+     * @return The crafted item stack, or empty if craft failed
+     */
+    public static ItemStack craft(ChiselMenu container, Player player, ItemStack target, boolean simulate) {
+        ItemStack source = container.getInventoryChisel().getStackInSpecialSlot();
+        ItemStack chisel = container.getChisel();
+
+        if (simulate) {
+            target = target.copy();
+            source = source.isEmpty() ? ItemStack.EMPTY : source.copy();
+            chisel = chisel.copy();
+        }
+
+        ItemStack result = ItemStack.EMPTY;
+        if (!chisel.isEmpty() && !source.isEmpty()) {
+            if (!(chisel.getItem() instanceof IChiselItem chiselItem)) {
+                return result;
+            }
+
+            if (!chiselItem.canChisel(player.level(), player, chisel, target)) {
+                return result;
+            }
+
+            EquipmentSlot equipSlot = container.getHand() == InteractionHand.MAIN_HAND ?
+                    EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+            result = chiselItem.craftItem(chisel, source, target, player, equipSlot);
+
+            if (!simulate) {
+                container.getInventoryChisel().setStackInSpecialSlot(source.isEmpty() ? ItemStack.EMPTY : source);
+                container.onChiselSlotChanged();
+
+                Block targetBlock = Blocks.AIR;
+                if (target.getItem() instanceof BlockItem blockItem) {
+                    targetBlock = blockItem.getBlock();
+                }
+                chiselItem.onChisel(player.level(), player, chisel, targetBlock);
+
+                if (chisel.isEmpty() || chisel.getCount() == 0) {
+                    container.getInventoryPlayer().setItem(container.getChiselSlot(), ItemStack.EMPTY);
+                }
+
+                if (!source.isEmpty() && !chiselItem.canChisel(player.level(), player, chisel, target)) {
+                    container.onChiselBroken();
+                }
+
+                container.getInventoryChisel().updateItems();
+                container.broadcastChanges();
+            }
+        }
+
+        return result;
     }
 
     @Override
     public void onTake(Player player, ItemStack stack) {
-        ItemStack chisel = chiselSupplier.get();
-        ItemStack input = menu.getInputSlot().getItem();
+        ItemStack chisel = container.getChisel().copy();
+        ItemStack result = craft(container, player, stack, false);
 
-        if (chisel.isEmpty() || input.isEmpty()) {
-            return;
-        }
+        if (!result.isEmpty()) {
+            CarvingHelper.playChiselSound(player.level(), player);
 
-        // Calculate how many we can craft
-        int craftCount = Math.min(input.getCount(), stack.getMaxStackSize());
-
-        // Handle chisel damage
-        if (chisel.getItem() instanceof IChiselItem chiselItem) {
-            if (chisel.isDamageableItem()) {
-                int damageLeft = chisel.getMaxDamage() - chisel.getDamageValue();
-                craftCount = Math.min(craftCount, damageLeft);
-                chisel.hurtAndBreak(craftCount, player, EquipmentSlot.MAINHAND);
+            ClickType clickType = container.getCurrentClickType();
+            if (clickType != null) {
+                switch (clickType) {
+                    case PICKUP, PICKUP_ALL, QUICK_CRAFT, QUICK_MOVE -> container.setCarried(result);
+                    case SWAP, THROW -> stack.setCount(result.getCount());
+                    default -> {}
+                }
+            } else {
+                container.setCarried(result);
             }
+        } else {
+            stack.setCount(0);
         }
-
-        // Update counts
-        input.shrink(craftCount);
-        stack.setCount(craftCount);
-
-        // Play sound
-        player.level().playSound(player, player.blockPosition(), SoundEvents.UI_STONECUTTER_TAKE_RESULT,
-                SoundSource.BLOCKS, 1.0F, 1.0F);
-
-        // Update the menu
-        menu.onInputChanged(input);
-
-        super.onTake(player, stack);
-    }
-
-    @Override
-    public ItemStack getItem() {
-        ItemStack stack = super.getItem();
-        if (!stack.isEmpty() && !menu.getInputSlot().getItem().isEmpty()) {
-            // Match the count to the input
-            ItemStack copy = stack.copy();
-            copy.setCount(Math.min(menu.getInputSlot().getItem().getCount(), stack.getMaxStackSize()));
-            return copy;
-        }
-        return stack;
     }
 }

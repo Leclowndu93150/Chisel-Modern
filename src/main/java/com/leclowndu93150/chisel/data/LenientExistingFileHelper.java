@@ -34,7 +34,7 @@ public class LenientExistingFileHelper extends ExistingFileHelper {
             if (missingResources.add(key)) {
                 LOGGER.warn("Missing {} resource: {}", packType.name(), loc);
             }
-            return true; // Pretend it exists to continue datagen
+            return true;
         }
         return exists;
     }
@@ -51,7 +51,7 @@ public class LenientExistingFileHelper extends ExistingFileHelper {
             if (missingResources.add(key)) {
                 LOGGER.warn("Missing {} resource: {} (type: {})", type.getPackType().name(), fullLoc, type.getClass().getSimpleName());
             }
-            return true; // Pretend it exists to continue datagen
+            return true;
         }
         return exists;
     }
@@ -68,7 +68,7 @@ public class LenientExistingFileHelper extends ExistingFileHelper {
             if (missingResources.add(key)) {
                 LOGGER.warn("Missing {} resource: {}", packType.name(), fullLoc);
             }
-            return true; // Pretend it exists to continue datagen
+            return true;
         }
         return exists;
     }

@@ -1,38 +1,44 @@
 package com.leclowndu93150.chisel.inventory;
 
+import com.leclowndu93150.chisel.api.IChiselItem;
+import com.leclowndu93150.chisel.carving.CarvingHelper;
+import net.minecraft.core.NonNullList;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * Virtual inventory for displaying available chisel variations.
- * This inventory holds all possible variations for the currently selected block.
+ * Inventory for the chisel selection grid.
+ * The "special slot" (last slot) holds the target item being chiseled.
+ * Selection slots (0 to size-1) display available variations.
  */
 public class InventoryChiselSelection implements Container {
 
-    private final int size;
-    private final List<ItemStack> stacks;
-    private int activeVariations = 0;
+    public final int size;
+    public int activeVariations = 0;
+    @Nullable
+    ChiselMenu container;
+    NonNullList<ItemStack> inventory;
 
-    public InventoryChiselSelection(int size) {
-        this.size = size + 1; // +1 for the target slot
-        this.stacks = new ArrayList<>(this.size);
-        for (int i = 0; i < this.size; i++) {
-            stacks.add(ItemStack.EMPTY);
-        }
+    public InventoryChiselSelection(ChiselMenu container, int size) {
+        this.size = size;
+        this.container = container;
+        this.inventory = NonNullList.withSize(size + 1, ItemStack.EMPTY);
     }
 
     @Override
     public int getContainerSize() {
-        return size;
+        return size + 1;
     }
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : stacks) {
+        for (ItemStack stack : inventory) {
             if (!stack.isEmpty()) {
                 return false;
             }
@@ -42,108 +48,127 @@ public class InventoryChiselSelection implements Container {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot < 0 || slot >= size) {
+        if (slot < 0 || slot >= inventory.size()) {
             return ItemStack.EMPTY;
         }
-        return stacks.get(slot);
+        return inventory.get(slot);
     }
 
     @Override
     public ItemStack removeItem(int slot, int amount) {
-        if (slot < 0 || slot >= size) {
-            return ItemStack.EMPTY;
+        ItemStack stack = inventory.get(slot);
+        if (!stack.isEmpty()) {
+            if (stack.getCount() <= amount) {
+                setItem(slot, ItemStack.EMPTY);
+                return stack;
+            } else {
+                ItemStack split = stack.split(amount);
+                if (stack.getCount() == 0) {
+                    setItem(slot, ItemStack.EMPTY);
+                }
+                return split;
+            }
         }
-        ItemStack stack = stacks.get(slot);
-        if (stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        if (amount >= stack.getCount()) {
-            stacks.set(slot, ItemStack.EMPTY);
-            return stack;
-        }
-        ItemStack result = stack.copy();
-        result.setCount(amount);
-        stack.shrink(amount);
-        return result;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        if (slot < 0 || slot >= size) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = stacks.get(slot);
-        stacks.set(slot, ItemStack.EMPTY);
+        ItemStack stack = getItem(slot);
+        inventory.set(slot, ItemStack.EMPTY);
         return stack;
     }
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        if (slot >= 0 && slot < size) {
-            stacks.set(slot, stack);
+        if (slot >= 0 && slot < inventory.size()) {
+            inventory.set(slot, stack);
         }
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 64;
     }
 
     @Override
     public void setChanged() {
-        // No-op for virtual inventory
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return true;
+        if (container == null) return false;
+        ItemStack held = player.getInventory().getItem(container.getChiselSlot());
+        return !held.isEmpty() && held.getItem() instanceof IChiselItem chiselItem &&
+               chiselItem.canOpenGui(player.level(), player, container.getHand());
     }
 
     @Override
     public void clearContent() {
+        inventory.clear();
+        for (int i = 0; i < size + 1; i++) {
+            inventory.add(ItemStack.EMPTY);
+        }
+    }
+
+    /**
+     * Gets the item in the special slot (input/target slot).
+     */
+    public ItemStack getStackInSpecialSlot() {
+        return inventory.get(size);
+    }
+
+    /**
+     * Sets the item in the special slot (input/target slot).
+     */
+    public void setStackInSpecialSlot(ItemStack stack) {
+        setItem(size, stack);
+    }
+
+    /**
+     * Clears only the selection slots, not the special slot.
+     */
+    public void clearItems() {
+        activeVariations = 0;
         for (int i = 0; i < size; i++) {
-            stacks.set(i, ItemStack.EMPTY);
+            setItem(i, ItemStack.EMPTY);
         }
-        activeVariations = 0;
     }
 
     /**
-     * Gets the target slot index (last slot in the inventory).
+     * Updates the selection slots based on the current target item.
+     * Populates with available variations for chiseling.
      */
-    public int getTargetSlot() {
-        return size - 1;
-    }
+    public void updateItems() {
+        ItemStack target = getStackInSpecialSlot();
+        clearItems();
 
-    /**
-     * Gets the target item stack.
-     */
-    public ItemStack getTarget() {
-        return getItem(getTargetSlot());
-    }
-
-    /**
-     * Sets the target item stack.
-     */
-    public void setTarget(ItemStack stack) {
-        setItem(getTargetSlot(), stack);
-    }
-
-    /**
-     * Gets the number of active variations currently displayed.
-     */
-    public int getActiveVariations() {
-        return activeVariations;
-    }
-
-    /**
-     * Sets the number of active variations.
-     */
-    public void setActiveVariations(int count) {
-        this.activeVariations = count;
-    }
-
-    /**
-     * Clears only the selection slots (not the target).
-     */
-    public void clearSelection() {
-        for (int i = 0; i < size - 1; i++) {
-            stacks.set(i, ItemStack.EMPTY);
+        if (target.isEmpty()) {
+            return;
         }
+
+        TagKey<Item> group = CarvingHelper.getCarvingGroupForItem(target);
+        if (group == null) {
+            return;
+        }
+
+        List<Item> variations = CarvingHelper.getItemsInGroup(group);
         activeVariations = 0;
+
+        for (Item item : variations) {
+            if (activeVariations >= size) {
+                break;
+            }
+            setItem(activeVariations, new ItemStack(item));
+            activeVariations++;
+        }
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (slot != size) {
+            return false;
+        }
+        return CarvingHelper.canChisel(stack);
     }
 }

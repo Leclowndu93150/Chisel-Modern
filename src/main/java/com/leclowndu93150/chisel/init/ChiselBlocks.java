@@ -1,13 +1,10 @@
 package com.leclowndu93150.chisel.init;
 
-import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
-import com.leclowndu93150.chisel.api.block.VariationData;
 import com.leclowndu93150.chisel.block.BlockAutoChisel;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.data.VariantTemplates;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
@@ -18,21 +15,13 @@ import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.leclowndu93150.chisel.data.ChiselModelTemplates.*;
 
-/**
- * Registration class for all Chisel blocks.
- * Complete 1:1 port from Chisel 1.18.2 Features.java and LegacyFeatures.java
- */
 public class ChiselBlocks {
 
-    // Collection of all block types for iteration
     public static final List<ChiselBlockType<?>> ALL_BLOCK_TYPES = new ArrayList<>();
-
-    // ==================== METALS (with mod compat tags) ====================
 
     public static final ChiselBlockType<BlockCarvable> ALUMINUM = registerType(
             new ChiselBlockType<BlockCarvable>("metals/aluminum")
@@ -221,8 +210,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== STONE TYPES ====================
-
     public static final ChiselBlockType<BlockCarvable> ANDESITE = registerType(
             new ChiselBlockType<BlockCarvable>("andesite")
                     .addVanillaBlock(Blocks.ANDESITE)
@@ -389,8 +376,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== CUSTOM STONES (No vanilla equivalent) ====================
-
     public static final ChiselBlockType<BlockCarvable> LIMESTONE = registerType(
             new ChiselBlockType<BlockCarvable>("limestone")
                     .properties(BlockBehaviour.Properties.of()
@@ -426,8 +411,6 @@ public class ChiselBlocks {
                     .variations(VariantTemplates.ROCK)
                     .build()
     );
-
-    // ==================== GEM BLOCKS ====================
 
     public static final ChiselBlockType<BlockCarvable> DIAMOND = registerType(
             new ChiselBlockType<BlockCarvable>("diamond")
@@ -506,8 +489,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== GLOWSTONE ====================
-
     public static final ChiselBlockType<BlockCarvable> GLOWSTONE = registerType(
             new ChiselBlockType<BlockCarvable>("glowstone")
                     .addVanillaBlock(Blocks.GLOWSTONE)
@@ -520,8 +501,6 @@ public class ChiselBlocks {
                     .variation("extra/neon_panel", "Neon Panel")
                     .build()
     );
-
-    // ==================== COAL/CHARCOAL ====================
 
     public static final ChiselBlockType<BlockCarvable> COAL = registerType(
             new ChiselBlockType<BlockCarvable>("coal")
@@ -544,8 +523,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== ICE ====================
-
     public static final ChiselBlockType<BlockCarvable> ICE = registerType(
             new ChiselBlockType<BlockCarvable>("ice")
                     .addVanillaBlock(Blocks.ICE)
@@ -565,8 +542,6 @@ public class ChiselBlocks {
                     .variations(VariantTemplates.PILLAR)
                     .build()
     );
-
-    // ==================== SPECIAL BLOCKS ====================
 
     public static final ChiselBlockType<BlockCarvable> ANTIBLOCK = registerType(
             new ChiselBlockType<BlockCarvable>("antiblock")
@@ -649,7 +624,7 @@ public class ChiselBlocks {
                     .variation("controller", "ME Controller", threeLayerTopShaded("controller_particle", "lines_plating", "rainbow_lines", "lines_invalid"))
                     .variation("wavy", "Rainbowliciously Wavy", twoLayerTopShaded("rainbow_wave_particle", "rainbow_wave_base", "rainbow_wave"))
                     .variation("controller_purple", "Purple ME Controller", threeLayerTopShaded("controller_unity_particle", "unity_lines_plating", "unity_lines", "lines_invalid"))
-                    .variation("uber_wavy", "Fabulously Wavy", twoLayerTopShaded("uber_rainbow", "uber_rainbow"))
+                    .variation("uber_wavy", "Fabulously Wavy", threeLayerTopShaded("orange_frame_particle", "orange_frame", "uber_rainbow", "screen_discoherent"))
                     .build()
     );
 
@@ -702,7 +677,6 @@ public class ChiselBlocks {
                     .variation("fanstilltransparent", "Fan (Still) - Transparent", cubeColumn())
                     .variation("massivefan", "Massive Fan")
                     .variation("massivehexplating", "Massive Hexagonal Plating")
-                    // Merged from TECHNICAL_NEW
                     .variation("weatheredgreenpanels", "Extremely Corroded Panels")
                     .variation("weatheredorangepanels", "Extremely Rusted Panels")
                     .variation("sturdy", "Sturdy")
@@ -816,10 +790,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== LAVASTONE / WATERSTONE ====================
-    // These use 2-layer models with fluid textures underneath stone patterns
-    // Textures come from block/fluid/ folder, tint index 1 is for lava/water color
-
     public static final ChiselBlockType<BlockCarvable> LAVASTONE = registerType(
             new ChiselBlockType<BlockCarvable>("lavastone")
                     .properties(BlockBehaviour.Properties.of()
@@ -841,8 +811,6 @@ public class ChiselBlocks {
                     .variations(VariantTemplates.WATERSTONE)
                     .build()
     );
-
-    // ==================== LEGACY BLOCKS ====================
 
     public static final ChiselBlockType<BlockCarvable> DIRT = registerType(
             new ChiselBlockType<BlockCarvable>("dirt")
@@ -877,6 +845,7 @@ public class ChiselBlocks {
                             .sound(SoundType.GLASS)
                             .explosionResistance(0.3f)
                             .noOcclusion())
+                    .defaultModelTemplate(simpleBlockCutout())
                     .variation("terrain_glassbubble", "Bubble")
                     .variation("japanese", "Japanese")
                     .variation("terrain_glassdungeon", "Dungeon")
@@ -1081,9 +1050,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== COLORED BLOCKS (CONCRETE, WOOL, etc.) ====================
-    // These are generated dynamically for all 16 colors
-
     public static final Map<DyeColor, ChiselBlockType<BlockCarvable>> CONCRETE = createColoredBlocks("concrete",
             color -> new ChiselBlockType<BlockCarvable>("concrete/" + color.getSerializedName())
                     .groupName(toEnglishName(color.getSerializedName()) + " Concrete")
@@ -1116,8 +1082,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // CARPET removed - no textures exist in 1.18.2
-
     public static final Map<DyeColor, ChiselBlockType<BlockCarvable>> GLASS_STAINED = createColoredBlocks("glass_stained",
             color -> new ChiselBlockType<BlockCarvable>("glass_stained/" + color.getSerializedName())
                     .groupName(toEnglishName(color.getSerializedName()) + " Stained Glass")
@@ -1126,19 +1090,35 @@ public class ChiselBlocks {
                             .sound(SoundType.GLASS)
                             .noOcclusion()
                             .explosionResistance(0.3f))
+                    .defaultModelTemplate(simpleBlockTranslucent())
                     .variation("panel", "Panel")
                     .variation("framed", "Framed")
-                    // framed_fancy removed - only -ctm texture exists in 1.18.2
                     .variation("streaks", "Streaks")
                     .variation("rough", "Rough")
                     .variation("brick", "Brick")
                     .build()
     );
 
+    public static final Map<DyeColor, ChiselBlockType<BlockCarvable>> GLASS_DYED = createColoredBlocks("glassdyed",
+            color -> new ChiselBlockType<BlockCarvable>("glassdyed/" + color.getSerializedName())
+                    .groupName(toEnglishName(color.getSerializedName()) + " Dyed Glass")
+                    .properties(BlockBehaviour.Properties.of()
+                            .sound(SoundType.GLASS)
+                            .noOcclusion()
+                            .explosionResistance(0.3f))
+                    .defaultModelTemplate(simpleBlockTranslucent())
+                    .variation("bubble", "Bubble")
+                    .variation("forestry", "Forestry")
+                    .variation("panel", "Panel")
+                    .variation("panel_fancy", "Fancy Panel")
+                    .variation("transparent", "Transparent")
+                    .build()
+    );
+
     public static final Map<DyeColor, ChiselBlockType<BlockCarvablePane>> GLASSPANE_DYED = createColoredBlocks("glasspanedyed",
             color -> new ChiselBlockType<BlockCarvablePane>("glasspanedyed/" + color.getSerializedName(),
                     (props, data) -> new BlockCarvablePane(props, data, "glasspanedyed/" + color.getSerializedName()))
-                    .groupName(toEnglishName(color.getSerializedName()) + " Stained Glass Pane")
+                    .groupName(toEnglishName(color.getSerializedName()) + " Dyed Glass Pane")
                     .addVanillaBlock(getStainedGlassPaneBlock(color))
                     .properties(BlockBehaviour.Properties.of()
                             .sound(SoundType.GLASS)
@@ -1153,10 +1133,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== WOOD TYPES (PLANKS, BOOKSHELVES) ====================
-
-    // Wood type names (vanilla woods from 1.18.2) - must be defined before createWoodBlocks is called
-    // Only includes woods that have textures in the 1.18.2 asset pack
     private static final List<String> WOOD_TYPES = List.of(
             "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "crimson"
     );
@@ -1172,7 +1148,6 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // Bookshelf - single type (not per-wood), textures exist in bookshelf/ folder
     public static final ChiselBlockType<BlockCarvable> BOOKSHELF = registerType(
             new ChiselBlockType<BlockCarvable>("bookshelf")
                     .groupName("Bookshelf")
@@ -1183,34 +1158,29 @@ public class ChiselBlocks {
                     .build()
     );
 
-    // ==================== PANE BLOCKS (IRON BARS) ====================
-    // Note: GLASSPANE_DYED removed - textures use -side/-top format for pane models
-    // which requires special pane model generation not currently implemented
-
-    public static final ChiselBlockType<BlockCarvable> IRONPANE = registerType(
-            new ChiselBlockType<BlockCarvable>("ironpane")
+    public static final ChiselBlockType<BlockCarvablePane> IRONPANE = registerType(
+            new ChiselBlockType<BlockCarvablePane>("ironpane",
+                    (props, data) -> new BlockCarvablePane(props, data, "ironpane"))
                     .groupName("Iron Bars")
                     .addVanillaBlock(Blocks.IRON_BARS)
                     .properties(() -> Blocks.IRON_BARS)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_IRON_TOOL)
-                    .variation("borderless", "Frameless")
-                    .variation("borderless-topper", "Frameless Topper")
-                    .variation("barbedwire", "Barbed Wire")
-                    .variation("cage", "Thick Cage")
-                    .variation("thickgrid", "Thick Grid")
-                    .variation("thingrid", "Thin Grid")
-                    .variation("ornatesteel", "Ornate")
-                    .variation("bars", "Straight")
-                    .variation("spikes", "Spikes")
-                    .variation("classic", "Classic")
-                    .variation("classicnew", "Classic Thin")
-                    .variation("fence", "Fence")
-                    .variation("modern", "Modern Fence")
+                    .variation("borderless", "Frameless", ironBars())
+                    .variation("borderless-topper", "Frameless Topper", ironBars())
+                    .variation("barbedwire", "Barbed Wire", ironBars())
+                    .variation("cage", "Thick Cage", ironBars())
+                    .variation("thickgrid", "Thick Grid", ironBars())
+                    .variation("thingrid", "Thin Grid", ironBars())
+                    .variation("ornatesteel", "Ornate", ironBars())
+                    .variation("bars", "Straight", ironBars())
+                    .variation("spikes", "Spikes", ironBars())
+                    .variation("classic", "Classic", ironBars())
+                    .variation("classicnew", "Classic Thin", ironBars())
+                    .variation("fence", "Fence", ironBars())
+                    .variation("modern", "Modern Fence", ironBars())
                     .build()
     );
-
-    // ==================== HELPER METHODS ====================
 
     private static <T extends Block & com.leclowndu93150.chisel.api.block.ICarvable> ChiselBlockType<T> registerType(ChiselBlockType<T> type) {
         ALL_BLOCK_TYPES.add(type);
@@ -1270,8 +1240,6 @@ public class ChiselBlocks {
             case BLACK -> Blocks.BLACK_WOOL;
         };
     }
-
-    // getCarpetBlock removed - CARPET blocks removed (no textures in 1.18.2)
 
     private static Block getStainedGlassBlock(DyeColor color) {
         return switch (color) {
@@ -1364,14 +1332,13 @@ public class ChiselBlocks {
                 .collect(Collectors.toList());
     }
 
-    // ==================== SPECIAL BLOCKS ====================
-
     public static final DeferredBlock<BlockAutoChisel> AUTO_CHISEL = ChiselRegistries.BLOCKS.register("auto_chisel",
             () -> new BlockAutoChisel(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(2.5F)
                     .sound(SoundType.METAL)
                     .requiresCorrectToolForDrops()
+                    .noOcclusion()
             )
     );
 

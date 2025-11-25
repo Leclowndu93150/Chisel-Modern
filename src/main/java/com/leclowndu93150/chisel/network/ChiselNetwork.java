@@ -36,12 +36,6 @@ public class ChiselNetwork {
         );
 
         registrar.playToClient(
-                AutoChiselUpdatePayload.TYPE,
-                AutoChiselUpdatePayload.STREAM_CODEC,
-                AutoChiselUpdatePayload::handle
-        );
-
-        registrar.playToClient(
                 AutoChiselFXPayload.TYPE,
                 AutoChiselFXPayload.STREAM_CODEC,
                 AutoChiselFXPayload::handle

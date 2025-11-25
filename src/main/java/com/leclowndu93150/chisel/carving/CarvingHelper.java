@@ -176,4 +176,16 @@ public class CarvingHelper {
     public static boolean canChisel(ItemStack stack) {
         return getCarvingGroupForItem(stack) != null;
     }
+
+    /**
+     * Gets the carving group TagKey for a block (as an item tag).
+     */
+    @Nullable
+    public static TagKey<Item> getCarvingGroupForBlock(Block block) {
+        Item item = block.asItem();
+        if (item == net.minecraft.world.item.Items.AIR) {
+            return null;
+        }
+        return getCarvingGroupForItem(new ItemStack(item));
+    }
 }

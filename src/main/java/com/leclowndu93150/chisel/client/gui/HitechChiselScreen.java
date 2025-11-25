@@ -11,6 +11,7 @@ import com.leclowndu93150.chisel.network.HitechSettingsPayload;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -29,7 +30,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.List;
 
 public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu> {
 
@@ -42,28 +47,32 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     private static final int PREVIEW_WIDTH = 74;
     private static final int PREVIEW_HEIGHT = 74;
 
-    private static final int MODE_BUTTON_TOP = 140;
-    private static final int PREVIEW_BUTTON_X = 8;
+    private static final int PREVIEW_BUTTON_X = 7;
     private static final int PREVIEW_BUTTON_Y = 91;
     private static final int CHISEL_BUTTON_Y = 113;
     private static final int BUTTON_WIDTH = 76;
     private static final int BUTTON_HEIGHT = 20;
 
     private static final int HIGHLIGHT_SELECTION_U = 0;
-    private static final int HIGHLIGHT_SELECTION_V = 220;
+    private static final int HIGHLIGHT_DUPLICATE_U = 18;
     private static final int HIGHLIGHT_TARGET_U = 36;
-    private static final int HIGHLIGHT_TARGET_V = 220;
+    private static final int HIGHLIGHT_V = 220;
 
     private float rotX = 165.0F;
     private float rotY = 0.0F;
     private float zoom = 1.0F;
-    private float momentumX = 0.0F;
-    private float momentumY = 0.0F;
-    private PreviewMode previewMode = PreviewMode.SINGLE;
-    private boolean rotate = false;
-    private boolean isDragging = false;
-    private double lastMouseX;
-    private double lastMouseY;
+    private float initRotX, initRotY, initZoom;
+    private float prevRotX, prevRotY;
+    private double momentumX = 0;
+    private double momentumY = 0;
+    private PreviewMode previewMode = PreviewMode.PANEL;
+    private boolean autoRotate = true;
+    private boolean panelClicked = false;
+    private int clickButton;
+    private int clickX, clickY;
+    private long lastDragTime;
+
+    private Button chiselButton;
 
     public HitechChiselScreen(HitechChiselMenu menu, Inventory playerInv, Component title) {
         super(menu, playerInv, title);
@@ -75,33 +84,59 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     protected void init() {
         super.init();
 
-        addRenderableWidget(Button.builder(Component.translatable("chisel.button.preview"), this::onPreviewModeClick)
+        addRenderableWidget(Button.builder(getPreviewModeText(), this::onPreviewModeClick)
                 .bounds(leftPos + PREVIEW_BUTTON_X, topPos + PREVIEW_BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
-        addRenderableWidget(Button.builder(Component.translatable("chisel.button.chisel"), this::onChiselClick)
+        chiselButton = addRenderableWidget(Button.builder(Component.translatable("chisel.button.chisel"), this::onChiselClick)
                 .bounds(leftPos + PREVIEW_BUTTON_X, topPos + CHISEL_BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
         addModeButtons();
+
+        ItemStack chisel = menu.getChisel();
+        if (chisel.getItem() instanceof ItemChisel itemChisel) {
+            previewMode = PreviewMode.values()[Math.min(itemChisel.getPreviewType(chisel), PreviewMode.values().length - 1)];
+            autoRotate = itemChisel.getRotate(chisel);
+        }
+    }
+
+    private Component getPreviewModeText() {
+        return Component.literal("< ").append(Component.translatable("chisel.preview." + previewMode.name().toLowerCase())).append(" >");
     }
 
     private void addModeButtons() {
-        int buttonX = leftPos + PREVIEW_BUTTON_X;
-        int buttonY = topPos + MODE_BUTTON_TOP;
+        int buttonX = leftPos + 7;
+        int buttonY = topPos + 140;
         int modesAdded = 0;
 
+        ItemStack chisel = menu.getChisel();
+        IChiselMode currentMode = null;
+        if (chisel.getItem() instanceof ItemChisel itemChisel) {
+            currentMode = itemChisel.getMode(chisel);
+        }
+
         for (IChiselMode mode : ChiselModeRegistry.INSTANCE.getAllModes()) {
-            if (modesAdded >= 4) break;
+            if (chisel.getItem() instanceof ItemChisel itemChisel) {
+                if (!itemChisel.supportsMode(minecraft.player, chisel, mode)) {
+                    continue;
+                }
+            }
 
             final IChiselMode finalMode = mode;
-            addRenderableWidget(new ButtonChiselMode(
+            ButtonChiselMode button = new ButtonChiselMode(
                     buttonX + (modesAdded % 2) * 38,
                     buttonY + (modesAdded / 2) * 22,
                     20, 20,
                     mode,
-                    button -> onModeButtonClick(finalMode)
-            ));
+                    b -> onModeButtonClick(finalMode)
+            );
+
+            if (mode == currentMode) {
+                button.active = false;
+            }
+
+            addRenderableWidget(button);
             modesAdded++;
         }
     }
@@ -109,37 +144,77 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     private int getChiselSlot() {
         return menu.getHand() == InteractionHand.MAIN_HAND
                 ? minecraft.player.getInventory().selected
-                : 40; // Offhand slot
+                : 40;
     }
 
     private void onPreviewModeClick(Button button) {
         previewMode = PreviewMode.values()[(previewMode.ordinal() + 1) % PreviewMode.values().length];
-        // Send to server
-        PacketDistributor.sendToServer(new HitechSettingsPayload(previewMode, rotate, getChiselSlot()));
+        button.setMessage(getPreviewModeText());
+        saveSettings();
     }
 
     private void onChiselClick(Button button) {
-        // Collect all slots from player inventory that should be chiseled
-        int targetSlot = menu.getTargetSlot();
-        if (targetSlot < 0) return;
+        Slot selection = menu.getSelection();
+        Slot target = menu.getTarget();
 
-        ItemStack targetItem = menu.getTargetItem();
-        if (targetItem.isEmpty()) return;
+        if (selection == null || !selection.hasItem()) return;
+        if (target == null || !target.hasItem()) return;
 
-        // Gather all player inventory slots (excluding armor)
-        int[] slots = new int[36];
-        for (int i = 0; i < 36; i++) {
-            slots[i] = i;
+        if (ItemStack.isSameItem(selection.getItem(), target.getItem())) return;
+
+        int[] slots;
+        if (hasShiftDown()) {
+            List<Slot> duplicates = menu.getSelectionDuplicates();
+            slots = new int[1 + duplicates.size()];
+            slots[0] = selection.index;
+            for (int i = 0; i < duplicates.size(); i++) {
+                slots[i + 1] = duplicates.get(i).index;
+            }
+        } else {
+            slots = new int[] { selection.index };
         }
+
         PacketDistributor.sendToServer(new ChiselButtonPayload(slots));
+
+        menu.chiselSlots(slots);
     }
 
     private void onModeButtonClick(IChiselMode mode) {
-        ItemStack chisel = menu.getChiselStack();
+        ItemStack chisel = menu.getChisel();
         if (chisel.getItem() instanceof ItemChisel itemChisel) {
             itemChisel.setMode(chisel, mode);
-            // Send to server
             PacketDistributor.sendToServer(new ChiselModePayload(getChiselSlot(), mode));
+
+            for (var widget : children()) {
+                if (widget instanceof ButtonChiselMode modeButton) {
+                    modeButton.active = modeButton.getMode() != mode;
+                }
+            }
+        }
+    }
+
+    private void saveSettings() {
+        ItemStack chisel = menu.getChisel();
+        if (chisel.getItem() instanceof ItemChisel itemChisel) {
+            itemChisel.setPreviewType(chisel, previewMode.ordinal());
+            itemChisel.setRotate(chisel, autoRotate);
+        }
+        PacketDistributor.sendToServer(new HitechSettingsPayload(previewMode, autoRotate, getChiselSlot()));
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+
+        if (chiselButton != null) {
+            if (hasShiftDown()) {
+                chiselButton.setMessage(Component.translatable("chisel.button.chisel_all").withStyle(ChatFormatting.YELLOW));
+            } else {
+                chiselButton.setMessage(Component.translatable("chisel.button.chisel"));
+            }
+
+            chiselButton.active = menu.getSelection() != null && menu.getSelection().hasItem()
+                    && menu.getTarget() != null && menu.getTarget().hasItem();
         }
     }
 
@@ -148,20 +223,48 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         graphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
-        if (!isDragging) {
-            rotX += momentumX;
-            rotY += momentumY;
-            momentumX *= 0.98F;
-            momentumY *= 0.98F;
+        renderSlotHighlights(graphics);
+
+        if (autoRotate && momentumX == 0 && momentumY == 0 && !panelClicked && System.currentTimeMillis() - lastDragTime > 2000) {
+            rotY = initRotY + (2 * partialTick);
+        }
+
+        if (panelClicked && clickButton == 0) {
+            momentumX = rotX - prevRotX;
+            momentumY = rotY - prevRotY;
+            prevRotX = rotX;
+            prevRotY = rotY;
         }
 
         render3DPreview(graphics, partialTick);
-        renderSlotHighlights(graphics);
+    }
+
+    private void renderSlotHighlights(GuiGraphics graphics) {
+        Slot selection = menu.getSelection();
+        if (selection != null && selection.hasItem()) {
+            drawSlotHighlight(graphics, selection, HIGHLIGHT_SELECTION_U);
+
+            for (Slot dup : menu.getSelectionDuplicates()) {
+                drawSlotHighlight(graphics, dup, hasShiftDown() ? HIGHLIGHT_SELECTION_U : HIGHLIGHT_DUPLICATE_U);
+            }
+        }
+
+        Slot target = menu.getTarget();
+        if (target != null && target.hasItem()) {
+            drawSlotHighlight(graphics, target, HIGHLIGHT_TARGET_U);
+        }
+    }
+
+    private void drawSlotHighlight(GuiGraphics graphics, Slot slot, int u) {
+        graphics.blit(TEXTURE, leftPos + slot.x - 1, topPos + slot.y - 1, u, HIGHLIGHT_V, 18, 18);
     }
 
     private void render3DPreview(GuiGraphics graphics, float partialTick) {
-        ItemStack selectedItem = getSelectedItem();
-        if (selectedItem.isEmpty() || !(selectedItem.getItem() instanceof BlockItem blockItem)) {
+        ItemStack previewItem = menu.getTargetItem();
+        if (previewItem.isEmpty()) {
+            previewItem = menu.getSelectionStack();
+        }
+        if (previewItem == null || previewItem.isEmpty() || !(previewItem.getItem() instanceof BlockItem blockItem)) {
             return;
         }
 
@@ -176,32 +279,52 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
                 topPos + PREVIEW_Y + PREVIEW_HEIGHT
         );
 
+        if (!panelClicked) {
+            rotX += (float) momentumX;
+            rotY += (float) momentumY;
+            momentumX *= 0.98;
+            momentumY *= 0.98;
+            if (Math.abs(momentumX) < 0.05) momentumX = 0;
+            if (Math.abs(momentumY) < 0.05) momentumY = 0;
+        }
+
+        rotX = Math.max(90, Math.min(270, rotX));
+
         PoseStack poseStack = graphics.pose();
         poseStack.pushPose();
         poseStack.translate(centerX, centerY, 100);
-        poseStack.scale(30 * zoom, -30 * zoom, 30 * zoom);
+
+        float scale = 30 * zoom * previewMode.getScale();
+        poseStack.scale(scale, -scale, scale);
         poseStack.mulPose(Axis.XP.rotationDegrees(rotX));
         poseStack.mulPose(Axis.YP.rotationDegrees(rotY));
-        poseStack.translate(-0.5, -0.5, -0.5);
+
+        poseStack.translate(-previewMode.getCenterX(), -previewMode.getCenterY(), -0.5);
 
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
 
         BakedModel model = blockRenderer.getBlockModel(state);
 
-        // Render for multiple render types to support transparent/cutout blocks
-        for (RenderType renderType : model.getRenderTypes(state, minecraft.level.random, net.neoforged.neoforge.client.model.data.ModelData.EMPTY)) {
-            blockRenderer.getModelRenderer().renderModel(
-                    poseStack.last(),
-                    bufferSource.getBuffer(renderType),
-                    state,
-                    model,
-                    1.0F, 1.0F, 1.0F,
-                    LightTexture.FULL_BRIGHT,
-                    OverlayTexture.NO_OVERLAY,
-                    net.neoforged.neoforge.client.model.data.ModelData.EMPTY,
-                    renderType
-            );
+        for (int[] pos : previewMode.getPositions()) {
+            poseStack.pushPose();
+            poseStack.translate(pos[0], pos[1], pos[2]);
+
+            for (RenderType renderType : model.getRenderTypes(state, minecraft.level.random, ModelData.EMPTY)) {
+                blockRenderer.getModelRenderer().renderModel(
+                        poseStack.last(),
+                        bufferSource.getBuffer(renderType),
+                        state,
+                        model,
+                        1.0F, 1.0F, 1.0F,
+                        LightTexture.FULL_BRIGHT,
+                        OverlayTexture.NO_OVERLAY,
+                        ModelData.EMPTY,
+                        renderType
+                );
+            }
+
+            poseStack.popPose();
         }
 
         bufferSource.endBatch();
@@ -209,36 +332,31 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
         graphics.disableScissor();
     }
 
-    private void renderSlotHighlights(GuiGraphics graphics) {
-        int selectedSlot = menu.getSelectedSlot();
-        int targetSlot = menu.getTargetSlot();
-
-        for (int i = 0; i < menu.getSelectionSize(); i++) {
-            Slot slot = menu.getSlot(i);
-            int x = leftPos + slot.x - 1;
-            int y = topPos + slot.y - 1;
-
-            if (i == selectedSlot) {
-                graphics.blit(TEXTURE, x, y, HIGHLIGHT_SELECTION_U, HIGHLIGHT_SELECTION_V, 18, 18);
-            } else if (i == targetSlot) {
-                graphics.blit(TEXTURE, x, y, HIGHLIGHT_TARGET_U, HIGHLIGHT_TARGET_V, 18, 18);
-            }
-        }
-    }
-
-    private ItemStack getSelectedItem() {
-        int selected = menu.getSelectedSlot();
-        if (selected >= 0 && selected < menu.getSelectionSize()) {
-            return menu.getSlot(selected).getItem();
-        }
-        return ItemStack.EMPTY;
-    }
-
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(graphics, mouseX, mouseY, partialTick);
         super.render(graphics, mouseX, mouseY, partialTick);
         this.renderTooltip(graphics, mouseX, mouseY);
+
+        Component previewLabel = Component.translatable("chisel.preview");
+        graphics.drawString(font, previewLabel,
+                leftPos + PREVIEW_X + (PREVIEW_WIDTH - font.width(previewLabel)) / 2,
+                topPos + PREVIEW_Y - 9, 0x404040, false);
+
+        drawButtonTooltips(graphics, mouseX, mouseY);
+    }
+
+    protected void drawButtonTooltips(GuiGraphics graphics, int mouseX, int mouseY) {
+        for (var widget : children()) {
+            if (widget instanceof ButtonChiselMode button && button.isHovered()) {
+                IChiselMode mode = button.getMode();
+                List<Component> ttLines = List.of(
+                        mode.getLocalizedName(),
+                        mode.getLocalizedDescription().copy().withStyle(ChatFormatting.GRAY)
+                );
+                graphics.renderComponentTooltip(font, ttLines, mouseX, mouseY);
+            }
+        }
     }
 
     @Override
@@ -246,21 +364,37 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     }
 
     @Override
+    protected void renderSlot(GuiGraphics graphics, Slot slot) {
+        if (slot == menu.getInputSlot()) {
+            return;
+        }
+        super.renderSlot(graphics, slot);
+    }
+
+    @Override
+    protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY) {
+        Slot inputSlot = menu.getInputSlot();
+        if (x == inputSlot.x && y == inputSlot.y) {
+            return false;
+        }
+        return super.isHovering(x, y, width, height, mouseX, mouseY);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isInPreviewArea(mouseX, mouseY)) {
-            isDragging = true;
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
+            panelClicked = true;
+            clickButton = button;
+            clickX = (int) mouseX;
+            clickY = (int) mouseY;
+            initRotX = rotX;
+            initRotY = rotY;
+            initZoom = zoom;
+            prevRotX = rotX;
+            prevRotY = rotY;
+            momentumX = 0;
+            momentumY = 0;
             return true;
-        }
-
-        Slot slot = findSlot(mouseX, mouseY);
-        if (slot != null && slot.index < menu.getSelectionSize()) {
-            if (button == 0) {
-                menu.setSelectedSlot(slot.index);
-            } else if (button == 1) {
-                menu.setTargetSlot(slot.index);
-            }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -268,8 +402,12 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (isDragging) {
-            isDragging = false;
+        if (panelClicked) {
+            lastDragTime = System.currentTimeMillis();
+            panelClicked = false;
+            initRotX = rotX;
+            initRotY = rotY;
+            initZoom = zoom;
             return true;
         }
         return super.mouseReleased(mouseX, mouseY, button);
@@ -277,16 +415,13 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (isDragging) {
-            double dx = mouseX - lastMouseX;
-            double dy = mouseY - lastMouseY;
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
-
-            rotY += (float) dx;
-            rotX += (float) dy;
-            momentumX = (float) dy * 0.5F;
-            momentumY = (float) dx * 0.5F;
+        if (panelClicked) {
+            if (clickButton == 0) {
+                rotX = Math.max(90, Math.min(270, initRotX + ((float) mouseY - clickY)));
+                rotY = initRotY - ((float) mouseX - clickX);
+            } else if (clickButton == 1) {
+                zoom = Math.max(0.5f, initZoom + (clickY - (float) mouseY) * 0.01f);
+            }
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
@@ -307,21 +442,39 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
                 && mouseY >= topPos + PREVIEW_Y && mouseY < topPos + PREVIEW_Y + PREVIEW_HEIGHT;
     }
 
-    private Slot findSlot(double mouseX, double mouseY) {
-        for (Slot slot : menu.slots) {
-            if (isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
-                return slot;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Preview modes for the 3D display.
-     */
     public enum PreviewMode {
-        SINGLE,
-        PANEL_3X3,
-        COLUMN_3X1
+        PANEL(0.5f, 1.5f, 2.0f, new int[][]{
+                {0, 1, 0}, {1, 1, 0}, {2, 1, 0},
+                {0, 2, 0}, {1, 2, 0}, {2, 2, 0},
+                {0, 3, 0}, {1, 3, 0}, {2, 3, 0}
+        }),
+        HOLLOW(0.5f, 1.5f, 2.0f, new int[][]{
+                {0, 1, 0}, {1, 1, 0}, {2, 1, 0},
+                {0, 2, 0}, /*hole*/  {2, 2, 0},
+                {0, 3, 0}, {1, 3, 0}, {2, 3, 0}
+        }),
+        PLUS(0.6f, 1.0f, 2.0f, new int[][]{
+                {1, 1, 0},
+                {1, 2, 0}, {2, 2, 0}, {0, 2, 0},
+                {1, 3, 0}
+        }),
+        SINGLE(1.0f, 0.5f, 0.5f, new int[][]{{0, 0, 0}});
+
+        private final float scale;
+        private final float centerX;
+        private final float centerY;
+        private final int[][] positions;
+
+        PreviewMode(float scale, float centerX, float centerY, int[][] positions) {
+            this.scale = scale;
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.positions = positions;
+        }
+
+        public float getScale() { return scale; }
+        public float getCenterX() { return centerX; }
+        public float getCenterY() { return centerY; }
+        public int[][] getPositions() { return positions; }
     }
 }

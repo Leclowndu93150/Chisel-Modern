@@ -18,10 +18,8 @@ import static com.leclowndu93150.chisel.data.ChiselModelTemplates.*;
  */
 public class VariantTemplates {
 
-    // ==================== RAW VARIANT ====================
     public static final VariationData RAW = new VariationData("raw", "Raw", simpleBlock());
 
-    // ==================== METAL VARIANTS ====================
     public static final List<VariationData> METAL = List.of(
             new VariationData("caution", "Caution", simpleBlock()),
             new VariationData("crate", "Shipping Crate", simpleBlock()),
@@ -32,7 +30,6 @@ public class VariantTemplates {
             new VariationData("scaffold", "Scaffold", simpleBlock())
     );
 
-    // ==================== METAL TERRAIN VARIANTS ====================
     public static final List<VariationData> METAL_TERRAIN = List.of(
             new VariationData("large_ingot", "Large Ingot", cubeBottomTop()),
             new VariationData("small_ingot", "Small Ingot", cubeBottomTop()),
@@ -48,7 +45,6 @@ public class VariantTemplates {
             new VariationData("simple", "Simple", cubeBottomTop())
     );
 
-    // ==================== STONE VARIANTS ====================
     public static final List<VariationData> STONE = List.of(
             new VariationData("cracked", "Cracked", simpleBlock()),
             new VariationData("solid_bricks", "Bricks", simpleBlock()),
@@ -80,7 +76,6 @@ public class VariantTemplates {
             new VariationData("prism", "Prism", simpleBlock())
     );
 
-    // ==================== ROCK VARIANTS ====================
     public static final List<VariationData> ROCK = List.of(
             new VariationData("cracked", "Cracked", simpleBlock()),
             new VariationData("solid_bricks", "Bricks", simpleBlock()),
@@ -117,7 +112,6 @@ public class VariantTemplates {
             new VariationData("cuts", "Cuts", simpleBlock())
     );
 
-    // ==================== COBBLESTONE VARIANTS ====================
     public static final List<VariationData> COBBLESTONE;
     static {
         List<VariationData> cobble = new ArrayList<>(ROCK);
@@ -127,11 +121,6 @@ public class VariantTemplates {
         COBBLESTONE = List.copyOf(cobble);
     }
 
-    // ==================== MOSSY COBBLESTONE VARIANTS ====================
-    /**
-     * Creates a mossy model template for a given base block and variant.
-     * Uses overlay system: base cobblestone texture + moss overlay.
-     */
     private static ModelTemplate mossyModel(String base, VariationData variant) {
         if (variant.name().equals("circularct")) {
             return mossyCtm(base, "circular");
@@ -151,7 +140,6 @@ public class VariantTemplates {
         COBBLESTONE_MOSSY = List.copyOf(mossy);
     }
 
-    // ==================== PILLAR VARIANTS ====================
     public static final List<VariationData> PILLAR = List.of(
             new VariationData("plainplain", "Plain-Capped Plain Pillar", columnPillar()),
             new VariationData("plaingreek", "Greek-Capped Plain Pillar", columnPillar()),
@@ -162,7 +150,6 @@ public class VariantTemplates {
             new VariationData("ornamental", "Ornamental Pillar", cubeColumn())
     );
 
-    // ==================== PLANKS VARIANTS ====================
     public static final List<VariationData> PLANKS = List.of(
             new VariationData("large_planks", "Large Planks", simpleBlock()),
             new VariationData("crude_horizontal_planks", "Crude Horizontal Planks", simpleBlock()),
@@ -178,11 +165,9 @@ public class VariantTemplates {
             new VariationData("smooth", "Smooth", simpleBlock()),
             new VariationData("encased_smooth", "Encased Smooth", simpleBlock()),
             new VariationData("braid", "Braid", simpleBlock()),
-            // log_cabin uses -ew and -ns textures, no separate -tb (top uses -ns)
             new VariationData("log_cabin", "Log Cabin", axisFacesNoTop())
     );
 
-    // ==================== COLOR VARIANTS ====================
     public static final List<VariationData> COLORS = Arrays.stream(DyeColor.values())
             .map(color -> new VariationData(color.getSerializedName(), toTitleCase(color.getSerializedName()), simpleBlock()))
             .collect(Collectors.toUnmodifiableList());
@@ -196,27 +181,24 @@ public class VariantTemplates {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    // ==================== WOOL/CARPET VARIANTS ====================
     public static final List<VariationData> WOOL_CARPET = List.of(
             new VariationData("legacy", "Legacy", simpleBlock()),
             new VariationData("llama", "Llama", simpleBlock())
     );
 
-    // ==================== BOOKSHELF VARIANTS ====================
     public static final List<VariationData> BOOKSHELF = List.of(
-            new VariationData("rainbow", "Rainbow", simpleBlock()),
-            new VariationData("novice_necromancer", "Novice Necromancer", simpleBlock()),
-            new VariationData("necromancer", "Necromancer", simpleBlock()),
-            new VariationData("redtomes", "Red Tomes", simpleBlock()),
-            new VariationData("abandoned", "Abandoned", simpleBlock()),
-            new VariationData("hoarder", "Hoarder", simpleBlock()),
-            new VariationData("brim", "Brim", simpleBlock()),
-            new VariationData("historian", "Historian", simpleBlock()),
-            new VariationData("cans", "Cans", simpleBlock()),
-            new VariationData("papers", "Stacks Of Papers", simpleBlock())
+            new VariationData("rainbow", "Rainbow", bookshelf()),
+            new VariationData("novice_necromancer", "Novice Necromancer", bookshelf()),
+            new VariationData("necromancer", "Necromancer", bookshelf()),
+            new VariationData("redtomes", "Red Tomes", bookshelf()),
+            new VariationData("abandoned", "Abandoned", bookshelf()),
+            new VariationData("hoarder", "Hoarder", bookshelf()),
+            new VariationData("brim", "Brim", bookshelf()),
+            new VariationData("historian", "Historian", bookshelf()),
+            new VariationData("cans", "Cans", bookshelf()),
+            new VariationData("papers", "Stacks Of Papers", bookshelf())
     );
 
-    // ==================== SCRIBBLES VARIANTS ====================
     public static final List<VariationData> SCRIBBLES = List.of(
             new VariationData("scribbles_0", "Hieroglyphs 1", cubeColumn("scribbles_0-side", "scribbles_0-top")),
             new VariationData("scribbles_1", "Hieroglyphs 2", cubeColumn("scribbles_1-side", "scribbles_0-top")),
@@ -236,7 +218,6 @@ public class VariantTemplates {
             new VariationData("scribbles_15", "Hieroglyphs 6", cubeColumn("scribbles_15-side", "scribbles_0-top"))
     );
 
-    // ==================== ANTIBLOCK VARIANTS ====================
     public static final List<VariationData> ANTIBLOCK = List.of(
             new VariationData("white", "White", simpleBlock()),
             new VariationData("orange", "Orange", simpleBlock()),
@@ -256,13 +237,11 @@ public class VariantTemplates {
             new VariationData("black", "Black", simpleBlock())
     );
 
-    // ==================== HEX PLATING VARIANTS (uses color tinting) ====================
     public static final List<VariationData> HEX_PLATING = List.of(
             new VariationData("hexbase", "Hex Base", hexPlate("hexbase")),
             new VariationData("hexnew", "Hex New", hexPlate("hexnew"))
     );
 
-    // ==================== LAVASTONE VARIANTS ====================
     public static final List<VariationData> LAVASTONE = List.of(
             new VariationData("cracked", "Cracked", fluidCube("lava")),
             new VariationData("soft_bricks", "Weathered Bricks", fluidCube("lava")),
@@ -298,7 +277,6 @@ public class VariantTemplates {
             new VariationData("cuts", "Cuts", fluidPassCube("lava"))
     );
 
-    // ==================== WATERSTONE VARIANTS ====================
     public static final List<VariationData> WATERSTONE = List.of(
             new VariationData("cracked", "Cracked", fluidCube("water")),
             new VariationData("soft_bricks", "Weathered Bricks", fluidCube("water")),
@@ -334,7 +312,6 @@ public class VariantTemplates {
             new VariationData("cuts", "Cuts", fluidPassCube("water"))
     );
 
-    // Helper method
     private static String toTitleCase(String input) {
         if (input == null || input.isEmpty()) {
             return input;

@@ -4,9 +4,6 @@ import com.leclowndu93150.chisel.block.entity.AutoChiselBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-/**
- * Registration class for Chisel block entities.
- */
 public class ChiselBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AutoChiselBlockEntity>> AUTO_CHISEL =

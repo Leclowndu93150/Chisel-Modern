@@ -61,6 +61,21 @@ public interface IChiselItem {
     boolean supportsMode(Player player, ItemStack chisel, IChiselMode mode);
 
     /**
+     * Gets the current chisel mode for this chisel.
+     */
+    IChiselMode getMode(ItemStack chisel);
+
+    /**
+     * Gets the target item stored in this chisel (for in-world chiseling).
+     */
+    ItemStack getTarget(ItemStack chisel);
+
+    /**
+     * Opens the chisel GUI for the player.
+     */
+    void openGui(Player player, InteractionHand hand, ItemStack chisel);
+
+    /**
      * Gets an override sound for chiseling, or null for default.
      */
     @Nullable

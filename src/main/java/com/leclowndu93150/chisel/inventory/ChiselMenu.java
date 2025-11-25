@@ -1,14 +1,15 @@
 package com.leclowndu93150.chisel.inventory;
 
+import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
+import com.leclowndu93150.chisel.item.ItemChisel;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
@@ -19,8 +20,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Container/Menu for the standard chisel GUI.
- * Based on the original Chisel mod's ChiselContainer.
+ * Container/Menu for the standard chisel GUI..
  */
 public class ChiselMenu extends AbstractContainerMenu {
 
@@ -36,13 +36,15 @@ public class ChiselMenu extends AbstractContainerMenu {
     public static final int PLAYER_INV_TOP = 120;
     public static final int HOTBAR_TOP = 178;
 
-    private final Container inputContainer;
-    private final InventoryChiselSelection selectionInventory;
-    private final Player player;
-    private final InteractionHand hand;
-    private final ItemStack chiselStack;
+    protected final InventoryChiselSelection inventoryChisel;
+    protected final Inventory inventoryPlayer;
+    protected final InteractionHand hand;
+    protected final int chiselSlot;
+    protected final ItemStack chisel;
+    protected SlotChiselInput inputSlot;
 
-    private SlotChiselInput inputSlot;
+    private ClickType currentClickType;
+
     public static Supplier<MenuType<ChiselMenu>> MENU_TYPE_SUPPLIER;
 
     public ChiselMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
@@ -55,22 +57,25 @@ public class ChiselMenu extends AbstractContainerMenu {
 
     protected ChiselMenu(@Nullable MenuType<?> type, int containerId, Inventory playerInv, InteractionHand hand, int selectionSize) {
         super(type, containerId);
-        this.player = playerInv.player;
+        this.inventoryPlayer = playerInv;
         this.hand = hand;
-        this.chiselStack = player.getItemInHand(hand);
-        this.inputContainer = new SimpleContainer(1) {
-            @Override
-            public void setChanged() {
-                super.setChanged();
-                slotsChanged(this);
-            }
-        };
-        this.selectionInventory = new InventoryChiselSelection(selectionSize);
+        this.chiselSlot = hand == InteractionHand.MAIN_HAND ? playerInv.selected : playerInv.getContainerSize() - 1;
+        this.chisel = playerInv.getItem(chiselSlot);
+        this.inventoryChisel = new InventoryChiselSelection(this, selectionSize);
 
         addSelectionSlots(selectionSize);
-        this.inputSlot = new SlotChiselInput(inputContainer, 0, INPUT_X, INPUT_Y, this::onInputChanged);
+        this.inputSlot = new SlotChiselInput(this, inventoryChisel, selectionSize, INPUT_X, INPUT_Y);
         addSlot(inputSlot);
         addPlayerInventory(playerInv);
+
+        if (!chisel.isEmpty() && chisel.getItem() instanceof ItemChisel itemChisel) {
+            ItemStack storedTarget = itemChisel.getTarget(chisel);
+            if (!storedTarget.isEmpty()) {
+                inventoryChisel.setItem(selectionSize, storedTarget.copy());
+            }
+        }
+
+        inventoryChisel.updateItems();
     }
 
     protected void addSelectionSlots(int size) {
@@ -78,7 +83,7 @@ public class ChiselMenu extends AbstractContainerMenu {
         for (int i = 0; i < size; i++) {
             int x = getSelectionLeft() + (i % cols) * 18;
             int y = getSelectionTop() + (i / cols) * 18;
-            addSlot(new SlotChiselSelection(this, selectionInventory, i, x, y, () -> chiselStack));
+            addSlot(new SlotChiselSelection(this, inventoryChisel, i, x, y));
         }
     }
 
@@ -100,95 +105,124 @@ public class ChiselMenu extends AbstractContainerMenu {
     protected int getPlayerInvTop() { return PLAYER_INV_TOP; }
     protected int getHotbarTop() { return HOTBAR_TOP; }
 
-    public void onInputChanged(ItemStack stack) {
-        selectionInventory.clearSelection();
-        if (stack.isEmpty()) return;
+    @Override
+    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+        if (clickTypeIn != ClickType.QUICK_CRAFT && slotId >= 0) {
+            int clickedPlayerSlot = slotId - inventoryChisel.getContainerSize() - 27;
 
-        TagKey<Item> group = CarvingHelper.getCarvingGroupForItem(stack);
-        if (group == null) return;
-
-        List<Item> variations = CarvingHelper.getItemsInGroup(group);
-        int slot = 0;
-        for (Item item : variations) {
-            if (slot >= selectionInventory.getContainerSize() - 1) break;
-            if (item != stack.getItem()) {
-                selectionInventory.setItem(slot, new ItemStack(item));
-                slot++;
+            if (clickedPlayerSlot == chiselSlot || (clickTypeIn == ClickType.SWAP && dragType == chiselSlot)) {
+                return;
             }
         }
-        selectionInventory.setActiveVariations(slot);
+
+        this.currentClickType = clickTypeIn;
+        super.clicked(slotId, dragType, clickTypeIn, player);
+    }
+
+    public ClickType getCurrentClickType() {
+        return currentClickType;
     }
 
     @Override
-    public void slotsChanged(Container container) {
-        super.slotsChanged(container);
-        if (container == inputContainer) {
-            onInputChanged(inputContainer.getItem(0));
-        }
+    public void removed(Player player) {
+        inventoryChisel.clearItems();
+        super.removed(player);
     }
 
     @Override
-    public ItemStack quickMoveStack(Player player, int slotIndex) {
-        ItemStack result = ItemStack.EMPTY;
-        Slot slot = this.slots.get(slotIndex);
+    public boolean stillValid(Player player) {
+        ItemStack held = inventoryPlayer.getItem(chiselSlot);
+        return !held.isEmpty() && held.getItem() instanceof IChiselItem chiselItem &&
+               chiselItem.canOpenGui(player.level(), player, hand);
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int slotIdx) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(slotIdx);
 
         if (slot != null && slot.hasItem()) {
             ItemStack slotStack = slot.getItem();
-            result = slotStack.copy();
+            itemstack = slotStack.copy();
 
-            int selectionEnd = getSelectionSize();
-            int inputSlotIndex = selectionEnd;
+            int selectionSize = getSelectionSize();
+            int inputSlotIndex = selectionSize;
             int playerInvStart = inputSlotIndex + 1;
             int playerInvEnd = playerInvStart + 36;
 
-            if (slotIndex < selectionEnd) {
-                // From selection slot - craft and move to player inventory
-                if (!moveItemStackTo(slotStack, playerInvStart, playerInvEnd, false)) {
-                    return ItemStack.EMPTY;
-                }
-                slot.onTake(player, slotStack);
-            } else if (slotIndex == inputSlotIndex) {
-                // From input slot - move to player inventory
-                if (!moveItemStackTo(slotStack, playerInvStart, playerInvEnd, false)) {
-                    return ItemStack.EMPTY;
-                }
-            } else {
-                // From player inventory - try to move to input slot
+            if (slotIdx > selectionSize) {
                 if (CarvingHelper.canChisel(slotStack)) {
-                    if (!moveItemStackTo(slotStack, inputSlotIndex, inputSlotIndex + 1, false)) {
+                    if (!this.moveItemStackTo(slotStack, inputSlotIndex, inputSlotIndex + 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else {
                     return ItemStack.EMPTY;
                 }
+            } else {
+                if (slotIdx < selectionSize && !slotStack.isEmpty()) {
+                    SlotChiselSelection selectSlot = (SlotChiselSelection) slot;
+                    ItemStack check = SlotChiselSelection.craft(this, player, slotStack, true);
+                    if (check.isEmpty()) {
+                        return ItemStack.EMPTY;
+                    }
+                    if (!this.moveItemStackTo(check, playerInvStart, playerInvEnd, true)) {
+                        return ItemStack.EMPTY;
+                    }
+                    ItemStack result = SlotChiselSelection.craft(this, player, slotStack, false);
+                    if (!result.isEmpty()) {
+                        CarvingHelper.playChiselSound(player.level(), player);
+                    }
+                    inventoryChisel.setStackInSpecialSlot(inventoryChisel.getStackInSpecialSlot());
+                } else if (!this.moveItemStackTo(slotStack, playerInvStart, playerInvEnd, true)) {
+                    return ItemStack.EMPTY;
+                }
             }
 
+            boolean clearSlot = slotIdx >= selectionSize || inventoryChisel.getStackInSpecialSlot().isEmpty();
+
+            slot.onQuickCraft(slotStack, itemstack);
+
             if (slotStack.isEmpty()) {
-                slot.set(ItemStack.EMPTY);
+                if (clearSlot) {
+                    slot.set(ItemStack.EMPTY);
+                }
             } else {
                 slot.setChanged();
             }
-        }
 
-        return result;
-    }
+            inventoryChisel.updateItems();
 
-    @Override
-    public boolean stillValid(Player player) {
-        return player.getItemInHand(hand).getItem() == chiselStack.getItem();
-    }
-
-    @Override
-    public void removed(Player player) {
-        super.removed(player);
-        // Return input items to player
-        if (!player.level().isClientSide) {
-            ItemStack input = inputContainer.removeItemNoUpdate(0);
-            if (!input.isEmpty()) {
-                if (!player.getInventory().add(input)) {
-                    player.drop(input, false);
-                }
+            if (slotStack.getCount() == itemstack.getCount()) {
+                return ItemStack.EMPTY;
             }
+            if (slotIdx >= selectionSize) {
+                slot.onTake(player, slotStack);
+            }
+            if (slotStack.isEmpty()) {
+                if (clearSlot) {
+                    slot.set(ItemStack.EMPTY);
+                }
+                return ItemStack.EMPTY;
+            } else {
+                if (!clearSlot) {
+                    slot.set(itemstack);
+                }
+                return slotStack;
+            }
+        }
+        return itemstack;
+    }
+
+    public void onChiselSlotChanged() {
+        if (chisel.getItem() instanceof ItemChisel itemChisel) {
+            itemChisel.setTarget(chisel, inventoryChisel.getStackInSpecialSlot());
+        }
+    }
+
+    public void onChiselBroken() {
+        if (!inventoryPlayer.player.level().isClientSide) {
+            inventoryPlayer.player.drop(inventoryChisel.getStackInSpecialSlot(), false);
+            inventoryChisel.setStackInSpecialSlot(ItemStack.EMPTY);
         }
     }
 
@@ -196,16 +230,24 @@ public class ChiselMenu extends AbstractContainerMenu {
         return inputSlot;
     }
 
-    public InventoryChiselSelection getSelectionInventory() {
-        return selectionInventory;
+    public InventoryChiselSelection getInventoryChisel() {
+        return inventoryChisel;
+    }
+
+    public Inventory getInventoryPlayer() {
+        return inventoryPlayer;
     }
 
     public int getSelectionSize() {
         return SELECTION_SIZE;
     }
 
-    public ItemStack getChiselStack() {
-        return chiselStack;
+    public ItemStack getChisel() {
+        return chisel;
+    }
+
+    public int getChiselSlot() {
+        return chiselSlot;
     }
 
     public InteractionHand getHand() {

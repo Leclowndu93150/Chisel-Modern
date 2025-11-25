@@ -24,25 +24,25 @@ public class ChiselBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        // Generate blockstates and models for all registered block types
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
+            ChiselModelTemplates.ModelTemplate defaultTemplate = blockType.getDefaultModelTemplate();
             for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
                 Block block = deferredBlock.get();
                 if (block instanceof ICarvable carvable) {
-                    generateBlockStateAndModel(block, carvable.getVariation());
+                    generateBlockStateAndModel(block, carvable.getVariation(), defaultTemplate);
                 }
             }
         }
     }
 
-    private void generateBlockStateAndModel(Block block, VariationData variation) {
+    private void generateBlockStateAndModel(Block block, VariationData variation, ChiselModelTemplates.ModelTemplate defaultTemplate) {
         ChiselModelTemplates.ModelTemplate template = variation.modelTemplate();
 
         if (template != null) {
-            // Use the stored model template function
             template.apply(this, block);
+        } else if (defaultTemplate != null) {
+            defaultTemplate.apply(this, block);
         } else {
-            // Default to simple cube_all if no template specified
             ChiselModelTemplates.simpleBlock().apply(this, block);
         }
     }

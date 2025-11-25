@@ -9,12 +9,10 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class ChiselConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    // General settings
     private static final ModConfigSpec.DoubleValue CONCRETE_VELOCITY_MULT = BUILDER
             .comment("Speed multiplier when walking on concrete blocks")
             .defineInRange("concreteVelocityMult", 1.35, 1.0, 2.0);
 
-    // Chisel tool settings
     private static final ModConfigSpec.BooleanValue ALLOW_CHISEL_DAMAGE = BUILDER
             .comment("Whether chisel tools take damage when used")
             .define("allowChiselDamage", true);
@@ -51,7 +49,6 @@ public class ChiselConfig {
             .comment("Attack damage of the iChisel")
             .defineInRange("hitechChiselAttackDamage", 3, 0, 50);
 
-    // Auto Chisel settings
     private static final ModConfigSpec.BooleanValue AUTO_CHISEL_POWERED = BUILDER
             .comment("Whether the auto chisel accepts Forge Energy (FE)")
             .define("autoChiselPowered", true);
@@ -60,7 +57,6 @@ public class ChiselConfig {
             .comment("Whether the auto chisel requires power to function")
             .define("autoChiselNeedsPower", false);
 
-    // World generation settings
     private static final ModConfigSpec.IntValue MARBLE_AMOUNT = BUILDER
             .comment("Amount of marble veins per chunk (0 to disable)")
             .defineInRange("marbleAmount", 20, 0, 100);
@@ -75,7 +71,6 @@ public class ChiselConfig {
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
-    // Runtime values - populated by config event
     public static double concreteVelocityMult;
     public static boolean allowChiselDamage;
     public static int ironChiselMaxDamage;

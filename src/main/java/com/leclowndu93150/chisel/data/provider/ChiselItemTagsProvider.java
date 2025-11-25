@@ -29,24 +29,19 @@ public class ChiselItemTagsProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        // Generate carving group item tags for each block type
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
-            // Create item tag for carving group
             TagKey<Item> carvingItemTag = ItemTags.create(Chisel.id("carving/" + blockType.getName().replace("/", "_")));
 
             IntrinsicTagAppender<Item> tagBuilder = tag(carvingItemTag);
 
-            // Add all chisel variant items to the carving group
             for (DeferredItem<BlockItem> item : blockType.getAllItems()) {
                 tagBuilder.add(item.get());
             }
 
-            // Add vanilla block items to the carving group
             for (ResourceLocation vanillaId : blockType.getVanillaBlocks()) {
                 tagBuilder.addOptional(vanillaId);
             }
 
-            // Add configured item tags to all variants
             for (TagKey<Item> itemTag : blockType.getItemTags()) {
                 IntrinsicTagAppender<Item> itemTagBuilder = tag(itemTag);
                 for (DeferredItem<BlockItem> item : blockType.getAllItems()) {

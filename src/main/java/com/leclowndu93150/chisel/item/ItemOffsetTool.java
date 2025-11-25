@@ -25,8 +25,4 @@ public class ItemOffsetTool extends Item {
         tooltip.add(Component.translatable("chisel.tooltip.offset_tool.2")
                 .withStyle(ChatFormatting.GRAY));
     }
-
-    // TODO: Implement offset adjustment when CTM support is added
-    // The offset tool should allow players to adjust the CTM offset of placed blocks
-    // by left-clicking to cycle through offsets
 }

@@ -1,5 +1,8 @@
 package com.leclowndu93150.chisel;
 
+import com.leclowndu93150.chisel.api.block.ChiselBlockType;
+import com.leclowndu93150.chisel.block.BlockCarvable;
+import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.carving.ChiselMode;
 import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
 import com.leclowndu93150.chisel.client.gui.ChiselScreen;
@@ -12,7 +15,11 @@ import com.leclowndu93150.chisel.init.ChiselItems;
 import com.leclowndu93150.chisel.init.ChiselMenus;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -25,6 +32,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import org.slf4j.Logger;
 
 @Mod(Chisel.MODID)
@@ -35,7 +43,6 @@ public class Chisel {
     public Chisel(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
 
-        // Register all deferred registers
         ChiselRegistries.BLOCKS.register(modEventBus);
         ChiselRegistries.ITEMS.register(modEventBus);
         ChiselRegistries.CREATIVE_TABS.register(modEventBus);
@@ -53,14 +60,12 @@ public class Chisel {
 
         NeoForge.EVENT_BUS.register(this);
 
-        // Register config
         modContainer.registerConfig(ModConfig.Type.COMMON, ChiselConfig.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Chisel common setup");
 
-        // Register chisel modes
         ChiselMode.registerAll();
     }
 
@@ -73,11 +78,41 @@ public class Chisel {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
-    @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             LOGGER.info("Chisel client setup");
+
+            event.enqueueWork(() -> {
+                registerBlockRenderType(ChiselBlocks.GLASS, RenderType.cutout());
+
+                for (ChiselBlockType<BlockCarvable> stainedType : ChiselBlocks.GLASS_STAINED.values()) {
+                    registerBlockRenderType(stainedType, RenderType.translucent());
+                }
+
+                for (ChiselBlockType<BlockCarvable> dyedType : ChiselBlocks.GLASS_DYED.values()) {
+                    registerBlockRenderType(dyedType, RenderType.translucent());
+                }
+
+                for (ChiselBlockType<BlockCarvablePane> paneType : ChiselBlocks.GLASSPANE_DYED.values()) {
+                    registerBlockRenderType(paneType, RenderType.translucent());
+                }
+
+                registerBlockRenderType(ChiselBlocks.IRONPANE, RenderType.cutout());
+
+                registerBlockRenderType(ChiselBlocks.WATERSTONE, RenderType.cutout());
+                registerBlockRenderType(ChiselBlocks.LAVASTONE, RenderType.cutout());
+
+                ItemBlockRenderTypes.setRenderLayer(ChiselBlocks.AUTO_CHISEL.get(), RenderType.cutout());
+            });
+        }
+
+        private static void registerBlockRenderType(ChiselBlockType<?> blockType, RenderType renderType) {
+            for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
+                Block block = deferredBlock.get();
+                ItemBlockRenderTypes.setRenderLayer(block, renderType);
+            }
         }
 
         @SubscribeEvent

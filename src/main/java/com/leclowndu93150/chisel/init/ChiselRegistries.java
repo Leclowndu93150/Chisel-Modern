@@ -9,9 +9,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/**
- * Central registry holder for all Chisel mod registrations.
- */
+
 public class ChiselRegistries {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Chisel.MODID);
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Chisel.MODID);

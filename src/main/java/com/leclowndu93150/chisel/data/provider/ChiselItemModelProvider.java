@@ -3,6 +3,7 @@ package com.leclowndu93150.chisel.data.provider;
 import com.google.gson.JsonObject;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
+import com.leclowndu93150.chisel.api.block.ICarvable;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselItems;
@@ -11,6 +12,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 
@@ -35,23 +37,31 @@ public class ChiselItemModelProvider implements DataProvider {
     public CompletableFuture<?> run(CachedOutput cache) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
-        // Generate item models for all block items
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             for (var entry : blockType.getBlocks().entrySet()) {
                 String variantName = entry.getKey();
-                DeferredBlock<?> block = entry.getValue();
+                DeferredBlock<?> deferredBlock = entry.getValue();
                 DeferredItem<BlockItem> item = blockType.getItem(variantName);
 
                 if (item != null) {
                     String registryPath = item.getId().getPath();
+                    Block block = deferredBlock.get();
                     JsonObject json;
 
-                    // Pane blocks need flat item models using the side texture
-                    if (block.get() instanceof BlockCarvablePane) {
-                        String texturePath = "chisel:block/" + blockType.getName() + "/" + variantName + "-side";
-                        json = createGeneratedItemModel(texturePath);
+                    String texturePath = blockType.getName() + "/" + variantName;
+                    if (block instanceof ICarvable carvable) {
+                        texturePath = carvable.getBlockType() + "/" + carvable.getVariation().getTextureName();
+                    }
+
+                    if (block instanceof BlockCarvablePane paneBlock) {
+                        if (blockType == ChiselBlocks.IRONPANE) {
+                            String mainTexture = "chisel:block/" + texturePath;
+                            json = createGeneratedItemModel(mainTexture);
+                        } else {
+                            String sideTexture = "chisel:block/" + texturePath + "-side";
+                            json = createGeneratedItemModel(sideTexture);
+                        }
                     } else {
-                        // Regular blocks inherit from block model
                         json = createBlockItemModel("chisel:block/" + registryPath);
                     }
 
@@ -61,7 +71,6 @@ public class ChiselItemModelProvider implements DataProvider {
             }
         }
 
-        // Generate item models for chisel tools
         futures.add(saveToolItemModel(cache, "iron_chisel"));
         futures.add(saveToolItemModel(cache, "diamond_chisel"));
         futures.add(saveToolItemModel(cache, "hitech_chisel"));

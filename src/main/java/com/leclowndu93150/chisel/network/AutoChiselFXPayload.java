@@ -50,7 +50,6 @@ public record AutoChiselFXPayload(BlockPos pos, ItemStack chisel, BlockState sta
         context.enqueueWork(() -> {
             Level level = Minecraft.getInstance().level;
             if (level != null && level.hasChunkAt(pos)) {
-                // Spawn block breaking particles
                 double x = pos.getX() + 0.5;
                 double y = pos.getY() + 1.0;
                 double z = pos.getZ() + 0.5;
@@ -62,7 +61,6 @@ public record AutoChiselFXPayload(BlockPos pos, ItemStack chisel, BlockState sta
                     level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, state), x, y, z, dx, dy, dz);
                 }
 
-                // Play chisel sound
                 level.playLocalSound(pos, SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundSource.BLOCKS, 0.5F, 1.0F, false);
             }
         });

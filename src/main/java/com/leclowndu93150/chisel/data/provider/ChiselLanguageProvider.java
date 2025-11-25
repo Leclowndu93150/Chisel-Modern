@@ -13,9 +13,6 @@ import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-/**
- * Data provider for generating language files (en_us.json).
- */
 public class ChiselLanguageProvider extends LanguageProvider {
 
     public ChiselLanguageProvider(PackOutput output) {
@@ -24,10 +21,8 @@ public class ChiselLanguageProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        // Creative tab
         add("itemGroup.chisel", "Chisel");
 
-        // Generate translations for all blocks
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             String groupName = blockType.getGroupName();
 
@@ -41,43 +36,53 @@ public class ChiselLanguageProvider extends LanguageProvider {
             }
         }
 
-        // Chisel tools
         add(ChiselItems.IRON_CHISEL.get(), "Chisel");
         add(ChiselItems.DIAMOND_CHISEL.get(), "Diamond Chisel");
         add(ChiselItems.HITECH_CHISEL.get(), "iChisel");
         add(ChiselItems.OFFSET_TOOL.get(), "Ender Offset Wand");
 
-        // Chisel item tooltips (used in ItemChisel.java)
+        add("jei.chisel.chiseling", "Chiseling");
+
         add("chisel.tooltip.gui", "Right-click to open GUI");
-        add("chisel.tooltip.leftclick.1", "Left-click to chisel blocks in the world");
-        add("chisel.tooltip.leftclick.2", "Target a block by leaving it in the inventory");
-        add("chisel.tooltip.modes", "Has multiple chiseling modes");
+        add("chisel.tooltip.leftclick.1", "Left-click blocks to cycle variants forward");
+        add("chisel.tooltip.leftclick.2", "Shift + Left-click to cycle backwards");
+        add("chisel.tooltip.target", "Set a target in the GUI to chisel to a specific variant");
+        add("chisel.tooltip.modes", "Shift + Right-click to change mode");
         add("chisel.tooltip.selectedmode", "Selected mode: %s");
 
-        // Offset tool tooltips (used in ItemOffsetTool.java)
         add("chisel.tooltip.offset_tool.1", "Right-click a block to cycle texture offset");
         add("chisel.tooltip.offset_tool.2", "Sneak + Right-click to reset offset");
 
-        // Container/GUI titles (used in ItemChisel.java)
         add("container.chisel", "Chisel");
         add("container.chisel.hitech", "iChisel");
 
-        // Hitech GUI buttons (used in HitechChiselScreen.java)
         add("chisel.button.preview", "Preview");
         add("chisel.button.chisel", "Chisel");
+        add("chisel.button.chisel_all", "Chisel All");
 
-        // Mode change message (used in ItemChisel.java)
+        add("chisel.preview", "Preview");
+        add("chisel.preview.panel", "Panel");
+        add("chisel.preview.hollow", "Hollow");
+        add("chisel.preview.plus", "Plus");
+        add("chisel.preview.single", "Single");
+
         add("chisel.message.mode_changed", "Mode changed to: %s");
 
-        // Chisel modes (used via IChiselMode.getUnlocName() -> "chisel.mode.<name>")
         add("chisel.mode.single", "Single");
+        add("chisel.mode.single.desc", "Chisel a single block.");
         add("chisel.mode.panel", "Panel");
+        add("chisel.mode.panel.desc", "Chisel a 3x3 square of blocks.");
         add("chisel.mode.column", "Column");
+        add("chisel.mode.column.desc", "Chisel a 3x1 column of blocks.");
         add("chisel.mode.row", "Row");
+        add("chisel.mode.row.desc", "Chisel a 1x3 row of blocks.");
         add("chisel.mode.contiguous", "Contiguous");
+        add("chisel.mode.contiguous.desc", "Chisel an area of alike blocks, extending 10 blocks in any direction.");
         add("chisel.mode.contiguous_2d", "Contiguous (2D)");
+        add("chisel.mode.contiguous_2d.desc", "Chisel an area of alike blocks, extending 10 blocks along the plane of the current side.");
 
-        // Auto Chisel power tooltips (used in AutoChiselScreen.java)
+        add(ChiselBlocks.AUTO_CHISEL.get(), "Auto Chisel");
+
         add("chisel.tooltip.power.stored", "%s/%s FE");
         add("chisel.tooltip.power.pertick", "%s FE/t");
     }

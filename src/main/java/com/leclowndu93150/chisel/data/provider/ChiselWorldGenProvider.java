@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Data provider for worldgen features (marble, limestone, diabase ore generation).
- */
 public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
 
     // Configured Features (what to generate)
@@ -55,17 +52,14 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
 
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             .add(Registries.CONFIGURED_FEATURE, context -> {
-                // Rule test: replace base stone (stone, deepslate, etc.)
                 RuleTest stoneOreReplaceables = new TagMatchTest(net.minecraft.tags.BlockTags.BASE_STONE_OVERWORLD);
 
-                // Marble ore - size 64 like granite/diorite/andesite
                 if (ChiselBlocks.MARBLE.getBlock("raw") != null) {
                     context.register(ORE_MARBLE, new ConfiguredFeature<>(Feature.ORE,
                             new OreConfiguration(stoneOreReplaceables,
                                     ChiselBlocks.MARBLE.getBlock("raw").get().defaultBlockState(), 64)));
                 }
 
-                // Limestone ore - size 64 like granite/diorite/andesite
                 if (ChiselBlocks.LIMESTONE.getBlock("raw") != null) {
                     context.register(ORE_LIMESTONE, new ConfiguredFeature<>(Feature.ORE,
                             new OreConfiguration(stoneOreReplaceables,
@@ -75,28 +69,24 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
             .add(Registries.PLACED_FEATURE, context -> {
                 var configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 
-                // Marble upper (Y 64-128, rarity 6)
                 if (ChiselBlocks.MARBLE.getBlock("raw") != null) {
                     context.register(ORE_MARBLE_UPPER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_MARBLE),
                             commonOrePlacement(6, HeightRangePlacement.uniform(
                                     VerticalAnchor.absolute(64), VerticalAnchor.absolute(128)))));
 
-                    // Marble lower (Y 0-60, count 2)
                     context.register(ORE_MARBLE_LOWER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_MARBLE),
                             commonOrePlacement(2, HeightRangePlacement.uniform(
                                     VerticalAnchor.absolute(0), VerticalAnchor.absolute(60)))));
                 }
 
-                // Limestone upper (Y 64-128, rarity 6)
                 if (ChiselBlocks.LIMESTONE.getBlock("raw") != null) {
                     context.register(ORE_LIMESTONE_UPPER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_LIMESTONE),
                             commonOrePlacement(6, HeightRangePlacement.uniform(
                                     VerticalAnchor.absolute(64), VerticalAnchor.absolute(128)))));
 
-                    // Limestone lower (Y 0-60, count 2)
                     context.register(ORE_LIMESTONE_LOWER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_LIMESTONE),
                             commonOrePlacement(2, HeightRangePlacement.uniform(
@@ -108,7 +98,6 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                 var placedFeatures = context.lookup(Registries.PLACED_FEATURE);
                 var overworldTag = biomes.getOrThrow(BiomeTags.IS_OVERWORLD);
 
-                // Add marble to overworld biomes
                 if (ChiselBlocks.MARBLE.getBlock("raw") != null) {
                     context.register(ADD_MARBLE, new BiomeModifiers.AddFeaturesBiomeModifier(
                             overworldTag,
@@ -119,7 +108,6 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                             GenerationStep.Decoration.UNDERGROUND_ORES));
                 }
 
-                // Add limestone to overworld biomes
                 if (ChiselBlocks.LIMESTONE.getBlock("raw") != null) {
                     context.register(ADD_LIMESTONE, new BiomeModifiers.AddFeaturesBiomeModifier(
                             overworldTag,
@@ -135,9 +123,6 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
         super(output, registries, BUILDER, Set.of(Chisel.MODID));
     }
 
-    /**
-     * Helper for common ore placement modifiers.
-     */
     private static List<PlacementModifier> commonOrePlacement(int count, PlacementModifier heightRange) {
         return List.of(
                 CountPlacement.of(count),
@@ -147,9 +132,6 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
         );
     }
 
-    /**
-     * Helper for rare ore placement modifiers.
-     */
     private static List<PlacementModifier> rareOrePlacement(int chance, PlacementModifier heightRange) {
         return List.of(
                 RarityFilter.onAverageOnceEvery(chance),

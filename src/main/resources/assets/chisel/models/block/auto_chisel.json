@@ -1,11 +1,12 @@
 {
   "parent": "block/block",
+  "render_type": "minecraft:translucent",
   "textures": {
     "frame": "chisel:block/autochisel/autochisel_frame",
     "side":  "chisel:block/autochisel/autochisel_side" ,
     "end":   "chisel:block/autochisel/autochisel_top"  ,
     "glass": "block/glass",
-	"particle": "chisel:block/autochisel/autochisel_side"
+    "particle": "chisel:block/autochisel/autochisel_side"
   },
   "elements": [
     {

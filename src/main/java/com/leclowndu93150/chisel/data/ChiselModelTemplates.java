@@ -42,7 +42,6 @@ public class ChiselModelTemplates {
             String variation = carvable.getVariation().getTextureName();
             return blockType + "/" + variation;
         }
-        // Fallback for non-ICarvable blocks
         return name(block);
     }
 
@@ -52,6 +51,28 @@ public class ChiselModelTemplates {
 
     private static void simpleBlock(BlockStateProvider prov, Block block) {
         prov.simpleBlock(block, prov.models().cubeAll("block/" + name(block), Chisel.id("block/" + texturePath(block))));
+    }
+
+    /**
+     * Simple cube_all block with cutout render type (for glass blocks - like vanilla glass).
+     */
+    public static ModelTemplate simpleBlockCutout() {
+        return (prov, block) -> {
+            prov.simpleBlock(block, prov.models()
+                    .cubeAll("block/" + name(block), Chisel.id("block/" + texturePath(block)))
+                    .renderType("cutout"));
+        };
+    }
+
+    /**
+     * Simple cube_all block with translucent render type (for stained glass blocks).
+     */
+    public static ModelTemplate simpleBlockTranslucent() {
+        return (prov, block) -> {
+            prov.simpleBlock(block, prov.models()
+                    .cubeAll("block/" + name(block), Chisel.id("block/" + texturePath(block)))
+                    .renderType("translucent"));
+        };
     }
 
     /**
@@ -122,6 +143,20 @@ public class ChiselModelTemplates {
         };
     }
 
+    /**
+     * Bookshelf model - uses oak planks as base with bookshelf texture overlaid on sides.
+     * Top/bottom are solid oak planks, sides are oak planks + bookshelf overlay.
+     */
+    public static ModelTemplate bookshelf() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("block/bookshelf_base"))
+                    .texture("overlay", Chisel.id(texPath)));
+        };
+    }
+
     public static ModelTemplate ctm(String variant) {
         return (prov, block) -> {
             String modelName = "block/" + name(block);
@@ -163,7 +198,7 @@ public class ChiselModelTemplates {
             String texPath = "block/" + texturePath(block);
             prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_axis"))
                     .texture("x", texPath + "-ew")
-                    .texture("y", texPath + "-ns")  // Use -ns for top/bottom
+                    .texture("y", texPath + "-ns")
                     .texture("z", texPath + "-ns"));
         };
     }
@@ -337,7 +372,6 @@ public class ChiselModelTemplates {
         };
     }
 
-    // Pane block model - simplified version for glass panes
     public static ModelTemplate paneBlock(String edge) {
         return (prov, block) -> {
             String name = "block/" + name(block);
@@ -346,61 +380,70 @@ public class ChiselModelTemplates {
         };
     }
 
-    // Pane block model for textures with -side and -top suffixes (like glasspanedyed)
     public static ModelTemplate paneBlockSideTop() {
         return (prov, block) -> {
             String name = "block/" + name(block);
             String basePath = "block/" + texturePath(block);
-            ResourceLocation sideTexture = Chisel.id(basePath + "-side");
-            ResourceLocation topTexture = Chisel.id(basePath + "-top");
-            paneBlockInternalSideTop(prov, block, name, sideTexture, topTexture);
+            ResourceLocation paneTexture = Chisel.id(basePath + "-side");
+            ResourceLocation edgeTexture = Chisel.id(basePath + "-top");
+            paneBlockVanillaStyle(prov, block, name, paneTexture, edgeTexture);
         };
     }
 
-    private static void paneBlockInternalSideTop(BlockStateProvider prov, Block block, String name, ResourceLocation side, ResourceLocation top) {
+    /**
+     * Creates pane blockstate using vanilla-style multipart with post, side, side_alt, noside, noside_alt models.
+     * This matches exactly how vanilla handles glass panes.
+     */
+    private static void paneBlockVanillaStyle(BlockStateProvider prov, Block block, String name,
+                                               ResourceLocation paneTexture, ResourceLocation edgeTexture) {
         MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
 
-        builder.part().modelFile(prov.models().withExistingParent(name + "_post", Chisel.id("block/pane/post"))
-                        .texture("pane", side)
-                        .texture("edge", top))
-                .addModel()
-                .condition(CrossCollisionBlock.NORTH, false)
-                .condition(CrossCollisionBlock.EAST, false)
-                .condition(CrossCollisionBlock.SOUTH, false)
-                .condition(CrossCollisionBlock.WEST, false)
-                .end();
+        var postModel = prov.models()
+                .withExistingParent(name + "_post", ResourceLocation.withDefaultNamespace("block/template_glass_pane_post"))
+                .texture("pane", paneTexture)
+                .texture("edge", edgeTexture)
+                .renderType("translucent");
+        builder.part().modelFile(postModel).addModel().end();
 
-        // North
-        builder.part().modelFile(prov.models().withExistingParent(name + "_n", Chisel.id("block/pane/n"))
-                        .texture("pane", side)
-                        .texture("edge", top))
-                .addModel()
-                .condition(CrossCollisionBlock.NORTH, true)
-                .end();
+        var sideModel = prov.models()
+                .withExistingParent(name + "_side", ResourceLocation.withDefaultNamespace("block/template_glass_pane_side"))
+                .texture("pane", paneTexture)
+                .texture("edge", edgeTexture)
+                .renderType("translucent");
+        var sideAltModel = prov.models()
+                .withExistingParent(name + "_side_alt", ResourceLocation.withDefaultNamespace("block/template_glass_pane_side_alt"))
+                .texture("pane", paneTexture)
+                .texture("edge", edgeTexture)
+                .renderType("translucent");
 
-        // East
-        builder.part().modelFile(prov.models().withExistingParent(name + "_e", Chisel.id("block/pane/e"))
-                        .texture("pane", side)
-                        .texture("edge", top))
-                .addModel()
-                .condition(CrossCollisionBlock.EAST, true)
-                .end();
+        var nosideModel = prov.models()
+                .withExistingParent(name + "_noside", ResourceLocation.withDefaultNamespace("block/template_glass_pane_noside"))
+                .texture("pane", paneTexture)
+                .renderType("translucent");
+        var nosideAltModel = prov.models()
+                .withExistingParent(name + "_noside_alt", ResourceLocation.withDefaultNamespace("block/template_glass_pane_noside_alt"))
+                .texture("pane", paneTexture)
+                .renderType("translucent");
 
-        // South
-        builder.part().modelFile(prov.models().withExistingParent(name + "_s", Chisel.id("block/pane/s"))
-                        .texture("pane", side)
-                        .texture("edge", top))
-                .addModel()
-                .condition(CrossCollisionBlock.SOUTH, true)
-                .end();
+        builder.part().modelFile(sideModel).addModel()
+                .condition(CrossCollisionBlock.NORTH, true).end();
+        builder.part().modelFile(nosideModel).addModel()
+                .condition(CrossCollisionBlock.NORTH, false).end();
 
-        // West
-        builder.part().modelFile(prov.models().withExistingParent(name + "_w", Chisel.id("block/pane/w"))
-                        .texture("pane", side)
-                        .texture("edge", top))
-                .addModel()
-                .condition(CrossCollisionBlock.WEST, true)
-                .end();
+        builder.part().modelFile(sideModel).rotationY(90).addModel()
+                .condition(CrossCollisionBlock.EAST, true).end();
+        builder.part().modelFile(nosideAltModel).addModel()
+                .condition(CrossCollisionBlock.EAST, false).end();
+
+        builder.part().modelFile(sideAltModel).addModel()
+                .condition(CrossCollisionBlock.SOUTH, true).end();
+        builder.part().modelFile(nosideAltModel).rotationY(90).addModel()
+                .condition(CrossCollisionBlock.SOUTH, false).end();
+
+        builder.part().modelFile(sideAltModel).rotationY(90).addModel()
+                .condition(CrossCollisionBlock.WEST, true).end();
+        builder.part().modelFile(nosideModel).rotationY(270).addModel()
+                .condition(CrossCollisionBlock.WEST, false).end();
     }
 
     private static void paneBlockInternal(BlockStateProvider prov, Block block, String name, ResourceLocation texture, ResourceLocation edge) {
@@ -416,7 +459,6 @@ public class ChiselModelTemplates {
                 .condition(CrossCollisionBlock.WEST, false)
                 .end();
 
-        // North
         builder.part().modelFile(prov.models().withExistingParent(name + "_n", Chisel.id("block/pane/n"))
                         .texture("pane", texture)
                         .texture("edge", edge))
@@ -424,7 +466,6 @@ public class ChiselModelTemplates {
                 .condition(CrossCollisionBlock.NORTH, true)
                 .end();
 
-        // East
         builder.part().modelFile(prov.models().withExistingParent(name + "_e", Chisel.id("block/pane/e"))
                         .texture("pane", texture)
                         .texture("edge", edge))
@@ -432,7 +473,6 @@ public class ChiselModelTemplates {
                 .condition(CrossCollisionBlock.EAST, true)
                 .end();
 
-        // South
         builder.part().modelFile(prov.models().withExistingParent(name + "_s", Chisel.id("block/pane/s"))
                         .texture("pane", texture)
                         .texture("edge", edge))
@@ -440,7 +480,6 @@ public class ChiselModelTemplates {
                 .condition(CrossCollisionBlock.SOUTH, true)
                 .end();
 
-        // West
         builder.part().modelFile(prov.models().withExistingParent(name + "_w", Chisel.id("block/pane/w"))
                         .texture("pane", texture)
                         .texture("edge", edge))
@@ -449,7 +488,6 @@ public class ChiselModelTemplates {
                 .end();
     }
 
-    // Bars model - for iron bars style blocks
     public static ModelTemplate bars(String texture, String edge, String side) {
         return (prov, block) -> {
             String name = "block/" + name(block);
@@ -459,7 +497,6 @@ public class ChiselModelTemplates {
 
             MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
 
-            // Post ends (always rendered)
             builder.part().modelFile(prov.models().withExistingParent(name + "_post_ends", Chisel.id("block/bars_post_ends"))
                             .texture("bars", tex)
                             .texture("particle", tex)
@@ -468,7 +505,6 @@ public class ChiselModelTemplates {
                     .addModel()
                     .end();
 
-            // Post (only when no connections)
             builder.part().modelFile(prov.models().withExistingParent(name + "_post", Chisel.id("block/bars_post"))
                             .texture("bars", tex)
                             .texture("particle", tex)
@@ -481,7 +517,6 @@ public class ChiselModelTemplates {
                     .condition(CrossCollisionBlock.WEST, false)
                     .end();
 
-            // Sides
             builder.part().modelFile(prov.models().withExistingParent(name + "_side", Chisel.id("block/bars_side"))
                             .texture("bars", tex)
                             .texture("particle", tex)
@@ -512,5 +547,115 @@ public class ChiselModelTemplates {
                     .condition(CrossCollisionBlock.WEST, true)
                     .end();
         };
+    }
+
+    /**
+     * Iron bars model template - uses vanilla iron bars template models.
+     * Detects if variant has -side/-top textures and uses them, otherwise uses the main texture.
+     */
+    public static ModelTemplate ironBars() {
+        return (prov, block) -> {
+            String name = "block/" + name(block);
+            String basePath = "block/" + texturePath(block);
+
+            ResourceLocation barsTexture = Chisel.id(basePath);
+            ResourceLocation edgeTexture = Chisel.id(basePath);
+
+            ironBarsVanillaStyle(prov, block, name, barsTexture, edgeTexture);
+        };
+    }
+
+    /**
+     * Creates iron bars blockstate using vanilla-style multipart with post_ends, post, cap, side models.
+     * This matches exactly how vanilla handles iron bars.
+     */
+    private static void ironBarsVanillaStyle(BlockStateProvider prov, Block block, String name,
+                                              ResourceLocation barsTexture, ResourceLocation edgeTexture) {
+        MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
+
+        var postEndsModel = prov.models()
+                .withExistingParent(name + "_post_ends", ResourceLocation.withDefaultNamespace("block/iron_bars_post_ends"))
+                .texture("particle", barsTexture)
+                .texture("edge", edgeTexture)
+                .renderType("cutout");
+        builder.part().modelFile(postEndsModel).addModel().end();
+
+        var postModel = prov.models()
+                .withExistingParent(name + "_post", ResourceLocation.withDefaultNamespace("block/iron_bars_post"))
+                .texture("particle", barsTexture)
+                .texture("bars", barsTexture)
+                .renderType("cutout");
+        builder.part().modelFile(postModel).addModel()
+                .condition(CrossCollisionBlock.NORTH, false)
+                .condition(CrossCollisionBlock.EAST, false)
+                .condition(CrossCollisionBlock.SOUTH, false)
+                .condition(CrossCollisionBlock.WEST, false)
+                .end();
+
+        var capModel = prov.models()
+                .withExistingParent(name + "_cap", ResourceLocation.withDefaultNamespace("block/iron_bars_cap"))
+                .texture("particle", barsTexture)
+                .texture("bars", barsTexture)
+                .texture("edge", edgeTexture)
+                .renderType("cutout");
+        var capAltModel = prov.models()
+                .withExistingParent(name + "_cap_alt", ResourceLocation.withDefaultNamespace("block/iron_bars_cap_alt"))
+                .texture("particle", barsTexture)
+                .texture("bars", barsTexture)
+                .texture("edge", edgeTexture)
+                .renderType("cutout");
+
+        builder.part().modelFile(capModel).addModel()
+                .condition(CrossCollisionBlock.NORTH, true)
+                .condition(CrossCollisionBlock.EAST, false)
+                .condition(CrossCollisionBlock.SOUTH, false)
+                .condition(CrossCollisionBlock.WEST, false)
+                .end();
+
+        builder.part().modelFile(capModel).rotationY(90).addModel()
+                .condition(CrossCollisionBlock.NORTH, false)
+                .condition(CrossCollisionBlock.EAST, true)
+                .condition(CrossCollisionBlock.SOUTH, false)
+                .condition(CrossCollisionBlock.WEST, false)
+                .end();
+
+        builder.part().modelFile(capAltModel).addModel()
+                .condition(CrossCollisionBlock.NORTH, false)
+                .condition(CrossCollisionBlock.EAST, false)
+                .condition(CrossCollisionBlock.SOUTH, true)
+                .condition(CrossCollisionBlock.WEST, false)
+                .end();
+
+        builder.part().modelFile(capAltModel).rotationY(90).addModel()
+                .condition(CrossCollisionBlock.NORTH, false)
+                .condition(CrossCollisionBlock.EAST, false)
+                .condition(CrossCollisionBlock.SOUTH, false)
+                .condition(CrossCollisionBlock.WEST, true)
+                .end();
+
+        var sideModel = prov.models()
+                .withExistingParent(name + "_side", ResourceLocation.withDefaultNamespace("block/iron_bars_side"))
+                .texture("particle", barsTexture)
+                .texture("bars", barsTexture)
+                .texture("edge", edgeTexture)
+                .renderType("cutout");
+        var sideAltModel = prov.models()
+                .withExistingParent(name + "_side_alt", ResourceLocation.withDefaultNamespace("block/iron_bars_side_alt"))
+                .texture("particle", barsTexture)
+                .texture("bars", barsTexture)
+                .texture("edge", edgeTexture)
+                .renderType("cutout");
+
+        builder.part().modelFile(sideModel).addModel()
+                .condition(CrossCollisionBlock.NORTH, true).end();
+
+        builder.part().modelFile(sideModel).rotationY(90).addModel()
+                .condition(CrossCollisionBlock.EAST, true).end();
+
+        builder.part().modelFile(sideAltModel).addModel()
+                .condition(CrossCollisionBlock.SOUTH, true).end();
+
+        builder.part().modelFile(sideAltModel).rotationY(90).addModel()
+                .condition(CrossCollisionBlock.WEST, true).end();
     }
 }

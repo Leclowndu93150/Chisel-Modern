@@ -145,12 +145,14 @@ public class ItemChisel extends Item implements IChiselItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (!level.isClientSide && canOpenGui(level, player, hand)) {
-            if (player.isShiftKeyDown() && type.hasModes()) {
+        if (player.isCrouching() && type.hasModes()) {
+            if (!level.isClientSide) {
                 cycleMode(stack, player, true);
-                return InteractionResultHolder.success(stack);
             }
+            return InteractionResultHolder.success(stack);
+        }
 
+        if (!level.isClientSide && canOpenGui(level, player, hand)) {
             if (player instanceof ServerPlayer serverPlayer) {
                 ChiselGuiType guiType = getGuiType(level, player, hand);
                 if (guiType == ChiselGuiType.HITECH) {
@@ -277,6 +279,16 @@ public class ItemChisel extends Item implements IChiselItem {
         stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withRotate(rotate));
     }
 
+    public ItemStack getTarget(ItemStack stack) {
+        ChiselData data = stack.get(ChiselDataComponents.CHISEL_DATA.get());
+        return data != null ? data.target() : ItemStack.EMPTY;
+    }
+
+    public void setTarget(ItemStack stack, ItemStack target) {
+        ChiselData data = stack.getOrDefault(ChiselDataComponents.CHISEL_DATA.get(), ChiselData.DEFAULT);
+        stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withTarget(target));
+    }
+
     public void cycleMode(ItemStack stack, Player player, boolean forward) {
         IChiselMode current = getMode(stack);
         IChiselMode next;
@@ -305,5 +317,37 @@ public class ItemChisel extends Item implements IChiselItem {
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return slotChanged || !ItemStack.isSameItem(oldStack, newStack);
+    }
+
+    @Override
+    public void openGui(Player player, InteractionHand hand, ItemStack chisel) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            ChiselGuiType guiType = getGuiType(player.level(), player, hand);
+            if (guiType == ChiselGuiType.HITECH) {
+                serverPlayer.openMenu(new MenuProvider() {
+                    @Override
+                    public Component getDisplayName() {
+                        return Component.translatable("container.chisel.hitech");
+                    }
+
+                    @Override
+                    public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player p) {
+                        return new HitechChiselMenu(containerId, playerInv, hand);
+                    }
+                }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
+            } else {
+                serverPlayer.openMenu(new MenuProvider() {
+                    @Override
+                    public Component getDisplayName() {
+                        return Component.translatable("container.chisel");
+                    }
+
+                    @Override
+                    public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player p) {
+                        return new ChiselMenu(containerId, playerInv, hand);
+                    }
+                }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
+            }
+        }
     }
 }

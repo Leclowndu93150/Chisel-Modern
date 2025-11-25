@@ -52,7 +52,7 @@ public record ChiselButtonPayload(int[] slotIds) implements CustomPacketPayload 
             return;
         }
 
-        ItemStack chisel = menu.getChiselStack();
+        ItemStack chisel = menu.getChisel();
         ItemStack target = menu.getTargetItem();
 
         if (!(chisel.getItem() instanceof IChiselItem)) {

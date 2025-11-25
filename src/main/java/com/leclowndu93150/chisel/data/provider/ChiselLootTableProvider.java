@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Data provider for generating loot table JSON files.
- */
 public class ChiselLootTableProvider extends LootTableProvider {
 
     public ChiselLootTableProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -34,17 +31,12 @@ public class ChiselLootTableProvider extends LootTableProvider {
 
         @Override
         protected void generate() {
-            // Generate drop self loot tables for all chisel blocks
             for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
                 for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
                     Block block = deferredBlock.get();
-                    // Default behavior: drop the block itself
                     dropSelf(block);
                 }
             }
-
-            // Special loot tables can be added here
-            // For example, glowstone drops with fortune/silk touch, ice drops nothing without silk touch, etc.
         }
 
         @Override
