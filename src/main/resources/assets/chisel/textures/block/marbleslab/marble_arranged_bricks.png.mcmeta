@@ -1,0 +1,9 @@
+{
+    "ctm": {
+        "ctm_version": 1,
+        "type": "ctm",
+        "textures": [
+            "chisel:block/marbleslab/marble_arranged_bricks-ctm"
+        ]
+    }
+}

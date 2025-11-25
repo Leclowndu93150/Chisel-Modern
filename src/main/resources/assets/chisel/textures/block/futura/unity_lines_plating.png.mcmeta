@@ -1,0 +1,14 @@
+{
+  "ctm": {
+    "ctm_version": 1,
+    "type": "sctm",
+    "layer": "CUTOUT",
+    "extra": {
+      "connect_to": [
+        { "block": "chisel:futura/controller"},
+        { "block": "chisel:futura/controller_purple"},
+        { "block": "appliedenergistics2:controller" }
+      ]
+    }
+  }
+}
