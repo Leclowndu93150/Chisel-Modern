@@ -1,4 +1,4 @@
-package com.leclowndu93150.chisel.network;
+package com.leclowndu93150.chisel.network.server;
 
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;

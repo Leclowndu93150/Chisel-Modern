@@ -1,15 +1,10 @@
 package com.leclowndu93150.chisel.network;
 
 import com.leclowndu93150.chisel.Chisel;
-import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
-import com.leclowndu93150.chisel.api.chunkdata.OffsetData;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.world.level.ChunkPos;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Payload for syncing chunk offset data to clients.
@@ -38,34 +33,5 @@ public record ChunkDataPayload(int chunkX, int chunkZ, CompoundTag data) impleme
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
-    }
-
-    public void handle(IPayloadContext context) {
-        context.enqueueWork(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.level != null) {
-                ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-
-                if (data.isEmpty()) {
-                    ChunkData.removeData(mc.level, chunkPos);
-                } else {
-                    OffsetData offsetData = new OffsetData();
-                    offsetData.readFromNBT(data);
-                    ChunkData.setData(mc.level, chunkPos, offsetData);
-                }
-
-                // Force chunk section rebuilds - mark this chunk and all neighbors dirty
-                int minSection = mc.level.getMinSection();
-                int maxSection = mc.level.getMaxSection();
-
-                for (int dx = -1; dx <= 1; dx++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        for (int sectionY = minSection; sectionY <= maxSection; sectionY++) {
-                            mc.levelRenderer.setSectionDirty(chunkX + dx, sectionY, chunkZ + dz);
-                        }
-                    }
-                }
-            }
-        });
     }
 }

@@ -5,7 +5,7 @@ import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import com.leclowndu93150.chisel.carving.ChiselModeRegistry;
 import com.leclowndu93150.chisel.inventory.ChiselMenu;
 import com.leclowndu93150.chisel.item.ItemChisel;
-import com.leclowndu93150.chisel.network.ChiselModePayload;
+import com.leclowndu93150.chisel.network.server.ChiselModePayload;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;

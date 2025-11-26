@@ -1,14 +1,18 @@
-package com.leclowndu93150.chisel.network;
+package com.leclowndu93150.chisel.network.server;
 
 import com.leclowndu93150.chisel.Chisel;
+import com.leclowndu93150.chisel.network.AutoChiselFXPayload;
+import com.leclowndu93150.chisel.network.ChunkDataPayload;
+import com.leclowndu93150.chisel.network.client.ClientPayloadHandler;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 /**
- * Handles registration of all network payloads for the Chisel mod.
+ * Handles registration of all network payloads.
  */
 @EventBusSubscriber(modid = Chisel.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ChiselNetwork {
@@ -38,13 +42,26 @@ public class ChiselNetwork {
         registrar.playToClient(
                 AutoChiselFXPayload.TYPE,
                 AutoChiselFXPayload.STREAM_CODEC,
-                AutoChiselFXPayload::handle
+                FMLEnvironment.dist.isClient() ? ClientHandlers.autoChiselFX() : (p, c) -> {}
         );
 
         registrar.playToClient(
                 ChunkDataPayload.TYPE,
                 ChunkDataPayload.STREAM_CODEC,
-                ChunkDataPayload::handle
+                FMLEnvironment.dist.isClient() ? ClientHandlers.chunkData() : (p, c) -> {}
         );
+    }
+
+    /**
+     * Holder class to defer loading of ClientPayloadHandler until needed.
+     */
+    private static class ClientHandlers {
+        static IPayloadHandler<AutoChiselFXPayload> autoChiselFX() {
+            return ClientPayloadHandler::handleAutoChiselFX;
+        }
+
+        static IPayloadHandler<ChunkDataPayload> chunkData() {
+            return ClientPayloadHandler::handleChunkData;
+        }
     }
 }
