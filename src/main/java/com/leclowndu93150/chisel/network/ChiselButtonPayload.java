@@ -11,6 +11,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -68,8 +69,15 @@ public record ChiselButtonPayload(int[] slotIds) implements CustomPacketPayload 
             return;
         }
 
-        for (int slotIndex : slots) {
-            ItemStack stack = player.getInventory().getItem(slotIndex);
+        boolean chiseledAny = false;
+        for (int menuSlotIndex : slots) {
+            if (menuSlotIndex < 0 || menuSlotIndex >= menu.slots.size()) {
+                continue;
+            }
+
+            Slot slot = menu.getSlot(menuSlotIndex);
+            ItemStack stack = slot.getItem();
+
             if (!stack.isEmpty()) {
                 TagKey<Item> stackGroup = CarvingHelper.getCarvingGroupForItem(stack);
                 if (stackGroup == null || !stackGroup.equals(targetGroup)) {
@@ -77,7 +85,8 @@ public record ChiselButtonPayload(int[] slotIds) implements CustomPacketPayload 
                 }
 
                 ItemStack result = new ItemStack(target.getItem(), stack.getCount());
-                player.getInventory().setItem(slotIndex, result);
+                slot.set(result);
+                chiseledAny = true;
 
                 if (chisel.isDamageableItem()) {
                     chisel.setDamageValue(chisel.getDamageValue() + 1);
@@ -86,6 +95,10 @@ public record ChiselButtonPayload(int[] slotIds) implements CustomPacketPayload 
                     }
                 }
             }
+        }
+
+        if (chiseledAny) {
+            CarvingHelper.playChiselSound(player.level(), player);
         }
     }
 }

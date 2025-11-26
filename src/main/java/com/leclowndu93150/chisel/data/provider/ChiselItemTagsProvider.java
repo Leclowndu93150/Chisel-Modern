@@ -8,6 +8,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -40,6 +41,11 @@ public class ChiselItemTagsProvider extends ItemTagsProvider {
 
             for (ResourceLocation vanillaId : blockType.getVanillaBlocks()) {
                 tagBuilder.addOptional(vanillaId);
+            }
+
+            for (TagKey<Block> sourceBlockTag : blockType.getSourceBlockTags()) {
+                TagKey<Item> sourceItemTag = TagKey.create(Registries.ITEM, sourceBlockTag.location());
+                tagBuilder.addOptionalTag(sourceItemTag);
             }
 
             for (TagKey<Item> itemTag : blockType.getItemTags()) {
