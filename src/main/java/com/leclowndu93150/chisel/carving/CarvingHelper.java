@@ -3,8 +3,10 @@ package com.leclowndu93150.chisel.carving;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.ChiselSound;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
+import com.leclowndu93150.chisel.compat.kubejs.KubeJSCompat;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -44,9 +46,18 @@ public class CarvingHelper {
                 .toList()) {
             TagKey<Block> tag = BlockTags.create(tagId);
             if (state.is(tag)) {
-                return tag;
+                Boolean include = KubeJSCompat.shouldIncludeBlock(tag, block);
+                if (include == null || include) {
+                    return tag;
+                }
             }
         }
+
+        TagKey<Block> kubeGroup = KubeJSCompat.getGroupForBlock(block);
+        if (kubeGroup != null) {
+            return kubeGroup;
+        }
+
         return null;
     }
 
@@ -63,31 +74,82 @@ public class CarvingHelper {
                 .toList()) {
             TagKey<Item> tag = ItemTags.create(tagId);
             if (stack.is(tag)) {
-                return tag;
+                Block block = Block.byItem(item);
+                TagKey<Block> blockTag = BlockTags.create(tagId);
+                Boolean include = KubeJSCompat.shouldIncludeBlock(blockTag, block);
+                if (include == null || include) {
+                    return tag;
+                }
             }
         }
+
+        Block block = Block.byItem(item);
+        if (block != null) {
+            TagKey<Block> kubeGroup = KubeJSCompat.getGroupForBlock(block);
+            if (kubeGroup != null) {
+                return TagKey.create(Registries.ITEM, kubeGroup.location());
+            }
+        }
+
         return null;
     }
 
     /**
      * Gets all blocks in a carving group.
+     * Includes KubeJS modifications if KubeJS is loaded.
      */
     public static List<Block> getBlocksInGroup(TagKey<Block> groupTag) {
         List<Block> blocks = new ArrayList<>();
+
         BuiltInRegistries.BLOCK.getTag(groupTag).ifPresent(tag -> {
-            tag.forEach(holder -> blocks.add(holder.value()));
+            tag.forEach(holder -> {
+                Block block = holder.value();
+                Boolean include = KubeJSCompat.shouldIncludeBlock(groupTag, block);
+                if (include == null || include) {
+                    blocks.add(block);
+                }
+            });
         });
+
+        for (ResourceLocation blockId : KubeJSCompat.getAdditionalBlocks(groupTag)) {
+            Block block = BuiltInRegistries.BLOCK.get(blockId);
+            if (block != null && !blocks.contains(block)) {
+                blocks.add(block);
+            }
+        }
+
         return blocks;
     }
 
     /**
      * Gets all items in a carving group.
+     * Includes KubeJS modifications if KubeJS is loaded.
      */
     public static List<Item> getItemsInGroup(TagKey<Item> groupTag) {
+        TagKey<Block> blockTag = TagKey.create(Registries.BLOCK, groupTag.location());
+
         List<Item> items = new ArrayList<>();
         BuiltInRegistries.ITEM.getTag(groupTag).ifPresent(tag -> {
-            tag.forEach(holder -> items.add(holder.value()));
+            tag.forEach(holder -> {
+                Item item = holder.value();
+                Block block = Block.byItem(item);
+                Boolean include = KubeJSCompat.shouldIncludeBlock(blockTag, block);
+                if (include == null || include) {
+                    items.add(item);
+                }
+            });
         });
+
+        for (ResourceLocation blockId : KubeJSCompat.getAdditionalBlocks(blockTag)) {
+            Block block = BuiltInRegistries.BLOCK.get(blockId);
+            if (block != null) {
+                Item item = block.asItem();
+                if (item != Items.AIR && !items.contains(item)) {
+                    items.add(item);
+                }
+            }
+        }
+
         return items;
     }
 
@@ -192,7 +254,6 @@ public class CarvingHelper {
      */
     @Nullable
     public static ChiselSound getChiselSoundForBlock(Block block) {
-        // Find the ChiselBlockType that contains this block
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             for (var deferredBlock : blockType.getAllBlocks()) {
                 if (deferredBlock.get() == block) {

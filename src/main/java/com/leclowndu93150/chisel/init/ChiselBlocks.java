@@ -550,8 +550,8 @@ public class ChiselBlocks {
 
     public static final ChiselBlockType<BlockCarvable> ICE = registerType(
             new ChiselBlockType<BlockCarvable>("ice")
-                    .addVanillaBlock(Blocks.ICE)
-                    .properties(() -> Blocks.ICE)
+                    .addVanillaBlock(Blocks.PACKED_ICE)
+                    .properties(() -> Blocks.PACKED_ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.ICE)
                     .variations(VariantTemplates.ROCK)
