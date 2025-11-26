@@ -1,37 +1,29 @@
 package com.leclowndu93150.chisel.compat.kubejs;
 
-import com.leclowndu93150.chisel.Chisel;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-/**
- * Handles KubeJS events for Chisel integration.
- * Fires the modifyGroups event during tag reload and processes the results.
- */
-@EventBusSubscriber(modid = Chisel.MODID)
 public class KubeJSEventHandler {
 
-    private static final boolean KUBEJS_LOADED = ModList.get().isLoaded("kubejs");
+    private static boolean registered = false;
     private static ModifyCarvingGroupsEvent lastEvent = null;
 
-    /**
-     * Called when tags are updated (server start, /reload, etc.)
-     */
-    @SubscribeEvent
-    public static void onTagsUpdated(TagsUpdatedEvent event) {
-        if (!KUBEJS_LOADED) return;
+    public static void register() {
+        if (registered) return;
+        registered = true;
+        NeoForge.EVENT_BUS.addListener(KubeJSEventHandler::onTagsUpdated);
+    }
 
+    private static void onTagsUpdated(TagsUpdatedEvent event) {
         if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) {
             fireModifyGroupsEvent();
         }

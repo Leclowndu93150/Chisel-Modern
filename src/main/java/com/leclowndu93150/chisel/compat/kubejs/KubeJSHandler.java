@@ -15,6 +15,10 @@ import java.util.Set;
  */
 public class KubeJSHandler {
 
+    public KubeJSHandler() {
+        KubeJSEventHandler.register();
+    }
+
     @Nullable
     public Boolean shouldIncludeBlock(TagKey<Block> groupTag, Block block) {
         return KubeJSEventHandler.shouldIncludeBlock(groupTag, block);
