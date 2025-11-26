@@ -1,8 +1,12 @@
 package com.leclowndu93150.chisel.carving;
 
 import com.leclowndu93150.chisel.Chisel;
+import com.leclowndu93150.chisel.api.ChiselSound;
+import com.leclowndu93150.chisel.api.block.ChiselBlockType;
+import com.leclowndu93150.chisel.init.ChiselBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -11,6 +15,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,7 +38,6 @@ public class CarvingHelper {
         Block block = state.getBlock();
         ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
 
-        // Check all carving tags to find which group this block belongs to
         for (ResourceLocation tagId : BuiltInRegistries.BLOCK.getTagNames()
                 .filter(tag -> tag.location().getNamespace().equals(Chisel.MODID) && tag.location().getPath().startsWith("carving/"))
                 .map(TagKey::location)
@@ -53,7 +57,6 @@ public class CarvingHelper {
     public static TagKey<Item> getCarvingGroupForItem(ItemStack stack) {
         Item item = stack.getItem();
 
-        // Check all carving tags to find which group this item belongs to
         for (ResourceLocation tagId : BuiltInRegistries.ITEM.getTagNames()
                 .filter(tag -> tag.location().getNamespace().equals(Chisel.MODID) && tag.location().getPath().startsWith("carving/"))
                 .map(TagKey::location)
@@ -156,11 +159,49 @@ public class CarvingHelper {
     }
 
     /**
-     * Plays the chisel sound effect.
+     * Plays the chisel sound effect with default fallback sound.
      */
     public static void playChiselSound(Level level, Player player) {
-        level.playSound(player, player.blockPosition(), SoundEvents.UI_STONECUTTER_TAKE_RESULT,
-                SoundSource.BLOCKS, 1.0F, 1.0F);
+        playChiselSound(level, player, ChiselSound.FALLBACK);
+    }
+
+    /**
+     * Plays the chisel sound effect for a specific block.
+     * Looks up the block type to determine which sound to play.
+     */
+    public static void playChiselSound(Level level, Player player, Block block) {
+        ChiselSound sound = getChiselSoundForBlock(block);
+        playChiselSound(level, player, sound);
+    }
+
+    /**
+     * Plays a specific chisel sound.
+     */
+    public static void playChiselSound(Level level, Player player, ChiselSound chiselSound) {
+        if (chiselSound == null) {
+            chiselSound = ChiselSound.FALLBACK;
+        }
+        float randomValue = level.random.nextFloat();
+        level.playSound(player, player.blockPosition(), chiselSound.getSound(),
+                SoundSource.PLAYERS, chiselSound.getVolume(randomValue), chiselSound.getPitch(randomValue));
+    }
+
+    /**
+     * Gets the appropriate chiseling sound for a block.
+     * Looks up the ChiselBlockType to find the configured sound.
+     */
+    @Nullable
+    public static ChiselSound getChiselSoundForBlock(Block block) {
+        // Find the ChiselBlockType that contains this block
+        for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
+            for (var deferredBlock : blockType.getAllBlocks()) {
+                if (deferredBlock.get() == block) {
+                    ChiselSound sound = blockType.getChiselSound();
+                    return sound != null ? sound : ChiselSound.FALLBACK;
+                }
+            }
+        }
+        return ChiselSound.FALLBACK;
     }
 
     /**
@@ -183,7 +224,7 @@ public class CarvingHelper {
     @Nullable
     public static TagKey<Item> getCarvingGroupForBlock(Block block) {
         Item item = block.asItem();
-        if (item == net.minecraft.world.item.Items.AIR) {
+        if (item == Items.AIR) {
             return null;
         }
         return getCarvingGroupForItem(new ItemStack(item));

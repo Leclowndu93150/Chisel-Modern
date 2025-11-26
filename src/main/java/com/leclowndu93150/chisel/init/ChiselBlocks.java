@@ -1,10 +1,12 @@
 package com.leclowndu93150.chisel.init;
 
+import com.leclowndu93150.chisel.api.ChiselSound;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockAutoChisel;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
+import com.leclowndu93150.chisel.client.sound.ChiselSoundTypes;
 import com.leclowndu93150.chisel.data.VariantTemplates;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -611,6 +613,7 @@ public class ChiselBlocks {
             new ChiselBlockType<BlockCarvable>("factory")
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_BROWN)
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_STONE_TOOL)
                     .variation("dots", "Dotted Rusty Plate")
@@ -641,6 +644,7 @@ public class ChiselBlocks {
             new ChiselBlockType<BlockCarvable>("futura")
                     .properties(() -> Blocks.STONE)
                     .mapColor(MapColor.COLOR_YELLOW)
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .variation("screen_metallic", "Gray Screen", twoLayerTopShaded("screen_metallic", "screen_discoherent"))
                     .variation("screen_cyan", "Cyan Screen", twoLayerTopShaded("screen_cyan", "screen_discoherent"))
@@ -655,6 +659,7 @@ public class ChiselBlocks {
             new ChiselBlockType<BlockCarvable>("laboratory")
                     .properties(() -> Blocks.STONE)
                     .mapColor(MapColor.SNOW)
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .variation("wallpanel", "Wall Panel")
                     .variation("dottedpanel", "Dotted Panel")
@@ -677,6 +682,7 @@ public class ChiselBlocks {
             new ChiselBlockType<BlockCarvable>("technical")
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_STONE_TOOL)
                     .variation("scaffold", "Rusty Scaffold")
@@ -718,6 +724,7 @@ public class ChiselBlocks {
             new ChiselBlockType<BlockCarvable>("tyrian")
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_CYAN)
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_STONE_TOOL)
                     .variation("shining", "Disordered Metal Bits")
@@ -841,6 +848,7 @@ public class ChiselBlocks {
                     .properties(BlockBehaviour.Properties.of()
                             .strength(0.5f, 0.0f)
                             .sound(SoundType.GRAVEL))
+                    .chiselSound(ChiselSound.DIRT)
                     .tag(BlockTags.MINEABLE_WITH_SHOVEL)
                     .variation("bricks", "Bricks")
                     .variation("netherbricks", "Nether Bricks")
@@ -989,6 +997,7 @@ public class ChiselBlocks {
                     .properties(BlockBehaviour.Properties.of()
                             .strength(1.5f, 0.0f)
                             .sound(SoundType.GRASS))
+                    .chiselSound(ChiselSound.WOOD)
                     .variation("box", "Box")
                     .variation("throughmiddle", "Horizontally Striked")
                     .variation("cross", "Crossed")
@@ -1172,6 +1181,7 @@ public class ChiselBlocks {
                     .groupName(toEnglishName(woodName) + " Planks")
                     .addVanillaBlock(getPlanksBlock(woodName))
                     .properties(() -> getPlanksBlock(woodName))
+                    .chiselSound(ChiselSound.WOOD)
                     .tag(BlockTags.PLANKS)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .variations(VariantTemplates.PLANKS)
@@ -1357,6 +1367,7 @@ public class ChiselBlocks {
             ChiselBlockType<BlockCarvable> builder = new ChiselBlockType<BlockCarvable>("bookshelf/" + woodName)
                     .groupName(toEnglishName(woodName) + " Bookshelf")
                     .properties(() -> getBookshelfBlock(woodName))
+                    .chiselSound(ChiselSound.WOOD)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .variations(VariantTemplates.bookshelfForWood(woodName));
 

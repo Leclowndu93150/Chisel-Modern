@@ -1,6 +1,7 @@
 package com.leclowndu93150.chisel.api.block;
 
 import com.leclowndu93150.chisel.Chisel;
+import com.leclowndu93150.chisel.api.ChiselSound;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.data.ChiselModelTemplates;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
@@ -10,6 +11,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -42,6 +44,10 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     private TagKey<Block> carvingGroupTag;
     @Nullable
     private MapColor mapColor;
+    @Nullable
+    private Supplier<SoundType> soundTypeSupplier;
+    @Nullable
+    private ChiselSound chiselSound;
     @Nullable
     private ChiselModelTemplates.ModelTemplate defaultModelTemplate;
 
@@ -146,6 +152,25 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     }
 
     /**
+     * Set a custom sound type for all variants (walk, break, place sounds).
+     * Uses a Supplier to defer resolution until registry is complete.
+     */
+    public ChiselBlockType<T> sound(Supplier<SoundType> soundTypeSupplier) {
+        this.soundTypeSupplier = soundTypeSupplier;
+        return this;
+    }
+
+    /**
+     * Set the chiseling sound for this block type.
+     * This is the sound played when using the chisel tool on these blocks.
+     * @param chiselSound The sound category to use (WOOD, DIRT, FALLBACK, etc.)
+     */
+    public ChiselBlockType<T> chiselSound(ChiselSound chiselSound) {
+        this.chiselSound = chiselSound;
+        return this;
+    }
+
+    /**
      * Add a single variation.
      */
     public ChiselBlockType<T> variation(VariationData variation) {
@@ -221,6 +246,10 @@ public class ChiselBlockType<T extends Block & ICarvable> {
                 props = props.mapColor(mapColor);
             }
 
+            if (soundTypeSupplier != null) {
+                props = props.sound(soundTypeSupplier.get());
+            }
+
             final VariationData finalVariation = variation;
             final BlockBehaviour.Properties finalProps = props;
 
@@ -268,6 +297,15 @@ public class ChiselBlockType<T extends Block & ICarvable> {
             return carvingGroupTag;
         }
         return net.minecraft.tags.BlockTags.create(Chisel.id("carving/" + name.replace("/", "_")));
+    }
+
+    /**
+     * Gets the chiseling sound for this block type.
+     * @return The ChiselSound to use, or null if not set (defaults to FALLBACK)
+     */
+    @Nullable
+    public ChiselSound getChiselSound() {
+        return chiselSound;
     }
 
     public Map<String, DeferredBlock<T>> getBlocks() {

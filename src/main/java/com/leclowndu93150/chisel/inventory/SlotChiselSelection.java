@@ -100,7 +100,12 @@ public class SlotChiselSelection extends Slot {
         ItemStack result = craft(container, player, stack, false);
 
         if (!result.isEmpty()) {
-            CarvingHelper.playChiselSound(player.level(), player);
+            // Play sound based on the block being crafted
+            Block targetBlock = Blocks.AIR;
+            if (stack.getItem() instanceof BlockItem blockItem) {
+                targetBlock = blockItem.getBlock();
+            }
+            CarvingHelper.playChiselSound(player.level(), player, targetBlock);
 
             ClickType clickType = container.getCurrentClickType();
             if (clickType != null) {

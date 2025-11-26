@@ -146,7 +146,7 @@ public class ChiselController {
             }
 
             if (level.isClientSide) {
-                CarvingHelper.playChiselSound(level, player);
+                CarvingHelper.playChiselSound(level, player, targetBlock);
                 level.levelEvent(player, LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(origState));
             }
 

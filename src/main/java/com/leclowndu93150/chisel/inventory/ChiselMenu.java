@@ -12,8 +12,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -170,7 +173,12 @@ public class ChiselMenu extends AbstractContainerMenu {
                     }
                     ItemStack result = SlotChiselSelection.craft(this, player, slotStack, false);
                     if (!result.isEmpty()) {
-                        CarvingHelper.playChiselSound(player.level(), player);
+                        // Play sound based on the block being crafted
+                        Block targetBlock = Blocks.AIR;
+                        if (slotStack.getItem() instanceof BlockItem blockItem) {
+                            targetBlock = blockItem.getBlock();
+                        }
+                        CarvingHelper.playChiselSound(player.level(), player, targetBlock);
                     }
                     inventoryChisel.setStackInSpecialSlot(inventoryChisel.getStackInSpecialSlot());
                 } else if (!this.moveItemStackTo(slotStack, playerInvStart, playerInvEnd, true)) {

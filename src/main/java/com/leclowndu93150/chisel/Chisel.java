@@ -15,6 +15,7 @@ import com.leclowndu93150.chisel.init.ChiselDataComponents;
 import com.leclowndu93150.chisel.init.ChiselItems;
 import com.leclowndu93150.chisel.init.ChiselMenus;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
+import com.leclowndu93150.chisel.init.ChiselSounds;
 import com.mojang.logging.LogUtils;
 import net.neoforged.fml.ModList;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -50,6 +51,7 @@ public class Chisel {
         ChiselRegistries.SOUND_EVENTS.register(modEventBus);
         ChiselRegistries.DATA_COMPONENT_TYPES.register(modEventBus);
 
+        ChiselSounds.init();
         ChiselBlocks.init();
         ChiselItems.init();
         ChiselMenus.init();
