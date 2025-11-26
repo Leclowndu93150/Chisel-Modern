@@ -32,6 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.core.BlockPos;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
@@ -306,11 +307,16 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
 
         BakedModel model = blockRenderer.getBlockModel(state);
 
+        PreviewBlockGetter blockGetter = new PreviewBlockGetter(state, previewMode.getPositions());
+
         for (int[] pos : previewMode.getPositions()) {
             poseStack.pushPose();
             poseStack.translate(pos[0], pos[1], pos[2]);
 
-            for (RenderType renderType : model.getRenderTypes(state, minecraft.level.random, ModelData.EMPTY)) {
+            BlockPos blockPos = new BlockPos(pos[0], pos[1], pos[2]);
+            ModelData modelData = model.getModelData(blockGetter, blockPos, state, ModelData.EMPTY);
+
+            for (RenderType renderType : model.getRenderTypes(state, minecraft.level.random, modelData)) {
                 blockRenderer.getModelRenderer().renderModel(
                         poseStack.last(),
                         bufferSource.getBuffer(renderType),
@@ -319,7 +325,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
                         1.0F, 1.0F, 1.0F,
                         LightTexture.FULL_BRIGHT,
                         OverlayTexture.NO_OVERLAY,
-                        ModelData.EMPTY,
+                        modelData,
                         renderType
                 );
             }
