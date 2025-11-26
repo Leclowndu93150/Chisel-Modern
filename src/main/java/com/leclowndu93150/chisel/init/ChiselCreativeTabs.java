@@ -11,7 +11,6 @@ public class ChiselCreativeTabs {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CHISEL_TAB =
             ChiselRegistries.CREATIVE_TABS.register("chisel_tab", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.chisel"))
-                    .withTabsBefore(CreativeModeTabs.BUILDING_BLOCKS)
                     .icon(() -> ChiselItems.IRON_CHISEL.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ChiselItems.IRON_CHISEL.get());

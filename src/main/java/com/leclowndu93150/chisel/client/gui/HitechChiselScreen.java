@@ -58,8 +58,8 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     private static final int HIGHLIGHT_TARGET_U = 36;
     private static final int HIGHLIGHT_V = 220;
 
-    private float rotX = 165.0F;
-    private float rotY = 0.0F;
+    private float rotX = 25.0F;
+    private float rotY = -45.0F;
     private float zoom = 1.0F;
     private float initRotX, initRotY, initZoom;
     private float prevRotX, prevRotY;
@@ -288,7 +288,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
             if (Math.abs(momentumY) < 0.05) momentumY = 0;
         }
 
-        rotX = Math.max(90, Math.min(270, rotX));
+        rotX = Math.max(-90, Math.min(90, rotX));
 
         PoseStack poseStack = graphics.pose();
         poseStack.pushPose();
@@ -417,8 +417,8 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (panelClicked) {
             if (clickButton == 0) {
-                rotX = Math.max(90, Math.min(270, initRotX + ((float) mouseY - clickY)));
-                rotY = initRotY - ((float) mouseX - clickX);
+                rotX = Math.max(-90, Math.min(90, initRotX - ((float) mouseY - clickY)));
+                rotY = initRotY + ((float) mouseX - clickX);
             } else if (clickButton == 1) {
                 zoom = Math.max(0.5f, initZoom + (clickY - (float) mouseY) * 0.01f);
             }

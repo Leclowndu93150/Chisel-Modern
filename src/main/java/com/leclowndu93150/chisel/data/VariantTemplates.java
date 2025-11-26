@@ -199,6 +199,24 @@ public class VariantTemplates {
             new VariationData("papers", "Stacks Of Papers", bookshelf())
     );
 
+    /**
+     * Generate bookshelf variants for a specific wood type.
+     */
+    public static List<VariationData> bookshelfForWood(String woodType) {
+        return List.of(
+                new VariationData("rainbow", "Rainbow", bookshelf(woodType)),
+                new VariationData("novice_necromancer", "Novice Necromancer", bookshelf(woodType)),
+                new VariationData("necromancer", "Necromancer", bookshelf(woodType)),
+                new VariationData("redtomes", "Red Tomes", bookshelf(woodType)),
+                new VariationData("abandoned", "Abandoned", bookshelf(woodType)),
+                new VariationData("hoarder", "Hoarder", bookshelf(woodType)),
+                new VariationData("brim", "Brim", bookshelf(woodType)),
+                new VariationData("historian", "Historian", bookshelf(woodType)),
+                new VariationData("cans", "Cans", bookshelf(woodType)),
+                new VariationData("papers", "Stacks Of Papers", bookshelf(woodType))
+        );
+    }
+
     public static final List<VariationData> SCRIBBLES = List.of(
             new VariationData("scribbles_0", "Hieroglyphs 1", cubeColumn("scribbles_0-side", "scribbles_0-top")),
             new VariationData("scribbles_1", "Hieroglyphs 2", cubeColumn("scribbles_1-side", "scribbles_0-top")),

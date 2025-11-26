@@ -5,7 +5,9 @@ import com.leclowndu93150.chisel.block.BlockAutoChisel;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.data.VariantTemplates;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -23,9 +25,18 @@ public class ChiselBlocks {
 
     public static final List<ChiselBlockType<?>> ALL_BLOCK_TYPES = new ArrayList<>();
 
+    /**
+     * Creates a common tag for storage blocks (c:storage_blocks/metalname).
+     * This allows modded metal blocks to be automatically included in chisel groups.
+     */
+    private static TagKey<Block> storageBlockTag(String metalName) {
+        return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/" + metalName));
+    }
+
     public static final ChiselBlockType<BlockCarvable> ALUMINUM = registerType(
             new ChiselBlockType<BlockCarvable>("metals/aluminum")
                     .groupName("Aluminum Block")
+                    .addBlocksFromTag(storageBlockTag("aluminum"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.COLOR_LIGHT_GRAY)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -38,6 +49,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> BRONZE = registerType(
             new ChiselBlockType<BlockCarvable>("metals/bronze")
                     .groupName("Bronze Block")
+                    .addBlocksFromTag(storageBlockTag("bronze"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_ORANGE)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -50,6 +62,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> COBALT = registerType(
             new ChiselBlockType<BlockCarvable>("metals/cobalt")
                     .groupName("Cobalt Block")
+                    .addBlocksFromTag(storageBlockTag("cobalt"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_CYAN)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -62,7 +75,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> COPPER = registerType(
             new ChiselBlockType<BlockCarvable>("metals/copper")
                     .groupName("Copper Block")
-                    .addVanillaBlock(Blocks.COPPER_BLOCK)
+                    .addBlocksFromTag(storageBlockTag("copper"))
                     .properties(() -> Blocks.COPPER_BLOCK)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -74,6 +87,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> ELECTRUM = registerType(
             new ChiselBlockType<BlockCarvable>("metals/electrum")
                     .groupName("Electrum Block")
+                    .addBlocksFromTag(storageBlockTag("electrum"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_YELLOW)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -86,7 +100,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> GOLD = registerType(
             new ChiselBlockType<BlockCarvable>("gold")
                     .groupName("Gold Block")
-                    .addVanillaBlock(Blocks.GOLD_BLOCK)
+                    .addBlocksFromTag(storageBlockTag("gold"))
                     .properties(() -> Blocks.GOLD_BLOCK)
                     .mapColor(MapColor.GOLD)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -103,6 +117,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> INVAR = registerType(
             new ChiselBlockType<BlockCarvable>("metals/invar")
                     .groupName("Invar Block")
+                    .addBlocksFromTag(storageBlockTag("invar"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -114,7 +129,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> IRON = registerType(
             new ChiselBlockType<BlockCarvable>("iron")
                     .groupName("Iron Block")
-                    .addVanillaBlock(Blocks.IRON_BLOCK)
+                    .addBlocksFromTag(storageBlockTag("iron"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -129,6 +144,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> LEAD = registerType(
             new ChiselBlockType<BlockCarvable>("metals/lead")
                     .groupName("Lead Block")
+                    .addBlocksFromTag(storageBlockTag("lead"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_LIGHT_BLUE)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -141,6 +157,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> NICKEL = registerType(
             new ChiselBlockType<BlockCarvable>("metals/nickel")
                     .groupName("Nickel Block")
+                    .addBlocksFromTag(storageBlockTag("nickel"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_LIGHT_BLUE)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -153,6 +170,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> PLATINUM = registerType(
             new ChiselBlockType<BlockCarvable>("metals/platinum")
                     .groupName("Platinum Block")
+                    .addBlocksFromTag(storageBlockTag("platinum"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_LIGHT_BLUE)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -165,6 +183,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> SILVER = registerType(
             new ChiselBlockType<BlockCarvable>("metals/silver")
                     .groupName("Silver Block")
+                    .addBlocksFromTag(storageBlockTag("silver"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.COLOR_LIGHT_GRAY)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -177,6 +196,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> STEEL = registerType(
             new ChiselBlockType<BlockCarvable>("metals/steel")
                     .groupName("Steel Block")
+                    .addBlocksFromTag(storageBlockTag("steel"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.COLOR_GRAY)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -189,6 +209,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> TIN = registerType(
             new ChiselBlockType<BlockCarvable>("metals/tin")
                     .groupName("Tin Block")
+                    .addBlocksFromTag(storageBlockTag("tin"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.COLOR_LIGHT_BLUE)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -201,6 +222,7 @@ public class ChiselBlocks {
     public static final ChiselBlockType<BlockCarvable> URANIUM = registerType(
             new ChiselBlockType<BlockCarvable>("metals/uranium")
                     .groupName("Uranium Block")
+                    .addBlocksFromTag(storageBlockTag("uranium"))
                     .properties(() -> Blocks.IRON_BLOCK)
                     .mapColor(MapColor.TERRACOTTA_GREEN)
                     .tag(BlockTags.BEACON_BASE_BLOCKS)
@@ -1137,6 +1159,10 @@ public class ChiselBlocks {
             "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "crimson"
     );
 
+    private static final List<String> BOOKSHELF_WOOD_TYPES = List.of(
+            "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"
+    );
+
     public static final Map<String, ChiselBlockType<BlockCarvable>> PLANKS = createWoodBlocks("planks",
             woodName -> new ChiselBlockType<BlockCarvable>("planks/" + woodName)
                     .groupName(toEnglishName(woodName) + " Planks")
@@ -1148,15 +1174,7 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> BOOKSHELF = registerType(
-            new ChiselBlockType<BlockCarvable>("bookshelf")
-                    .groupName("Bookshelf")
-                    .addVanillaBlock(Blocks.BOOKSHELF)
-                    .properties(() -> Blocks.BOOKSHELF)
-                    .tag(BlockTags.MINEABLE_WITH_AXE)
-                    .variations(VariantTemplates.BOOKSHELF)
-                    .build()
-    );
+    public static final Map<String, ChiselBlockType<BlockCarvable>> BOOKSHELVES = createBookshelfBlocks();
 
     public static final ChiselBlockType<BlockCarvablePane> IRONPANE = registerType(
             new ChiselBlockType<BlockCarvablePane>("ironpane",
@@ -1303,9 +1321,51 @@ public class ChiselBlocks {
             case "jungle" -> Blocks.JUNGLE_PLANKS;
             case "acacia" -> Blocks.ACACIA_PLANKS;
             case "dark_oak" -> Blocks.DARK_OAK_PLANKS;
+            case "mangrove" -> Blocks.MANGROVE_PLANKS;
+            case "cherry" -> Blocks.CHERRY_PLANKS;
+            case "bamboo" -> Blocks.BAMBOO_PLANKS;
             case "crimson" -> Blocks.CRIMSON_PLANKS;
+            case "warped" -> Blocks.WARPED_PLANKS;
             default -> Blocks.OAK_PLANKS;
         };
+    }
+
+    private static Block getBookshelfBlock(String woodName) {
+        return switch (woodName) {
+            case "oak" -> Blocks.BOOKSHELF;
+            case "spruce" -> Blocks.BOOKSHELF;
+            case "birch" -> Blocks.BOOKSHELF;
+            case "jungle" -> Blocks.BOOKSHELF;
+            case "acacia" -> Blocks.BOOKSHELF;
+            case "dark_oak" -> Blocks.BOOKSHELF;
+            case "mangrove" -> Blocks.BOOKSHELF;
+            case "cherry" -> Blocks.BOOKSHELF;
+            case "bamboo" -> Blocks.BOOKSHELF;
+            case "crimson" -> Blocks.BOOKSHELF;
+            case "warped" -> Blocks.BOOKSHELF;
+            default -> Blocks.BOOKSHELF;
+        };
+    }
+
+    private static Map<String, ChiselBlockType<BlockCarvable>> createBookshelfBlocks() {
+        Map<String, ChiselBlockType<BlockCarvable>> map = new LinkedHashMap<>();
+        for (String woodName : BOOKSHELF_WOOD_TYPES) {
+            ChiselBlockType<BlockCarvable> builder = new ChiselBlockType<BlockCarvable>("bookshelf/" + woodName)
+                    .groupName(toEnglishName(woodName) + " Bookshelf")
+                    .properties(() -> getBookshelfBlock(woodName))
+                    .tag(BlockTags.MINEABLE_WITH_AXE)
+                    .variations(VariantTemplates.bookshelfForWood(woodName));
+
+            // Oak bookshelf includes vanilla bookshelf
+            if (woodName.equals("oak")) {
+                builder.addVanillaBlock(Blocks.BOOKSHELF);
+            }
+
+            ChiselBlockType<BlockCarvable> type = builder.build();
+            map.put(woodName, type);
+            ALL_BLOCK_TYPES.add(type);
+        }
+        return map;
     }
 
     private static String toEnglishName(String name) {

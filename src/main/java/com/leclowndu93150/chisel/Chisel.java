@@ -31,6 +31,8 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.slf4j.Logger;
@@ -58,21 +60,13 @@ public class Chisel {
         ChiselDataComponents.init();
         ChiselBlockEntities.init();
 
-        NeoForge.EVENT_BUS.register(this);
-
         modContainer.registerConfig(ModConfig.Type.COMMON, ChiselConfig.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        LOGGER.info("Chisel common setup");
-
         ChiselMode.registerAll();
     }
 
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        LOGGER.info("Chisel server starting");
-    }
 
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
@@ -82,7 +76,6 @@ public class Chisel {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            LOGGER.info("Chisel client setup");
 
             event.enqueueWork(() -> {
                 registerBlockRenderType(ChiselBlocks.GLASS, RenderType.cutout());

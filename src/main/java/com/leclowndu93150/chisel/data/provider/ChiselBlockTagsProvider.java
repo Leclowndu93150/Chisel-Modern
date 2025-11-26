@@ -38,6 +38,12 @@ public class ChiselBlockTagsProvider extends BlockTagsProvider {
                 tagBuilder.addOptional(vanillaId);
             }
 
+            // Add blocks from source tags (e.g., c:storage_blocks/iron)
+            // This allows modded blocks to automatically be included in carving groups
+            for (TagKey<Block> sourceTag : blockType.getSourceBlockTags()) {
+                tagBuilder.addOptionalTag(sourceTag);
+            }
+
             for (TagKey<Block> blockTag : blockType.getBlockTags()) {
                 IntrinsicTagAppender<Block> miningTagBuilder = tag(blockTag);
                 for (DeferredBlock<?> block : blockType.getAllBlocks()) {

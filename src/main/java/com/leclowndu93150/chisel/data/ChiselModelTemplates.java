@@ -157,6 +157,21 @@ public class ChiselModelTemplates {
         };
     }
 
+    /**
+     * Bookshelf model for a specific wood type - uses that wood's planks as base with bookshelf texture overlaid on sides.
+     * All wood types share the same overlay textures from bookshelf/.
+     */
+    public static ModelTemplate bookshelf(String woodType) {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            // Get the variant name (e.g., "rainbow") and use shared bookshelf textures
+            String variantName = getVariantName(block);
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("block/bookshelf_base_" + woodType))
+                    .texture("overlay", Chisel.id("block/bookshelf/" + variantName)));
+        };
+    }
+
     public static ModelTemplate ctm(String variant) {
         return (prov, block) -> {
             String modelName = "block/" + name(block);

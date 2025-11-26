@@ -7,6 +7,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
@@ -38,6 +39,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildIceRecipes(output);
         buildMiscellaneousRecipes(output);
         buildGlassRecipes(output);
+        buildBookshelfRecipes(output);
     }
 
     private void buildToolRecipes(RecipeOutput output) {
@@ -310,14 +312,14 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .save(output, Chisel.id("futura/screen_metallic"));
         }
 
-        if (ChiselBlocks.TECHNICAL.getBlock("scaffoldrusty") != null) {
-            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.TECHNICAL.getBlock("scaffoldrusty").get(), 16)
+        if (ChiselBlocks.TECHNICAL.getBlock("scaffold") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.TECHNICAL.getBlock("scaffold").get(), 16)
                     .pattern("I I")
                     .pattern("III")
                     .pattern("I I")
                     .define('I', Tags.Items.INGOTS_IRON)
                     .unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON))
-                    .save(output, Chisel.id("technical/scaffoldrusty"));
+                    .save(output, Chisel.id("technical/scaffold"));
         }
 
         if (ChiselBlocks.TYRIAN.getBlock("tyrian") != null) {
@@ -430,5 +432,44 @@ public class ChiselRecipeProvider extends RecipeProvider {
                 }
             }
         }
+    }
+
+    private void buildBookshelfRecipes(RecipeOutput output) {
+        String[] woodTypes = {"spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"};
+
+        for (String woodType : woodTypes) {
+            var bookshelfType = ChiselBlocks.BOOKSHELVES.get(woodType);
+            if (bookshelfType != null) {
+                var baseBlock = bookshelfType.getBlock("rainbow");
+                if (baseBlock != null) {
+                    Item slab = getSlabItem(woodType);
+                    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, baseBlock.get())
+                            .pattern("SSS")
+                            .pattern("BBB")
+                            .pattern("SSS")
+                            .define('S', slab)
+                            .define('B', Items.BOOK)
+                            .unlockedBy("has_book", has(Items.BOOK))
+                            .save(output, Chisel.id("bookshelf/" + woodType + "_rainbow"));
+                }
+            }
+        }
+    }
+
+    private Item getSlabItem(String woodType) {
+        return switch (woodType) {
+            case "oak" -> Items.OAK_SLAB;
+            case "spruce" -> Items.SPRUCE_SLAB;
+            case "birch" -> Items.BIRCH_SLAB;
+            case "jungle" -> Items.JUNGLE_SLAB;
+            case "acacia" -> Items.ACACIA_SLAB;
+            case "dark_oak" -> Items.DARK_OAK_SLAB;
+            case "mangrove" -> Items.MANGROVE_SLAB;
+            case "cherry" -> Items.CHERRY_SLAB;
+            case "bamboo" -> Items.BAMBOO_SLAB;
+            case "crimson" -> Items.CRIMSON_SLAB;
+            case "warped" -> Items.WARPED_SLAB;
+            default -> Items.OAK_SLAB;
+        };
     }
 }

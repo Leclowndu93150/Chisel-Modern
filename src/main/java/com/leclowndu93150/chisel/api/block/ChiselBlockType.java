@@ -28,6 +28,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     private final String name;
     private final List<VariationData> variations = new ArrayList<>();
     private final List<ResourceLocation> vanillaBlocks = new ArrayList<>();
+    private final List<TagKey<Block>> sourceBlockTags = new ArrayList<>();
     private final List<TagKey<Block>> blockTags = new ArrayList<>();
     private final List<TagKey<Item>> itemTags = new ArrayList<>();
 
@@ -76,6 +77,15 @@ public class ChiselBlockType<T extends Block & ICarvable> {
      */
     public ChiselBlockType<T> addVanillaBlock(ResourceLocation blockId) {
         vanillaBlocks.add(blockId);
+        return this;
+    }
+
+    /**
+     * Add all blocks from a tag to this carving group.
+     * Blocks will be resolved at runtime, allowing modded blocks to be included.
+     */
+    public ChiselBlockType<T> addBlocksFromTag(TagKey<Block> tag) {
+        sourceBlockTags.add(tag);
         return this;
     }
 
@@ -239,6 +249,10 @@ public class ChiselBlockType<T extends Block & ICarvable> {
 
     public List<ResourceLocation> getVanillaBlocks() {
         return Collections.unmodifiableList(vanillaBlocks);
+    }
+
+    public List<TagKey<Block>> getSourceBlockTags() {
+        return Collections.unmodifiableList(sourceBlockTags);
     }
 
     public List<TagKey<Block>> getBlockTags() {
