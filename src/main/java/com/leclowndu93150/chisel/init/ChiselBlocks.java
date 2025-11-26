@@ -3,6 +3,7 @@ package com.leclowndu93150.chisel.init;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockAutoChisel;
 import com.leclowndu93150.chisel.block.BlockCarvable;
+import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.data.VariantTemplates;
 import net.minecraft.resources.ResourceLocation;
@@ -860,8 +861,9 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> GLASS = registerType(
-            new ChiselBlockType<BlockCarvable>("glass")
+    public static final ChiselBlockType<BlockCarvableGlass> GLASS = registerType(
+            new ChiselBlockType<BlockCarvableGlass>("glass",
+                    (props, data) -> new BlockCarvableGlass(props, data, "glass"))
                     .addVanillaBlock(Blocks.GLASS)
                     .properties(BlockBehaviour.Properties.of()
                             .sound(SoundType.GLASS)
@@ -1104,8 +1106,9 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final Map<DyeColor, ChiselBlockType<BlockCarvable>> GLASS_STAINED = createColoredBlocks("glass_stained",
-            color -> new ChiselBlockType<BlockCarvable>("glass_stained/" + color.getSerializedName())
+    public static final Map<DyeColor, ChiselBlockType<BlockCarvableGlass>> GLASS_STAINED = createColoredBlocks("glass_stained",
+            color -> new ChiselBlockType<BlockCarvableGlass>("glass_stained/" + color.getSerializedName(),
+                    (props, data) -> new BlockCarvableGlass(props, data, "glass_stained/" + color.getSerializedName()))
                     .groupName(toEnglishName(color.getSerializedName()) + " Stained Glass")
                     .addVanillaBlock(getStainedGlassBlock(color))
                     .properties(BlockBehaviour.Properties.of()
@@ -1121,8 +1124,9 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final Map<DyeColor, ChiselBlockType<BlockCarvable>> GLASS_DYED = createColoredBlocks("glassdyed",
-            color -> new ChiselBlockType<BlockCarvable>("glassdyed/" + color.getSerializedName())
+    public static final Map<DyeColor, ChiselBlockType<BlockCarvableGlass>> GLASS_DYED = createColoredBlocks("glassdyed",
+            color -> new ChiselBlockType<BlockCarvableGlass>("glassdyed/" + color.getSerializedName(),
+                    (props, data) -> new BlockCarvableGlass(props, data, "glassdyed/" + color.getSerializedName()))
                     .groupName(toEnglishName(color.getSerializedName()) + " Dyed Glass")
                     .properties(BlockBehaviour.Properties.of()
                             .sound(SoundType.GLASS)

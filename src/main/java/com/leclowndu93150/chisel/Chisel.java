@@ -2,6 +2,7 @@ package com.leclowndu93150.chisel;
 
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockCarvable;
+import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.carving.ChiselMode;
 import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
@@ -18,7 +19,6 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -30,10 +30,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import net.neoforged.neoforge.event.OnDatapackSyncEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.slf4j.Logger;
 
@@ -80,11 +76,11 @@ public class Chisel {
             event.enqueueWork(() -> {
                 registerBlockRenderType(ChiselBlocks.GLASS, RenderType.cutout());
 
-                for (ChiselBlockType<BlockCarvable> stainedType : ChiselBlocks.GLASS_STAINED.values()) {
+                for (ChiselBlockType<BlockCarvableGlass> stainedType : ChiselBlocks.GLASS_STAINED.values()) {
                     registerBlockRenderType(stainedType, RenderType.translucent());
                 }
 
-                for (ChiselBlockType<BlockCarvable> dyedType : ChiselBlocks.GLASS_DYED.values()) {
+                for (ChiselBlockType<BlockCarvableGlass> dyedType : ChiselBlocks.GLASS_DYED.values()) {
                     registerBlockRenderType(dyedType, RenderType.translucent());
                 }
 
