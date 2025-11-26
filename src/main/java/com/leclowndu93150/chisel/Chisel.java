@@ -98,6 +98,8 @@ public class Chisel {
                 registerBlockRenderType(ChiselBlocks.WATERSTONE, RenderType.cutout());
                 registerBlockRenderType(ChiselBlocks.LAVASTONE, RenderType.cutout());
 
+                registerBlockRenderType(ChiselBlocks.ANTIBLOCK, RenderType.cutout());
+
                 ItemBlockRenderTypes.setRenderLayer(ChiselBlocks.AUTO_CHISEL.get(), RenderType.cutout());
             });
         }

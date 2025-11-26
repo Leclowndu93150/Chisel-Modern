@@ -237,22 +237,22 @@ public class VariantTemplates {
     );
 
     public static final List<VariationData> ANTIBLOCK = List.of(
-            new VariationData("white", "White", simpleBlock()),
-            new VariationData("orange", "Orange", simpleBlock()),
-            new VariationData("magenta", "Magenta", simpleBlock()),
-            new VariationData("light_blue", "Light Blue", simpleBlock()),
-            new VariationData("yellow", "Yellow", simpleBlock()),
-            new VariationData("lime", "Lime", simpleBlock()),
-            new VariationData("pink", "Pink", simpleBlock()),
-            new VariationData("gray", "Gray", simpleBlock()),
-            new VariationData("light_gray", "Light Gray", simpleBlock()),
-            new VariationData("cyan", "Cyan", simpleBlock()),
-            new VariationData("purple", "Purple", simpleBlock()),
-            new VariationData("blue", "Blue", simpleBlock()),
-            new VariationData("brown", "Brown", simpleBlock()),
-            new VariationData("green", "Green", simpleBlock()),
-            new VariationData("red", "Red", simpleBlock()),
-            new VariationData("black", "Black", simpleBlock())
+            new VariationData("white", "White", twoLayerWithTop("antiblock", false)),
+            new VariationData("orange", "Orange", twoLayerWithTop("antiblock", false)),
+            new VariationData("magenta", "Magenta", twoLayerWithTop("antiblock", false)),
+            new VariationData("light_blue", "Light Blue", twoLayerWithTop("antiblock", false)),
+            new VariationData("yellow", "Yellow", twoLayerWithTop("antiblock", false)),
+            new VariationData("lime", "Lime", twoLayerWithTop("antiblock", false)),
+            new VariationData("pink", "Pink", twoLayerWithTop("antiblock", false)),
+            new VariationData("gray", "Gray", twoLayerWithTop("antiblock", false)),
+            new VariationData("light_gray", "Light Gray", twoLayerWithTop("antiblock", false)),
+            new VariationData("cyan", "Cyan", twoLayerWithTop("antiblock", false)),
+            new VariationData("purple", "Purple", twoLayerWithTop("antiblock", false)),
+            new VariationData("blue", "Blue", twoLayerWithTop("antiblock", false)),
+            new VariationData("brown", "Brown", twoLayerWithTop("antiblock", false)),
+            new VariationData("green", "Green", twoLayerWithTop("antiblock", false)),
+            new VariationData("red", "Red", twoLayerWithTop("antiblock", false)),
+            new VariationData("black", "Black", twoLayerWithTop("antiblock", false))
     );
 
     public static final List<VariationData> HEX_PLATING = List.of(
