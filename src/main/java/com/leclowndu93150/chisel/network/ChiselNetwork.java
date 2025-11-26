@@ -40,5 +40,11 @@ public class ChiselNetwork {
                 AutoChiselFXPayload.STREAM_CODEC,
                 AutoChiselFXPayload::handle
         );
+
+        registrar.playToClient(
+                ChunkDataPayload.TYPE,
+                ChunkDataPayload.STREAM_CODEC,
+                ChunkDataPayload::handle
+        );
     }
 }

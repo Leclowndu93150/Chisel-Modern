@@ -1,7 +1,6 @@
 package com.leclowndu93150.chisel;
 
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
-import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.carving.ChiselMode;
