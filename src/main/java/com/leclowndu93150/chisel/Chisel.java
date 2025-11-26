@@ -7,6 +7,7 @@ import com.leclowndu93150.chisel.carving.ChiselMode;
 import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
 import com.leclowndu93150.chisel.client.gui.ChiselScreen;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;
+import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineCompat;
 import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselCreativeTabs;
@@ -15,6 +16,7 @@ import com.leclowndu93150.chisel.init.ChiselItems;
 import com.leclowndu93150.chisel.init.ChiselMenus;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.mojang.logging.LogUtils;
+import net.neoforged.fml.ModList;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -60,6 +62,10 @@ public class Chisel {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         ChiselMode.registerAll();
+
+        if (ModList.get().isLoaded("ftbultimine")) {
+            FTBUltimineCompat.init();
+        }
     }
 
 

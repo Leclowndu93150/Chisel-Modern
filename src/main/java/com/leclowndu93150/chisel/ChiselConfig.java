@@ -69,6 +69,15 @@ public class ChiselConfig {
             .comment("Amount of basalt veins per chunk (0 to disable)")
             .defineInRange("basaltVeinAmount", 0, 0, 100);
 
+    // FTB Ultimine compatibility
+    private static final ModConfigSpec.BooleanValue ENABLE_ULTIMINE_COMPAT_CONFIG = BUILDER
+            .comment("Enable FTB Ultimine integration (requires FTB Ultimine to be installed)")
+            .define("enableUltimineCompat", true);
+
+    private static final ModConfigSpec.BooleanValue ULTIMINE_GROUP_VARIANTS = BUILDER
+            .comment("When using FTB Ultimine with a chisel, select blocks of the same type together")
+            .define("ultimineGroupVariants", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static double concreteVelocityMult;
@@ -86,6 +95,8 @@ public class ChiselConfig {
     public static int marbleAmount;
     public static int limestoneAmount;
     public static int basaltVeinAmount;
+    public static boolean enableUltimineCompat;
+    public static boolean ultimineGroupVariants;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -105,6 +116,8 @@ public class ChiselConfig {
             marbleAmount = MARBLE_AMOUNT.get();
             limestoneAmount = LIMESTONE_AMOUNT.get();
             basaltVeinAmount = BASALT_VEIN_AMOUNT.get();
+            enableUltimineCompat = ENABLE_ULTIMINE_COMPAT_CONFIG.get();
+            ultimineGroupVariants = ULTIMINE_GROUP_VARIANTS.get();
         }
     }
 }

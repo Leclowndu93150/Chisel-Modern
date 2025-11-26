@@ -3,13 +3,13 @@ package com.leclowndu93150.chisel.item;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.leclowndu93150.chisel.ChiselConfig;
 import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
+import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -21,11 +21,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @EventBusSubscriber
@@ -65,8 +68,7 @@ public class ChiselController {
             return;
         }
 
-        IChiselMode mode = chisel.getMode(held);
-        Iterable<? extends BlockPos> candidates = mode.getCandidates(player, pos, side);
+        Iterable<? extends BlockPos> candidates = getCandidates(player, pos, side, chisel.getMode(held));
 
         ItemStack target = chisel.getTarget(held);
 
@@ -172,5 +174,15 @@ public class ChiselController {
         if (event.getPlayer().getAbilities().instabuild && !stack.isEmpty() && stack.getItem() instanceof IChiselItem) {
             event.setCanceled(true);
         }
+    }
+
+    private static Iterable<? extends BlockPos> getCandidates(Player player, BlockPos pos, Direction side, IChiselMode mode) {
+        if (ChiselConfig.enableUltimineCompat && ModList.get().isLoaded("ftbultimine")) {
+            Optional<Collection<BlockPos>> ultimineSelection = FTBUltimineHelper.getBlockSelection(player);
+            if (ultimineSelection.isPresent()) {
+                return ultimineSelection.get();
+            }
+        }
+        return mode.getCandidates(player, pos, side);
     }
 }

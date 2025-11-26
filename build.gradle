@@ -108,6 +108,9 @@ dependencies {
     implementation "curse.maven:jei-238222:7229074"
     implementation "curse.maven:jade-324717:6853386"
     runtimeOnly "curse.maven:mekanism-268560:7132168"
+    implementation "curse.maven:ftb-ultimine-forge-386134:7188395"
+    implementation "curse.maven:architectury-api-419699:5786327"
+    implementation "curse.maven:ftb-library-forge-404465:7260617"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
