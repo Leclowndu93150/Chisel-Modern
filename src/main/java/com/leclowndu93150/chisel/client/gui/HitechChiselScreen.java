@@ -417,7 +417,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (panelClicked) {
             if (clickButton == 0) {
-                rotX = Math.max(-90, Math.min(90, initRotX - ((float) mouseY - clickY)));
+                rotX = Math.max(-90, Math.min(90, initRotX + ((float) mouseY - clickY)));
                 rotY = initRotY + ((float) mouseX - clickX);
             } else if (clickButton == 1) {
                 zoom = Math.max(0.5f, initZoom + (clickY - (float) mouseY) * 0.01f);
