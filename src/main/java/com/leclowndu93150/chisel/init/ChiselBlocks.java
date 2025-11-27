@@ -7,7 +7,9 @@ import com.leclowndu93150.chisel.block.BlockBrownstone;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
+import com.leclowndu93150.chisel.block.BlockHolystone;
 import com.leclowndu93150.chisel.client.sound.ChiselSoundTypes;
+import com.leclowndu93150.chisel.data.ChiselModelTemplates;
 import com.leclowndu93150.chisel.data.VariantTemplates;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -597,11 +599,14 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> CLOUD = registerType(
-            new ChiselBlockType<BlockCarvable>("cloud")
+    public static final ChiselBlockType<BlockCarvableGlass> CLOUD = registerType(
+            new ChiselBlockType<BlockCarvableGlass>("cloud",
+                    (props, data) -> new BlockCarvableGlass(props, data, "cloud"))
                     .properties(BlockBehaviour.Properties.of()
                             .sound(SoundType.WOOL)
-                            .explosionResistance(0.3f))
+                            .explosionResistance(0.3f)
+                            .noOcclusion())
+                    .defaultModelTemplate(simpleBlockCutout())
                     .variation("cloud", "Cloud")
                     .variation("large", "Bricks")
                     .variation("small", "Small Bricks")
@@ -762,6 +767,64 @@ public class ChiselBlocks {
                     .variation("8", "Flame")
                     .variation("9", "Pink Steel")
                     .variation("companion", "Companion Cube")
+                    .build()
+    );
+
+    // Fantasy Block 1 (1.7.10 port)
+    public static final ChiselBlockType<BlockCarvable> FANTASY = registerType(
+            new ChiselBlockType<BlockCarvable>("fantasy")
+                    .groupName("Fantasy Block")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.STONE)
+                            .strength(2.0f, 10.0f)
+                            .sound(SoundType.STONE)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.FANTASY)
+                    .build()
+    );
+
+    // Fantasy Block 2 (1.7.10 port)
+    public static final ChiselBlockType<BlockCarvable> FANTASY2 = registerType(
+            new ChiselBlockType<BlockCarvable>("fantasy2")
+                    .groupName("Fantasy Block 2")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.QUARTZ)
+                            .strength(2.0f, 10.0f)
+                            .sound(SoundType.STONE)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.FANTASY)
+                    .build()
+    );
+
+    // Warning Signs (1.7.10)
+    public static final ChiselBlockType<BlockCarvable> WARNING = registerType(
+            new ChiselBlockType<BlockCarvable>("warning")
+                    .groupName("Warning Sign")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_YELLOW)
+                            .strength(2.0f, 10.0f)
+                            .sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.WARNING)
+                    .build()
+    );
+
+    // Holystone 1.7.10 port - Emits light and star particles
+    public static final ChiselBlockType<BlockHolystone> HOLYSTONE = registerType(
+            new ChiselBlockType<BlockHolystone>("holystone",
+                    (props, data) -> new BlockHolystone(props, data, "holystone"))
+                    .groupName("Holystone")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.QUARTZ)
+                            .strength(2.0f, 10.0f)
+                            .lightLevel(state -> 4)
+                            .requiresCorrectToolForDrops())
+                    .sound(ChiselSoundTypes.HOLYSTONE_SUPPLIER)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.HOLYSTONE)
                     .build()
     );
 
@@ -1347,8 +1410,6 @@ public class ChiselBlocks {
 
     private static Block getBookshelfBlock(String woodName) {
         return switch (woodName) {
-            case "oak" -> Blocks.BOOKSHELF;
-            case "spruce" -> Blocks.BOOKSHELF;
             case "birch" -> Blocks.BOOKSHELF;
             case "jungle" -> Blocks.BOOKSHELF;
             case "acacia" -> Blocks.BOOKSHELF;

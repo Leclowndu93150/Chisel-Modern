@@ -2,6 +2,7 @@ package com.leclowndu93150.chisel.init;
 
 import com.leclowndu93150.chisel.Chisel;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.inventory.MenuType;
@@ -18,4 +19,5 @@ public class ChiselRegistries {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, Chisel.MODID);
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(Registries.SOUND_EVENT, Chisel.MODID);
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, Chisel.MODID);
+    public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = DeferredRegister.create(Registries.PARTICLE_TYPE, Chisel.MODID);
 }

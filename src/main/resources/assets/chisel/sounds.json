@@ -81,5 +81,46 @@
       "chisel:step/metal6",
       "chisel:step/metal9"
     ]
+  },
+  "block.holystone.break": {
+    "category": "block",
+    "subtitle": "subtitles.block.generic.break",
+    "sounds": [
+      "chisel:dig/holystone1",
+      "chisel:dig/holystone2",
+      "chisel:dig/holystone5"
+    ]
+  },
+  "block.holystone.fall": {
+    "category": "block",
+    "sounds": [
+      "chisel:step/holystone3",
+      "chisel:step/holystone7"
+    ]
+  },
+  "block.holystone.hit": {
+    "category": "block",
+    "subtitle": "subtitles.block.generic.hit",
+    "sounds": [
+      "chisel:step/holystone3",
+      "chisel:step/holystone7"
+    ]
+  },
+  "block.holystone.place": {
+    "category": "neutral",
+    "subtitle": "subtitles.block.generic.place",
+    "sounds": [
+      "chisel:dig/holystone1",
+      "chisel:dig/holystone2",
+      "chisel:dig/holystone5"
+    ]
+  },
+  "block.holystone.step": {
+    "category": "neutral",
+    "subtitle": "subtitles.block.generic.footsteps",
+    "sounds": [
+      "chisel:step/holystone3",
+      "chisel:step/holystone7"
+    ]
   }
 }

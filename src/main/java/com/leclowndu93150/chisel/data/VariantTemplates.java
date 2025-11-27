@@ -349,4 +349,72 @@ public class VariantTemplates {
         }
         return result.toString();
     }
+
+    // Fantasy Block variants (1.7.10 port)
+    public static final List<VariationData> FANTASY = List.of(
+            new VariationData("brick", "Brick", cubeColumn("brick_side", "brick_top")),
+            new VariationData("brick_faded", "Brick Faded", cubeColumn("brick_faded_side", "brick_faded_top")),
+            new VariationData("brick_wear", "Brick Wear", cubeColumn("brick_wear_side", "brick_wear_top")),
+            new VariationData("bricks", "Bricks", cubeColumn("bricks_side", "bricks_top")),
+            new VariationData("decor", "Decor", cubeColumn("decor_side", "decor_top")),
+            new VariationData("decor_block", "Decor Block", cubeColumn("decor_block_side", "decor_block_top")),
+            new VariationData("pillar", "Pillar", cubeColumn("pillar_side", "pillar_top")),
+            new VariationData("pillar_decorated", "Pillar Decorated", cubeColumn("pillar_decorated_side", "pillar_decorated_top")),
+            new VariationData("gold_decor_1", "Gold Decor 1", cubeColumn("gold_decor_1_side", "gold_decor_1_top")),
+            new VariationData("gold_decor_2", "Gold Decor 2", cubeColumn("gold_decor_2_side", "gold_decor_2_top")),
+            new VariationData("gold_decor_3", "Gold Decor 3", cubeColumn("gold_decor_3_side", "gold_decor_3_top")),
+            new VariationData("gold_decor_4", "Gold Decor 4", cubeColumn("gold_decor_4_side", "gold_decor_4_top")),
+            new VariationData("plate", "Plate", cubeColumn("plate_side", "plate_top")),
+            new VariationData("block", "Block", simpleBlock()).withTooltip("Has CTM"),
+            new VariationData("bricks_chaotic", "Bricks Chaotic", simpleBlock()),
+            new VariationData("bricks_wear", "Bricks Wear", cubeColumn("bricks_wear_side", "bricks_wear_top"))
+    );
+
+    // Warning Sign variants (1.7.10 port)
+    public static final List<VariationData> WARNING = List.of(
+            new VariationData("radiation", "Radiation", simpleBlock()),
+            new VariationData("biohazard", "Biohazard", simpleBlock()),
+            new VariationData("fire", "Fire", simpleBlock()),
+            new VariationData("explosion", "Explosion", simpleBlock()),
+            new VariationData("death", "Death", simpleBlock()),
+            new VariationData("falling", "Falling", simpleBlock()),
+            new VariationData("fall", "Fall", simpleBlock()),
+            new VariationData("voltage", "Voltage", simpleBlock()),
+            new VariationData("generic", "Generic", simpleBlock()),
+            new VariationData("acid", "Acid", simpleBlock()),
+            new VariationData("underconstruction", "Under Construction", simpleBlock()),
+            new VariationData("sound", "Sound", simpleBlock()),
+            new VariationData("noentry", "No Entry", simpleBlock()),
+            new VariationData("cryogenic", "Cryogenic", simpleBlock()),
+            new VariationData("oxygen", "Oxygen", simpleBlock())
+    );
+
+    // Holystone variants (1.7.10 port)
+    public static final List<VariationData> HOLYSTONE = List.of(
+            new VariationData("raw", "Holystone", simpleBlock()),
+            new VariationData("smooth", "Smooth", simpleBlock()),
+            new VariationData("love", "Love", simpleBlock()),
+            new VariationData("chiseled", "Chiseled", cubeColumn("chiseled_side", "chiseled_top")),
+            new VariationData("blocks", "Blocks", simpleBlock()),
+            new VariationData("blocks_rough", "Blocks Rough", simpleBlock()),
+            new VariationData("brick", "Brick", simpleBlock()),
+            new VariationData("large_bricks", "Large Bricks", simpleBlock()),
+            new VariationData("platform", "Platform", cubeBottomTop("platform_top", "platform_bottom", "platform_side")),
+            new VariationData("platform_tiles", "Platform Tiles", cubeBottomTop("platform_tiles_top", "platform_tiles_bottom", "platform_tiles_side")),
+            new VariationData("construction", "Construction", simpleBlock()),
+            new VariationData("fancy_tiles", "Fancy Tiles", simpleBlock()),
+            new VariationData("plate", "Plate", simpleBlock()),
+            new VariationData("plate_rough", "Plate Rough", simpleBlock())
+    );
+
+    // Futura variants (1.7.10 port)
+    public static final List<VariationData> FUTURA = List.of(
+            new VariationData("screen_metallic", "Screen Metallic", simpleBlock()),
+            new VariationData("screen_cyan", "Screen Cyan", simpleBlock()),
+            new VariationData("controller", "Controller", simpleBlock()),
+            new VariationData("wavy", "Wavy", simpleBlock()),
+            new VariationData("controller_purple", "Controller Purple", simpleBlock()),
+            new VariationData("uber_wavy", "Uber Wavy", simpleBlock())
+    );
+
 }

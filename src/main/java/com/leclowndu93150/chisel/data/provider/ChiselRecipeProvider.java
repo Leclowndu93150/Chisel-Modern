@@ -40,6 +40,9 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildMiscellaneousRecipes(output);
         buildGlassRecipes(output);
         buildBookshelfRecipes(output);
+        buildFantasyRecipes(output);
+        buildWarningRecipes(output);
+        buildHolystoneRecipes(output);
     }
 
     private void buildToolRecipes(RecipeOutput output) {
@@ -472,4 +475,56 @@ public class ChiselRecipeProvider extends RecipeProvider {
             default -> Items.OAK_SLAB;
         };
     }
+
+    private void buildFantasyRecipes(RecipeOutput output) {
+        // Fantasy 1: Stone + Gold Nugget
+        if (ChiselBlocks.FANTASY.getBlock("brick") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.FANTASY.getBlock("brick").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SGS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('G', Tags.Items.NUGGETS_GOLD)
+                    .unlockedBy("has_gold_nugget", has(Tags.Items.NUGGETS_GOLD))
+                    .save(output, Chisel.id("fantasy/brick"));
+        }
+
+        // Fantasy 2: Fantasy + White Dye
+        if (ChiselBlocks.FANTASY2.getBlock("brick") != null && ChiselBlocks.FANTASY.getBlock("brick") != null) {
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.FANTASY2.getBlock("brick").get())
+                    .requires(ChiselBlocks.FANTASY.getBlock("brick").get())
+                    .requires(Tags.Items.DYES_WHITE)
+                    .unlockedBy("has_fantasy", has(ChiselBlocks.FANTASY.getBlock("brick").get()))
+                    .save(output, Chisel.id("fantasy2/brick"));
+        }
+    }
+
+    private void buildWarningRecipes(RecipeOutput output) {
+        // Stone + Sign
+        if (ChiselBlocks.WARNING.getBlock("radiation") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.WARNING.getBlock("radiation").get(), 4)
+                    .pattern("SSS")
+                    .pattern("SIS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('I', Items.OAK_SIGN)
+                    .unlockedBy("has_sign", has(Items.OAK_SIGN))
+                    .save(output, Chisel.id("warning/radiation"));
+        }
+    }
+
+    private void buildHolystoneRecipes(RecipeOutput output) {
+        // Stone + Feather
+        if (ChiselBlocks.HOLYSTONE.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.HOLYSTONE.getBlock("raw").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SFS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('F', Items.FEATHER)
+                    .unlockedBy("has_feather", has(Items.FEATHER))
+                    .save(output, Chisel.id("holystone/raw"));
+        }
+    }
+
 }

@@ -76,6 +76,18 @@ public class ChiselModelTemplates {
     }
 
     /**
+     * Cloud block template - translucent with no culling between same blocks.
+     */
+    public static ModelTemplate cloudBlock() {
+        return (prov, block) -> {
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent("block/" + name(block), Chisel.id("block/cube_all_translucent"))
+                    .texture("all", Chisel.id("block/" + texturePath(block)))
+                    .renderType("translucent"));
+        };
+    }
+
+    /**
      * Replaces the variant (last path component) in a texture path.
      */
     public static String replaceVariant(String texPath, String newVariant) {

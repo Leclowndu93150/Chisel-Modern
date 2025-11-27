@@ -18,6 +18,13 @@ public class ChiselSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> METAL_PLACE = registerSound("block.metal.place");
     public static final DeferredHolder<SoundEvent, SoundEvent> METAL_STEP = registerSound("block.metal.step");
 
+    // Holystone Block Sounds
+    public static final DeferredHolder<SoundEvent, SoundEvent> HOLYSTONE_BREAK = registerSound("block.holystone.break");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HOLYSTONE_FALL = registerSound("block.holystone.fall");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HOLYSTONE_HIT = registerSound("block.holystone.hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HOLYSTONE_PLACE = registerSound("block.holystone.place");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HOLYSTONE_STEP = registerSound("block.holystone.step");
+
     // Chiseling Action Sounds
     public static final DeferredHolder<SoundEvent, SoundEvent> CHISEL_FALLBACK = registerSound("chisel.fallback");
     public static final DeferredHolder<SoundEvent, SoundEvent> CHISEL_WOOD = registerSound("chisel.wood");

@@ -9,12 +9,14 @@ import com.leclowndu93150.chisel.client.gui.ChiselScreen;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;
 import com.leclowndu93150.chisel.compat.ChiselRebornCompat;
 import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineCompat;
+import com.leclowndu93150.chisel.client.particle.HolystoneStarParticle;
 import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselCreativeTabs;
 import com.leclowndu93150.chisel.init.ChiselDataComponents;
 import com.leclowndu93150.chisel.init.ChiselItems;
 import com.leclowndu93150.chisel.init.ChiselMenus;
+import com.leclowndu93150.chisel.init.ChiselParticles;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.leclowndu93150.chisel.init.ChiselSounds;
 import com.mojang.logging.LogUtils;
@@ -33,6 +35,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.slf4j.Logger;
 
@@ -53,8 +56,10 @@ public class Chisel {
         ChiselRegistries.MENU_TYPES.register(modEventBus);
         ChiselRegistries.SOUND_EVENTS.register(modEventBus);
         ChiselRegistries.DATA_COMPONENT_TYPES.register(modEventBus);
+        ChiselRegistries.PARTICLE_TYPES.register(modEventBus);
 
         ChiselSounds.init();
+        ChiselParticles.init();
         ChiselBlocks.init();
         ChiselItems.init();
         ChiselMenus.init();
@@ -105,6 +110,8 @@ public class Chisel {
 
                 registerBlockRenderType(ChiselBlocks.ANTIBLOCK, RenderType.cutout());
 
+                registerBlockRenderType(ChiselBlocks.CLOUD, RenderType.cutout());
+
                 ItemBlockRenderTypes.setRenderLayer(ChiselBlocks.AUTO_CHISEL.get(), RenderType.cutout());
             });
         }
@@ -121,6 +128,11 @@ public class Chisel {
             event.register(ChiselMenus.CHISEL_MENU.get(), ChiselScreen::new);
             event.register(ChiselMenus.HITECH_CHISEL_MENU.get(), HitechChiselScreen::new);
             event.register(ChiselMenus.AUTO_CHISEL_MENU.get(), AutoChiselScreen::new);
+        }
+
+        @SubscribeEvent
+        public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+            event.registerSpriteSet(ChiselParticles.HOLYSTONE_STAR.get(), HolystoneStarParticle.Provider::new);
         }
     }
 }

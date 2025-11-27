@@ -35,4 +35,23 @@ public class ChiselSoundTypes {
      * Supplier for the metal sound type. Use this in ChiselBlockType.sound() calls.
      */
     public static final Supplier<SoundType> METAL_SUPPLIER = () -> METAL;
+
+    /**
+     * Custom holystone sound type for holystone blocks.
+     * Uses ethereal, chime-like sounds.
+     */
+    public static final SoundType HOLYSTONE = new DeferredSoundType(
+        1.0F,  // volume
+        1.0F,  // pitch
+        ChiselSounds.HOLYSTONE_BREAK,
+        ChiselSounds.HOLYSTONE_STEP,
+        ChiselSounds.HOLYSTONE_PLACE,
+        ChiselSounds.HOLYSTONE_HIT,
+        ChiselSounds.HOLYSTONE_FALL
+    );
+
+    /**
+     * Supplier for the holystone sound type. Use this in ChiselBlockType.sound() calls.
+     */
+    public static final Supplier<SoundType> HOLYSTONE_SUPPLIER = () -> HOLYSTONE;
 }
