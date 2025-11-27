@@ -7,6 +7,7 @@ import com.leclowndu93150.chisel.carving.ChiselMode;
 import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
 import com.leclowndu93150.chisel.client.gui.ChiselScreen;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;
+import com.leclowndu93150.chisel.compat.ChiselRebornCompat;
 import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineCompat;
 import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
@@ -42,6 +43,8 @@ public class Chisel {
 
     public Chisel(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
+
+        ChiselRebornCompat.registerAliases();
 
         ChiselRegistries.BLOCKS.register(modEventBus);
         ChiselRegistries.ITEMS.register(modEventBus);
