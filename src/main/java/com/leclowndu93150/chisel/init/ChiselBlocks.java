@@ -548,8 +548,8 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> ICE = registerType(
-            new ChiselBlockType<BlockCarvable>("ice")
+    public static final ChiselBlockType<BlockCarvableGlass> ICE = registerType(
+            new ChiselBlockType<BlockCarvableGlass>("ice")
                     .addVanillaBlock(Blocks.PACKED_ICE)
                     .properties(() -> Blocks.PACKED_ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -558,8 +558,8 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> ICE_PILLAR = registerType(
-            new ChiselBlockType<BlockCarvable>("icepillar")
+    public static final ChiselBlockType<BlockCarvableGlass> ICE_PILLAR = registerType(
+            new ChiselBlockType<BlockCarvableGlass>("icepillar")
                     .addVanillaBlock(Blocks.ICE)
                     .properties(() -> Blocks.ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
