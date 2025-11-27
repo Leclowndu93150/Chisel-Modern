@@ -86,5 +86,7 @@ public class ChiselLanguageProvider extends LanguageProvider {
 
         add("chisel.tooltip.power.stored", "%s/%s FE");
         add("chisel.tooltip.power.pertick", "%s FE/t");
+
+        add("chisel.tooltip.brownstone.speed", "Walking on this block increases your speed");
     }
 }

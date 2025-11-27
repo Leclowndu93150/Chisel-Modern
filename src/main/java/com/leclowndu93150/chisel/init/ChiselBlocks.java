@@ -3,6 +3,7 @@ package com.leclowndu93150.chisel.init;
 import com.leclowndu93150.chisel.api.ChiselSound;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockAutoChisel;
+import com.leclowndu93150.chisel.block.BlockBrownstone;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
@@ -577,8 +578,8 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> BROWNSTONE = registerType(
-            new ChiselBlockType<BlockCarvable>("brownstone")
+    public static final ChiselBlockType<BlockBrownstone> BROWNSTONE = registerType(
+            new ChiselBlockType<>("brownstone", (props, data) -> new BlockBrownstone(props, data, "brownstone"))
                     .properties(BlockBehaviour.Properties.of()
                             .sound(SoundType.STONE)
                             .strength(1.0f))
