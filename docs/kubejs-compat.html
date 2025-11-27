@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chisel - KubeJS Integration</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-code: #0f0f1a;
+            --accent: #e94560;
+            --accent-secondary: #0f3460;
+            --text-primary: #eaeaea;
+            --text-secondary: #a0a0a0;
+            --text-muted: #6c6c6c;
+            --border: #2a2a4a;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--accent-secondary) 100%);
+            padding: 3rem 2rem;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        header h1 .icon {
+            font-size: 2rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+            vertical-align: middle;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        /* Main content */
+        main {
+            padding: 2rem 0;
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            color: var(--accent);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        pre::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent-secondary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            border-radius: 0 8px 0 8px;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        pre code {
+            color: var(--text-primary);
+        }
+
+        :not(pre) > code {
+            background: var(--bg-code);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--accent);
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #c792ea; }
+        .string { color: #c3e88d; }
+        .comment { color: #6c6c6c; font-style: italic; }
+        .function { color: #82aaff; }
+        .property { color: #f78c6c; }
+        .number { color: #f78c6c; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--accent-secondary);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        td code {
+            color: var(--info);
+        }
+
+        tr:hover {
+            background: rgba(233, 69, 96, 0.05);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .card h4 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: rgba(96, 165, 250, 0.1);
+            border-color: var(--info);
+        }
+
+        .alert-warning {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: var(--warning);
+        }
+
+        .alert-success {
+            background: rgba(74, 222, 128, 0.1);
+            border-color: var(--success);
+        }
+
+        .alert strong {
+            color: var(--text-primary);
+        }
+
+        /* Method signatures */
+        .method-signature {
+            background: var(--bg-code);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+            margin: 1rem 0;
+        }
+
+        .method-signature code {
+            color: var(--info);
+        }
+
+        .returns {
+            color: var(--success);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-secondary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#getting-started">Getting Started</a></li>
+            <li><a href="#events">Events</a></li>
+            <li><a href="#api">API Reference</a></li>
+            <li><a href="#examples">Examples</a></li>
+            <li><a href="#bindings">Bindings</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <!-- Getting Started -->
+        <section id="getting-started">
+            <h2>Getting Started</h2>
+            <p>Chisel provides full KubeJS integration, allowing modpack makers to create, modify, and remove carving groups through server scripts.</p>
+
+            <div class="alert alert-info">
+                <strong>Note:</strong> All Chisel KubeJS scripts should be placed in <code>kubejs/server_scripts/</code> as they run during server/datapack reload.
+            </div>
+
+            <h3>Quick Start</h3>
+            <p>Create a new file at <code>kubejs/server_scripts/chisel_tweaks.js</code>:</p>
+
+            <pre data-lang="javascript"><code><span class="comment">// Listen to the Chisel carving groups event</span>
+<span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Your modifications here</span>
+    <span class="property">event</span>.<span class="function">create</span>(<span class="string">'my_custom_group'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:stone'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:andesite'</span>)
+});</code></pre>
+        </section>
+
+        <!-- Events -->
+        <section id="events">
+            <h2>Events</h2>
+
+            <div class="card">
+                <h4>ChiselEvents.modifyGroups</h4>
+                <p>Server-side event that fires during datapack reload. Use this to modify, create, or remove carving groups.</p>
+                <p><strong>Type:</strong> Server Script</p>
+                <p><strong>Fires:</strong> On server start and <code>/reload</code></p>
+            </div>
+
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// event: ModifyCarvingGroupsEvent</span>
+});</code></pre>
+        </section>
+
+        <!-- API Reference -->
+        <section id="api">
+            <h2>API Reference</h2>
+
+            <h3>ModifyCarvingGroupsEvent</h3>
+            <p>The main event object passed to the <code>modifyGroups</code> callback.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Description</th>
+                        <th>Returns</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>get(groupId)</code></td>
+                        <td>Get or create a carving group builder</td>
+                        <td><code>CarvingGroupBuilder</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>create(groupId)</code></td>
+                        <td>Alias for <code>get()</code> - creates or modifies a group</td>
+                        <td><code>CarvingGroupBuilder</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>remove(groupId)</code></td>
+                        <td>Remove an entire carving group</td>
+                        <td><code>ModifyCarvingGroupsEvent</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>removeFromAll(blockId)</code></td>
+                        <td>Remove a block from ALL carving groups</td>
+                        <td><code>ModifyCarvingGroupsEvent</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>hasGroup(groupId)</code></td>
+                        <td>Check if a group exists or is being created</td>
+                        <td><code>boolean</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>getGroupIds()</code></td>
+                        <td>Get all group IDs being modified</td>
+                        <td><code>String[]</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-info">
+                <strong>Group ID Format:</strong> Use <code>'chisel:groupname'</code> format or just <code>'groupname'</code> (defaults to chisel namespace).
+            </div>
+
+            <h3>CarvingGroupBuilder</h3>
+            <p>Builder for modifying individual carving groups. All methods return the builder for chaining.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>add(blockId)</code></td>
+                        <td>Add a single block to the group</td>
+                    </tr>
+                    <tr>
+                        <td><code>addAll(blockIds[])</code></td>
+                        <td>Add multiple blocks at once</td>
+                    </tr>
+                    <tr>
+                        <td><code>remove(blockId)</code></td>
+                        <td>Remove a single block from the group</td>
+                    </tr>
+                    <tr>
+                        <td><code>removeAll(blockIds[])</code></td>
+                        <td>Remove multiple blocks at once</td>
+                    </tr>
+                    <tr>
+                        <td><code>clear()</code></td>
+                        <td>Clear all existing blocks before adding new ones</td>
+                    </tr>
+                    <tr>
+                        <td><code>replace(blockIds[])</code></td>
+                        <td>Replace entire group with specified blocks</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-info">
+                <strong>Block ID Format:</strong> Use <code>'modid:blockname'</code> or just <code>'blockname'</code> (defaults to minecraft namespace).
+            </div>
+        </section>
+
+        <!-- Examples -->
+        <section id="examples">
+            <h2>Examples</h2>
+
+            <h3>Creating a New Carving Group</h3>
+            <p>Create a custom group to chisel between different stone variants:</p>
+
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Create a new carving group for all stone types</span>
+    <span class="property">event</span>.<span class="function">create</span>(<span class="string">'all_stones'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:stone'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:granite'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:diorite'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:andesite'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:deepslate'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:tuff'</span>);
+});</code></pre>
+
+            <h3>Adding Blocks to an Existing Group</h3>
+            <p>Add modded blocks to Chisel's existing carving groups:</p>
+
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Add Create mod limestone to Chisel's limestone group</span>
+    <span class="property">event</span>.<span class="function">get</span>(<span class="string">'chisel:carving/limestone'</span>)
+        .<span class="function">add</span>(<span class="string">'create:limestone'</span>);
+
+    <span class="comment">// Add Quark marble to Chisel's marble group</span>
+    <span class="property">event</span>.<span class="function">get</span>(<span class="string">'chisel:carving/marble'</span>)
+        .<span class="function">add</span>(<span class="string">'quark:marble'</span>);
+});</code></pre>
+
+            <h3>Removing Blocks from Groups</h3>
+            <p>Remove specific blocks from carving groups:</p>
+
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Remove polished variants from andesite group</span>
+    <span class="property">event</span>.<span class="function">get</span>(<span class="string">'chisel:carving/andesite'</span>)
+        .<span class="function">remove</span>(<span class="string">'minecraft:polished_andesite'</span>);
+
+    <span class="comment">// Remove a block from ALL groups at once</span>
+    <span class="property">event</span>.<span class="function">removeFromAll</span>(<span class="string">'minecraft:cobblestone'</span>);
+});</code></pre>
+
+            <h3>Replacing an Entire Group</h3>
+            <p>Completely replace the contents of a carving group:</p>
+
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Replace the iron group with only specific blocks</span>
+    <span class="property">event</span>.<span class="function">get</span>(<span class="string">'chisel:carving/iron'</span>)
+        .<span class="function">replace</span>([
+            <span class="string">'minecraft:iron_block'</span>,
+            <span class="string">'chisel:iron/plate'</span>,
+            <span class="string">'chisel:iron/tiles'</span>
+        ]);
+});</code></pre>
+
+            <h3>Removing an Entire Group</h3>
+            <p>Completely disable a carving group:</p>
+
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Remove the diamond carving group entirely</span>
+    <span class="property">event</span>.<span class="function">remove</span>(<span class="string">'chisel:carving/diamond'</span>);
+
+    <span class="comment">// Remove multiple groups</span>
+    <span class="property">event</span>.<span class="function">remove</span>(<span class="string">'chisel:carving/emerald'</span>);
+    <span class="property">event</span>.<span class="function">remove</span>(<span class="string">'chisel:carving/gold'</span>);
+});</code></pre>
+
+            <h3>Using addAll for Multiple Blocks</h3>
+            <p>Add multiple blocks efficiently using arrays:</p>
+
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Create a terracotta carving group with all colors</span>
+    <span class="property">event</span>.<span class="function">create</span>(<span class="string">'terracotta'</span>)
+        .<span class="function">addAll</span>([
+            <span class="string">'minecraft:terracotta'</span>,
+            <span class="string">'minecraft:white_terracotta'</span>,
+            <span class="string">'minecraft:orange_terracotta'</span>,
+            <span class="string">'minecraft:magenta_terracotta'</span>,
+            <span class="string">'minecraft:light_blue_terracotta'</span>,
+            <span class="string">'minecraft:yellow_terracotta'</span>,
+            <span class="string">'minecraft:lime_terracotta'</span>,
+            <span class="string">'minecraft:pink_terracotta'</span>,
+            <span class="string">'minecraft:gray_terracotta'</span>,
+            <span class="string">'minecraft:light_gray_terracotta'</span>,
+            <span class="string">'minecraft:cyan_terracotta'</span>,
+            <span class="string">'minecraft:purple_terracotta'</span>,
+            <span class="string">'minecraft:blue_terracotta'</span>,
+            <span class="string">'minecraft:brown_terracotta'</span>,
+            <span class="string">'minecraft:green_terracotta'</span>,
+            <span class="string">'minecraft:red_terracotta'</span>,
+            <span class="string">'minecraft:black_terracotta'</span>
+        ]);
+});</code></pre>
+
+            <h3>Complete Modpack Example</h3>
+            <p>A comprehensive example showing multiple modifications:</p>
+
+            <pre data-lang="javascript"><code><span class="comment">// kubejs/server_scripts/chisel_modpack_tweaks.js</span>
+
+<span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// === Add mod compatibility ===</span>
+
+    <span class="comment">// Create mod integration</span>
+    <span class="property">event</span>.<span class="function">get</span>(<span class="string">'chisel:carving/limestone'</span>)
+        .<span class="function">add</span>(<span class="string">'create:limestone'</span>);
+
+    <span class="comment">// Quark integration</span>
+    <span class="property">event</span>.<span class="function">get</span>(<span class="string">'chisel:carving/marble'</span>)
+        .<span class="function">add</span>(<span class="string">'quark:marble'</span>);
+
+    <span class="comment">// === Create custom groups ===</span>
+
+    <span class="comment">// Nether stone variants</span>
+    <span class="property">event</span>.<span class="function">create</span>(<span class="string">'nether_stones'</span>)
+        .<span class="function">addAll</span>([
+            <span class="string">'minecraft:netherrack'</span>,
+            <span class="string">'minecraft:blackstone'</span>,
+            <span class="string">'minecraft:basalt'</span>,
+            <span class="string">'minecraft:smooth_basalt'</span>
+        ]);
+
+    <span class="comment">// End stone variants</span>
+    <span class="property">event</span>.<span class="function">create</span>(<span class="string">'end_stones'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:end_stone'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:end_stone_bricks'</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:purpur_block'</span>);
+
+    <span class="comment">// === Balance tweaks ===</span>
+
+    <span class="comment">// Disable diamond chiseling (too OP for our pack)</span>
+    <span class="property">event</span>.<span class="function">remove</span>(<span class="string">'chisel:carving/diamond'</span>);
+
+    <span class="comment">// Remove cobblestone from stone group</span>
+    <span class="property">event</span>.<span class="function">get</span>(<span class="string">'chisel:carving/cobblestone'</span>)
+        .<span class="function">remove</span>(<span class="string">'minecraft:cobblestone'</span>);
+});</code></pre>
+        </section>
+
+        <!-- Bindings -->
+        <section id="bindings">
+            <h2>Global Bindings</h2>
+            <p>Chisel provides a global <code>Chisel</code> binding with utility methods and constants.</p>
+
+            <h3>Chisel Binding</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property / Method</th>
+                        <th>Description</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>Chisel.MOD_ID</code></td>
+                        <td>The Chisel mod ID</td>
+                        <td><code>"chisel"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Chisel.SOUND_WOOD</code></td>
+                        <td>Wood chiseling sound constant</td>
+                        <td><code>ChiselSound</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Chisel.SOUND_DIRT</code></td>
+                        <td>Dirt chiseling sound constant</td>
+                        <td><code>ChiselSound</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Chisel.SOUND_FALLBACK</code></td>
+                        <td>Default chiseling sound constant</td>
+                        <td><code>ChiselSound</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Chisel.SOUND_STONECUTTER</code></td>
+                        <td>Stonecutter chiseling sound constant</td>
+                        <td><code>ChiselSound</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Chisel.id(path)</code></td>
+                        <td>Create a Chisel resource location</td>
+                        <td><code>"chisel:{path}"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Chisel.carvingTag(name)</code></td>
+                        <td>Create a carving group tag ID</td>
+                        <td><code>"chisel:carving/{name}"</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Using Bindings</h3>
+            <pre data-lang="javascript"><code><span class="function">ChiselEvents</span>.<span class="function">modifyGroups</span>(<span class="property">event</span> <span class="keyword">=></span> {
+    <span class="comment">// Use the helper to create the tag ID</span>
+    <span class="keyword">let</span> <span class="property">tagId</span> = <span class="function">Chisel</span>.<span class="function">carvingTag</span>(<span class="string">'my_group'</span>);
+    <span class="comment">// tagId = "chisel:carving/my_group"</span>
+
+    <span class="property">event</span>.<span class="function">get</span>(<span class="property">tagId</span>)
+        .<span class="function">add</span>(<span class="string">'minecraft:stone'</span>);
+
+    <span class="comment">// Create a chisel resource location</span>
+    <span class="keyword">let</span> <span class="property">blockId</span> = <span class="function">Chisel</span>.<span class="function">id</span>(<span class="string">'marble/raw'</span>);
+    <span class="comment">// blockId = "chisel:marble/raw"</span>
+});</code></pre>
+        </section>
+
+    </main>
+</body>
+</html>
