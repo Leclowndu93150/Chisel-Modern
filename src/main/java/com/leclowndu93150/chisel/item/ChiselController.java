@@ -10,6 +10,7 @@ import com.leclowndu93150.chisel.carving.CarvingHelper;
 import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -116,7 +117,14 @@ public class ChiselController {
 
     private static boolean checkClickCache(Player player) {
         long time = player.level().getGameTime();
-        if (CLICK_CACHE.getUnchecked(player) > time - 2) {
+        int cooldown = ChiselConfig.carvingCooldownTicks;
+        long lastClick = CLICK_CACHE.getUnchecked(player);
+        if (lastClick > time - cooldown) {
+            if (player.level().isClientSide) {
+                long ticksRemaining = cooldown - (time - lastClick);
+                double secondsRemaining = ticksRemaining / 20.0;
+                player.displayClientMessage(Component.translatable("chisel.message.cooldown", String.format("%.1f", secondsRemaining)), true);
+            }
             return false;
         }
         CLICK_CACHE.put(player, time);

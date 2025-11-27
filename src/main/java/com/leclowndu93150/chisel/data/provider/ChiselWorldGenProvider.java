@@ -33,6 +33,8 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
             Registries.CONFIGURED_FEATURE, Chisel.id("ore_marble"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> ORE_LIMESTONE = ResourceKey.create(
             Registries.CONFIGURED_FEATURE, Chisel.id("ore_limestone"));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> ORE_DIABASE = ResourceKey.create(
+            Registries.CONFIGURED_FEATURE, Chisel.id("ore_diabase"));
 
     // Placed Features (where to generate)
     public static final ResourceKey<PlacedFeature> ORE_MARBLE_UPPER = ResourceKey.create(
@@ -43,12 +45,16 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
             Registries.PLACED_FEATURE, Chisel.id("ore_limestone_upper"));
     public static final ResourceKey<PlacedFeature> ORE_LIMESTONE_LOWER = ResourceKey.create(
             Registries.PLACED_FEATURE, Chisel.id("ore_limestone_lower"));
+    public static final ResourceKey<PlacedFeature> ORE_DIABASE_PLACED = ResourceKey.create(
+            Registries.PLACED_FEATURE, Chisel.id("ore_diabase"));
 
     // Biome Modifiers (add to biomes)
     public static final ResourceKey<BiomeModifier> ADD_MARBLE = ResourceKey.create(
             NeoForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_marble"));
     public static final ResourceKey<BiomeModifier> ADD_LIMESTONE = ResourceKey.create(
             NeoForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_limestone"));
+    public static final ResourceKey<BiomeModifier> ADD_DIABASE = ResourceKey.create(
+            NeoForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_diabase"));
 
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             .add(Registries.CONFIGURED_FEATURE, context -> {
@@ -64,6 +70,12 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                     context.register(ORE_LIMESTONE, new ConfiguredFeature<>(Feature.ORE,
                             new OreConfiguration(stoneOreReplaceables,
                                     ChiselBlocks.LIMESTONE.getBlock("raw").get().defaultBlockState(), 64)));
+                }
+
+                if (ChiselBlocks.DIABASE.getBlock("raw") != null) {
+                    context.register(ORE_DIABASE, new ConfiguredFeature<>(Feature.ORE,
+                            new OreConfiguration(stoneOreReplaceables,
+                                    ChiselBlocks.DIABASE.getBlock("raw").get().defaultBlockState(), 32)));
                 }
             })
             .add(Registries.PLACED_FEATURE, context -> {
@@ -92,6 +104,14 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                             commonOrePlacement(2, HeightRangePlacement.uniform(
                                     VerticalAnchor.absolute(0), VerticalAnchor.absolute(60)))));
                 }
+
+                // Diabase generates near lava pools (Y=-64 to Y=0, concentrated around lava level)
+                if (ChiselBlocks.DIABASE.getBlock("raw") != null) {
+                    context.register(ORE_DIABASE_PLACED, new PlacedFeature(
+                            configuredFeatures.getOrThrow(ORE_DIABASE),
+                            commonOrePlacement(8, HeightRangePlacement.triangle(
+                                    VerticalAnchor.absolute(-64), VerticalAnchor.absolute(0)))));
+                }
             })
             .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
                 var biomes = context.lookup(Registries.BIOME);
@@ -114,6 +134,15 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                             HolderSet.direct(
                                     placedFeatures.getOrThrow(ORE_LIMESTONE_UPPER),
                                     placedFeatures.getOrThrow(ORE_LIMESTONE_LOWER)
+                            ),
+                            GenerationStep.Decoration.UNDERGROUND_ORES));
+                }
+
+                if (ChiselBlocks.DIABASE.getBlock("raw") != null) {
+                    context.register(ADD_DIABASE, new BiomeModifiers.AddFeaturesBiomeModifier(
+                            overworldTag,
+                            HolderSet.direct(
+                                    placedFeatures.getOrThrow(ORE_DIABASE_PLACED)
                             ),
                             GenerationStep.Decoration.UNDERGROUND_ORES));
                 }

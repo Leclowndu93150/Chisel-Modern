@@ -67,6 +67,7 @@ public class ChiselLanguageProvider extends LanguageProvider {
         add("chisel.preview.single", "Single");
 
         add("chisel.message.mode_changed", "Mode changed to: %s");
+        add("chisel.message.cooldown", "Chisel on cooldown: %ss");
 
         add("chisel.mode.single", "Single");
         add("chisel.mode.single.desc", "Chisel a single block.");

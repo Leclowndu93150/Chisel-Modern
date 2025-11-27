@@ -5,21 +5,13 @@
 *.ipr
 *.iws
 
-Chisel-1.18-dev
-NeoForge-1.21.1
-Minecraft-Source-1.21.1
+modsourcesthatareneededforapi
 src/generated
 # IntelliJ
 out/
 # mpeltonen/sbt-idea plugin
-minecraft-assets-1.20.1
 .idea_modules/
-JustEnoughItems-1.21.1
 .claude
-ConnectedTexturesMod-1.21-dev
-FTB-Ultimine-1.21.1-main
-KubeJS-main
-Chisel-Reborn-1.21.1
 
 # JIRA plugin
 atlassian-ide-plugin.xml

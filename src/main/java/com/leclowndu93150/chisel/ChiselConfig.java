@@ -29,6 +29,10 @@ public class ChiselConfig {
             .comment("Maximum durability of the iChisel (hitech chisel)")
             .defineInRange("hitechChiselMaxDamage", 10048, 1, 100000);
 
+    private static final ModConfigSpec.IntValue CARVING_COOLDOWN_TICKS = BUILDER
+            .comment("Cooldown between carving actions in ticks (20 ticks = 1 second, default 4 = 0.2s)")
+            .defineInRange("carvingCooldownTicks", 4, 0, 100);
+
     private static final ModConfigSpec.BooleanValue IRON_CHISEL_CAN_LEFT_CLICK = BUILDER
             .comment("Whether the iron chisel can left-click chisel blocks in the world")
             .define("ironChiselCanLeftClick", false);
@@ -69,6 +73,10 @@ public class ChiselConfig {
             .comment("Amount of basalt veins per chunk (0 to disable)")
             .defineInRange("basaltVeinAmount", 0, 0, 100);
 
+    private static final ModConfigSpec.IntValue DIABASE_AMOUNT = BUILDER
+            .comment("Amount of diabase veins per chunk near lava level (0 to disable)")
+            .defineInRange("diabaseAmount", 8, 0, 100);
+
     // FTB Ultimine compatibility
     private static final ModConfigSpec.BooleanValue ENABLE_ULTIMINE_COMPAT_CONFIG = BUILDER
             .comment("Enable FTB Ultimine integration (requires FTB Ultimine to be installed)")
@@ -85,6 +93,7 @@ public class ChiselConfig {
     public static int ironChiselMaxDamage;
     public static int diamondChiselMaxDamage;
     public static int hitechChiselMaxDamage;
+    public static int carvingCooldownTicks;
     public static boolean ironChiselCanLeftClick;
     public static boolean ironChiselHasModes;
     public static int ironChiselAttackDamage;
@@ -95,6 +104,7 @@ public class ChiselConfig {
     public static int marbleAmount;
     public static int limestoneAmount;
     public static int basaltVeinAmount;
+    public static int diabaseAmount;
     public static boolean enableUltimineCompat;
     public static boolean ultimineGroupVariants;
 
@@ -106,6 +116,7 @@ public class ChiselConfig {
             ironChiselMaxDamage = IRON_CHISEL_MAX_DAMAGE.get();
             diamondChiselMaxDamage = DIAMOND_CHISEL_MAX_DAMAGE.get();
             hitechChiselMaxDamage = HITECH_CHISEL_MAX_DAMAGE.get();
+            carvingCooldownTicks = CARVING_COOLDOWN_TICKS.get();
             ironChiselCanLeftClick = IRON_CHISEL_CAN_LEFT_CLICK.get();
             ironChiselHasModes = IRON_CHISEL_HAS_MODES.get();
             ironChiselAttackDamage = IRON_CHISEL_ATTACK_DAMAGE.get();
@@ -116,6 +127,7 @@ public class ChiselConfig {
             marbleAmount = MARBLE_AMOUNT.get();
             limestoneAmount = LIMESTONE_AMOUNT.get();
             basaltVeinAmount = BASALT_VEIN_AMOUNT.get();
+            diabaseAmount = DIABASE_AMOUNT.get();
             enableUltimineCompat = ENABLE_ULTIMINE_COMPAT_CONFIG.get();
             ultimineGroupVariants = ULTIMINE_GROUP_VARIANTS.get();
         }
