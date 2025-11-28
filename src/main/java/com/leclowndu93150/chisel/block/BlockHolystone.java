@@ -25,8 +25,7 @@ public class BlockHolystone extends BlockCarvable {
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        // 25% chance per tick to spawn a star particle
-        if (random.nextInt(4) == 0) {
+        if (random.nextInt(16) == 0) {
             double x = pos.getX() + random.nextDouble();
             double y = pos.getY() + 1.0 + random.nextDouble() * 0.5;
             double z = pos.getZ() + random.nextDouble();
