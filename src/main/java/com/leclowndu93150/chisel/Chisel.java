@@ -23,6 +23,7 @@ import com.mojang.logging.LogUtils;
 import net.neoforged.fml.ModList;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
@@ -34,8 +35,11 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.slf4j.Logger;
 
@@ -46,6 +50,7 @@ public class Chisel {
 
     public Chisel(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::registerCapabilities);
 
         ChiselRebornCompat.registerAliases();
 
@@ -78,6 +83,34 @@ public class Chisel {
         }
     }
 
+    private void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ChiselBlockEntities.AUTO_CHISEL.get(),
+                (blockEntity, side) -> {
+                    if (side == Direction.DOWN) {
+                        return blockEntity.getOutputInv();
+                    } else if (side == Direction.UP) {
+                        return blockEntity.getInputInv();
+                    } else if (side == null) {
+                        return new CombinedInvWrapper(
+                                blockEntity.getInputInv(),
+                                blockEntity.getOutputInv(),
+                                blockEntity.getChiselSlot(),
+                                blockEntity.getTargetSlot()
+                        );
+                    } else {
+                        return new CombinedInvWrapper(blockEntity.getInputInv(), blockEntity.getOutputInv());
+                    }
+                }
+        );
+
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                ChiselBlockEntities.AUTO_CHISEL.get(),
+                (blockEntity, side) -> blockEntity.getEnergyStorage()
+        );
+    }
 
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
