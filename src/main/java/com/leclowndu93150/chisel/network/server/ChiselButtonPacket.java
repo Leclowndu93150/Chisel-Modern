@@ -83,15 +83,26 @@ public class ChiselButtonPacket {
                     continue;
                 }
 
-                ItemStack result = new ItemStack(target.getItem(), stack.getCount());
+                int toChisel = stack.getCount();
+
+                if (chisel.isDamageableItem()) {
+                    int durabilityLeft = chisel.getMaxDamage() - chisel.getDamageValue();
+                    toChisel = Math.min(toChisel, durabilityLeft);
+
+                    if (toChisel <= 0) {
+                        break;
+                    }
+
+                    chisel.setDamageValue(chisel.getDamageValue() + toChisel);
+                }
+
+                ItemStack result = new ItemStack(target.getItem(), toChisel);
                 slot.set(result);
                 chiseledAny = true;
 
-                if (chisel.isDamageableItem()) {
-                    chisel.setDamageValue(chisel.getDamageValue() + 1);
-                    if (chisel.getDamageValue() >= chisel.getMaxDamage()) {
-                        break;
-                    }
+                if (chisel.isDamageableItem() && chisel.getDamageValue() >= chisel.getMaxDamage()) {
+                    chisel.shrink(1);
+                    break;
                 }
             }
         }

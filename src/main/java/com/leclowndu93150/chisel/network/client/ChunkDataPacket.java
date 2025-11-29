@@ -41,7 +41,7 @@ public class ChunkDataPacket {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void handle(ChunkDataPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handleClient(ChunkDataPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             var mc = Minecraft.getInstance();
@@ -68,6 +68,5 @@ public class ChunkDataPacket {
                 }
             }
         });
-        context.setPacketHandled(true);
     }
 }

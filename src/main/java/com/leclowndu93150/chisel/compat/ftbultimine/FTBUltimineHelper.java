@@ -25,10 +25,14 @@ public class FTBUltimineHelper {
             return Optional.empty();
         }
 
-        FTBUltiminePlayerData data = FTBUltimine.instance.getOrCreatePlayerData(player);
+        try {
+            FTBUltiminePlayerData data = FTBUltimine.instance.getOrCreatePlayerData(player);
 
-        if (data.isPressed() && data.hasCachedPositions()) {
-            return Optional.of(data.cachedPositions());
+            if (data != null && data.isPressed() && data.hasCachedPositions()) {
+                return Optional.of(data.cachedPositions());
+            }
+        } catch (NullPointerException e) {
+            return Optional.empty();
         }
 
         return Optional.empty();

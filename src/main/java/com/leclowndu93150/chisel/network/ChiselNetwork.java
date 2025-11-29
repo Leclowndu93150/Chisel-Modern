@@ -8,6 +8,8 @@ import com.leclowndu93150.chisel.network.server.ChiselModePacket;
 import com.leclowndu93150.chisel.network.server.HitechSettingsPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -33,7 +35,7 @@ public class ChiselNetwork {
     }
 
     public static void register() {
-        // Server-bound packets
+
         CHANNEL.messageBuilder(ChiselModePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .encoder(ChiselModePacket::encode)
                 .decoder(ChiselModePacket::decode)
@@ -52,17 +54,22 @@ public class ChiselNetwork {
                 .consumerMainThread(HitechSettingsPacket::handle)
                 .add();
 
-        // Client-bound packets
         CHANNEL.messageBuilder(AutoChiselFXPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(AutoChiselFXPacket::encode)
                 .decoder(AutoChiselFXPacket::decode)
-                .consumerMainThread(AutoChiselFXPacket::handle)
+                .consumerMainThread((packet, ctx) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> AutoChiselFXPacket.handleClient(packet, ctx));
+                    ctx.get().setPacketHandled(true);
+                })
                 .add();
 
         CHANNEL.messageBuilder(ChunkDataPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(ChunkDataPacket::encode)
                 .decoder(ChunkDataPacket::decode)
-                .consumerMainThread(ChunkDataPacket::handle)
+                .consumerMainThread((packet, ctx) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ChunkDataPacket.handleClient(packet, ctx));
+                    ctx.get().setPacketHandled(true);
+                })
                 .add();
     }
 

@@ -46,7 +46,7 @@ public class AutoChiselFXPacket {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void handle(AutoChiselFXPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handleClient(AutoChiselFXPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             var level = Minecraft.getInstance().level;
@@ -65,6 +65,5 @@ public class AutoChiselFXPacket {
                 level.playLocalSound(packet.pos, SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundSource.BLOCKS, 0.5F, 1.0F, false);
             }
         });
-        context.setPacketHandled(true);
     }
 }
