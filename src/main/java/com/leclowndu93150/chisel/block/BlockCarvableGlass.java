@@ -15,7 +15,7 @@ public class BlockCarvableGlass extends BlockCarvable {
     }
 
     @Override
-    protected boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
+    public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
         return adjacentBlockState.is(this) || super.skipRendering(state, adjacentBlockState, side);
     }
 }

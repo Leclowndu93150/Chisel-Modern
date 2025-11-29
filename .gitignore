@@ -6,6 +6,8 @@
 *.iws
 
 modsourcesthatareneededforapi
+Minecraft-Source-1.20.1
+MinecraftForge-1.20.1
 Chisel-1.7-release
 src/generated
 # IntelliJ

@@ -1,13 +1,21 @@
 package com.leclowndu93150.chisel.compat;
 
 import com.leclowndu93150.chisel.Chisel;
-import com.leclowndu93150.chisel.init.ChiselRegistries;
+import com.leclowndu93150.chisel.init.ChiselBlocks;
+import com.leclowndu93150.chisel.init.ChiselItems;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.MissingMappingsEvent;
 import org.slf4j.Logger;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Compatibility layer for migrating worlds from Chisel Reborn to Chisel Modern.
@@ -18,7 +26,7 @@ import java.util.Set;
  *   <li>Chisel Modern: {@code chisel:{base}/{variant}} (e.g., {@code chisel:andesite/array})</li>
  * </ul>
  * <p>
- * This class registers aliases so that old Chisel Reborn block IDs resolve to
+ * This class handles missing mappings so that old Chisel Reborn block IDs resolve to
  * the equivalent Chisel Modern blocks when loading saved worlds.
  * <p>
  * Variant name differences between mods:
@@ -31,11 +39,13 @@ import java.util.Set;
  *   <li>{@code cut} → {@code cuts}</li>
  * </ul>
  */
+@Mod.EventBusSubscriber(modid = Chisel.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ChiselRebornCompat {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Set<String> registeredAliases = new HashSet<>();
+    private static final Map<String, String> BLOCK_REMAPS = new HashMap<>();
+    private static final Map<String, String> ITEM_REMAPS = new HashMap<>();
 
     private static final String[] COLORS = {
         "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
@@ -62,11 +72,10 @@ public class ChiselRebornCompat {
     };
 
     /**
-     * Registers all Chisel Reborn to Chisel Modern block and item aliases.
-     * Must be called BEFORE DeferredRegisters are registered to the event bus.
+     * Initializes all Chisel Reborn to Chisel Modern block and item remap mappings.
      */
-    public static void registerAliases() {
-        LOGGER.info("Registering Chisel Reborn compatibility aliases...");
+    public static void init() {
+        LOGGER.info("Initializing Chisel Reborn compatibility mappings...");
         int count = 0;
 
         count += registerRawVariantAliases();
@@ -86,7 +95,51 @@ public class ChiselRebornCompat {
         count += registerNetherbrickAliases();
         count += registerFallbackAliases();
 
-        LOGGER.info("Registered {} Chisel Reborn compatibility aliases", count);
+        LOGGER.info("Initialized {} Chisel Reborn compatibility mappings", count);
+    }
+
+    @SubscribeEvent
+    public static void onMissingBlockMappings(MissingMappingsEvent event) {
+        for (MissingMappingsEvent.Mapping<Block> mapping : event.getMappings(Registries.BLOCK, Chisel.MODID)) {
+            String oldPath = mapping.getKey().getPath();
+            String newPath = BLOCK_REMAPS.get(oldPath);
+
+            if (newPath != null) {
+                ResourceLocation newId = ResourceLocation.tryParse(newPath);
+                if (newId != null) {
+                    Block newBlock = ForgeRegistries.BLOCKS.getValue(newId);
+                    if (newBlock != null) {
+                        LOGGER.debug("Remapping block {} -> {}", mapping.getKey(), newId);
+                        mapping.remap(newBlock);
+                    } else {
+                        LOGGER.warn("Could not find block to remap to: {}", newId);
+                        mapping.warn();
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMissingItemMappings(MissingMappingsEvent event) {
+        for (MissingMappingsEvent.Mapping<Item> mapping : event.getMappings(Registries.ITEM, Chisel.MODID)) {
+            String oldPath = mapping.getKey().getPath();
+            String newPath = ITEM_REMAPS.get(oldPath);
+
+            if (newPath != null) {
+                ResourceLocation newId = ResourceLocation.tryParse(newPath);
+                if (newId != null) {
+                    Item newItem = ForgeRegistries.ITEMS.getValue(newId);
+                    if (newItem != null) {
+                        LOGGER.debug("Remapping item {} -> {}", mapping.getKey(), newId);
+                        mapping.remap(newItem);
+                    } else {
+                        LOGGER.warn("Could not find item to remap to: {}", newId);
+                        mapping.warn();
+                    }
+                }
+            }
+        }
     }
 
     private static String mapVariant(String rebornVariant) {
@@ -472,34 +525,26 @@ public class ChiselRebornCompat {
     }
 
     private static boolean registerAlias(String fromPath, String toPath) {
-        if (registeredAliases.contains(fromPath)) {
+        if (BLOCK_REMAPS.containsKey(fromPath)) {
             LOGGER.debug("Skipping duplicate alias: {} (already registered)", fromPath);
             return false;
         }
 
-        registeredAliases.add(fromPath);
-
-        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, fromPath);
-        ResourceLocation to = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, toPath);
-
-        ChiselRegistries.BLOCKS.addAlias(from, to);
-        ChiselRegistries.ITEMS.addAlias(from, to);
+        String fullPath = Chisel.MODID + ":" + toPath;
+        BLOCK_REMAPS.put(fromPath, fullPath);
+        ITEM_REMAPS.put(fromPath, fullPath);
         return true;
     }
 
     private static boolean registerAliasToVanilla(String fromPath, String vanillaBlock) {
-        if (registeredAliases.contains(fromPath)) {
+        if (BLOCK_REMAPS.containsKey(fromPath)) {
             LOGGER.debug("Skipping duplicate alias: {} (already registered)", fromPath);
             return false;
         }
 
-        registeredAliases.add(fromPath);
-
-        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, fromPath);
-        ResourceLocation to = ResourceLocation.withDefaultNamespace(vanillaBlock);
-
-        ChiselRegistries.BLOCKS.addAlias(from, to);
-        ChiselRegistries.ITEMS.addAlias(from, to);
+        String fullPath = "minecraft:" + vanillaBlock;
+        BLOCK_REMAPS.put(fromPath, fullPath);
+        ITEM_REMAPS.put(fromPath, fullPath);
         return true;
     }
 }

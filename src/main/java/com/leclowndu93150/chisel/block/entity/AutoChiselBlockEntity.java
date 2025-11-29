@@ -5,9 +5,9 @@ import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
 import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.leclowndu93150.chisel.inventory.AutoChiselMenu;
-import com.leclowndu93150.chisel.network.AutoChiselFXPayload;
+import com.leclowndu93150.chisel.network.client.AutoChiselFXPacket;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -30,9 +30,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.network.PacketDistributor;
+import com.leclowndu93150.chisel.network.ChiselNetwork;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.Nullable;
 
 public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, Nameable {
@@ -218,8 +224,9 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
                         BlockState resultState = result.getItem() instanceof BlockItem blockItem
                                 ? blockItem.getBlock().defaultBlockState()
                                 : Blocks.STONE.defaultBlockState();
-                        PacketDistributor.sendToPlayersTrackingChunk(serverLevel, serverLevel.getChunk(worldPosition).getPos(),
-                                new AutoChiselFXPayload(worldPosition, chisel.copy(), resultState));
+                        // unchecked cast
+                        ChiselNetwork.sendToAllTrackingChunk((LevelChunk) serverLevel.getChunk(worldPosition),
+                                new AutoChiselFXPacket(worldPosition, chisel.copy(), resultState));
                     }
 
                     sourceSlot = (sourceSlot + 1) % inputInv.getSlots();
@@ -296,32 +303,32 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("chisel", chiselSlot.serializeNBT(registries));
-        tag.put("target", targetSlot.serializeNBT(registries));
-        tag.put("input", inputInv.serializeNBT(registries));
-        tag.put("output", outputInv.serializeNBT(registries));
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("chisel", chiselSlot.serializeNBT());
+        tag.put("target", targetSlot.serializeNBT());
+        tag.put("input", inputInv.serializeNBT());
+        tag.put("output", outputInv.serializeNBT());
         tag.putInt("energy", energyStorage.getEnergyStored());
         tag.putInt("progress", progress);
         tag.putInt("source", sourceSlot);
         if (customName != null) {
-            tag.putString("customName", Component.Serializer.toJson(customName, registries));
+            tag.putString("customName", Component.Serializer.toJson(customName));
         }
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        chiselSlot.deserializeNBT(registries, tag.getCompound("chisel"));
-        targetSlot.deserializeNBT(registries, tag.getCompound("target"));
-        inputInv.deserializeNBT(registries, tag.getCompound("input"));
-        outputInv.deserializeNBT(registries, tag.getCompound("output"));
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        chiselSlot.deserializeNBT(tag.getCompound("chisel"));
+        targetSlot.deserializeNBT(tag.getCompound("target"));
+        inputInv.deserializeNBT(tag.getCompound("input"));
+        outputInv.deserializeNBT(tag.getCompound("output"));
         energyStorage.receiveEnergy(tag.getInt("energy") - energyStorage.getEnergyStored(), false);
         progress = tag.getInt("progress");
         sourceSlot = tag.getInt("source");
         if (tag.contains("customName")) {
-            customName = Component.Serializer.fromJson(tag.getString("customName"), registries);
+            customName = Component.Serializer.fromJson(tag.getString("customName"));
         }
     }
 
@@ -332,9 +339,9 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        saveAdditional(tag, registries);
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = super.getUpdateTag();
+        saveAdditional(tag);
         return tag;
     }
 
@@ -367,5 +374,41 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player player) {
         return new AutoChiselMenu(containerId, playerInv, this, dataAccess, ContainerLevelAccess.create(level, worldPosition));
+    }
+    
+    private final LazyOptional<IItemHandler> itemHandlerTop = LazyOptional.of(() -> inputInv);
+    private final LazyOptional<IItemHandler> itemHandlerBottom = LazyOptional.of(() -> outputInv);
+    private final LazyOptional<IItemHandler> itemHandlerSides = LazyOptional.of(() ->
+        new CombinedInvWrapper(inputInv, outputInv));
+    private final LazyOptional<IItemHandler> itemHandlerAll = LazyOptional.of(() ->
+        new CombinedInvWrapper(inputInv, outputInv, chiselSlot, targetSlot));
+    private final LazyOptional<net.minecraftforge.energy.IEnergyStorage> energyHandler = LazyOptional.of(() -> energyStorage);
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            if (side == Direction.DOWN) {
+                return itemHandlerBottom.cast();
+            } else if (side == Direction.UP) {
+                return itemHandlerTop.cast();
+            } else if (side == null) {
+                return itemHandlerAll.cast();
+            } else {
+                return itemHandlerSides.cast();
+            }
+        } else if (cap == ForgeCapabilities.ENERGY) {
+            return energyHandler.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        itemHandlerTop.invalidate();
+        itemHandlerBottom.invalidate();
+        itemHandlerSides.invalidate();
+        itemHandlerAll.invalidate();
+        energyHandler.invalidate();
     }
 }

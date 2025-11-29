@@ -16,10 +16,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderHighlightEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderHighlightEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 
 import java.awt.geom.Line2D;
@@ -29,7 +29,7 @@ import java.util.Map;
 
 import static net.minecraft.core.Direction.*;
 
-@EventBusSubscriber(modid = Chisel.MODID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Chisel.MODID, value = Dist.CLIENT)
 public class OffsetToolRenderer {
 
     @SubscribeEvent
@@ -68,20 +68,20 @@ public class OffsetToolRenderer {
         VertexConsumer linesBuf = bufferSource.getBuffer(RenderType.lines());
 
         if (face.getStepX() != 0) {
-            linesBuf.addVertex(mat, x, 0, 0).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, x, 1, 1).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, x, 1, 0).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, x, 0, 1).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
+            linesBuf.vertex(mat, x, 0, 0).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, x, 1, 1).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, x, 1, 0).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, x, 0, 1).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
         } else if (face.getStepY() != 0) {
-            linesBuf.addVertex(mat, 0, y, 0).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, 1, y, 1).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, 1, y, 0).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, 0, y, 1).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
+            linesBuf.vertex(mat, 0, y, 0).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, 1, y, 1).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, 1, y, 0).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, 0, y, 1).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
         } else {
-            linesBuf.addVertex(mat, 0, 0, z).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, 1, 1, z).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, 1, 0, z).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
-            linesBuf.addVertex(mat, 0, 1, z).setColor(0, 0, 0, 255).setNormal(0, 1, 0);
+            linesBuf.vertex(mat, 0, 0, z).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, 1, 1, z).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, 1, 0, z).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
+            linesBuf.vertex(mat, 0, 1, z).color(0, 0, 0, 255).normal(0, 1, 0).endVertex();
         }
 
         // Draw the triangle highlight showing which direction will be moved
@@ -106,19 +106,19 @@ public class OffsetToolRenderer {
         // Use either the move dir offset, or 0/1 if the move dir is not offset in this direction
         if (face.getStepX() != 0) {
             float xOff = x + (face.getStepX() > 0 ? offset : -offset);
-            triBuf.addVertex(mat, xOff, 0.5f, 0.5f).setColor(255, 255, 255, alpha);
-            triBuf.addVertex(mat, xOff, isY ? clampedY : 0, isZ ? clampedZ : 0).setColor(255, 255, 255, alpha);
-            triBuf.addVertex(mat, xOff, isY ? clampedY : 1, isZ ? clampedZ : 1).setColor(255, 255, 255, alpha);
+            triBuf.vertex(mat, xOff, 0.5f, 0.5f).color(255, 255, 255, alpha).endVertex();
+            triBuf.vertex(mat, xOff, isY ? clampedY : 0, isZ ? clampedZ : 0).color(255, 255, 255, alpha).endVertex();
+            triBuf.vertex(mat, xOff, isY ? clampedY : 1, isZ ? clampedZ : 1).color(255, 255, 255, alpha).endVertex();
         } else if (face.getStepY() != 0) {
             float yOff = y + (face.getStepY() > 0 ? offset : -offset);
-            triBuf.addVertex(mat, 0.5f, yOff, 0.5f).setColor(255, 255, 255, alpha);
-            triBuf.addVertex(mat, isX ? clampedX : 0, yOff, isZ ? clampedZ : 0).setColor(255, 255, 255, alpha);
-            triBuf.addVertex(mat, isX ? clampedX : 1, yOff, isZ ? clampedZ : 1).setColor(255, 255, 255, alpha);
+            triBuf.vertex(mat, 0.5f, yOff, 0.5f).color(255, 255, 255, alpha).endVertex();
+            triBuf.vertex(mat, isX ? clampedX : 0, yOff, isZ ? clampedZ : 0).color(255, 255, 255, alpha).endVertex();
+            triBuf.vertex(mat, isX ? clampedX : 1, yOff, isZ ? clampedZ : 1).color(255, 255, 255, alpha).endVertex();
         } else {
             float zOff = z + (face.getStepZ() > 0 ? offset : -offset);
-            triBuf.addVertex(mat, 0.5f, 0.5f, zOff).setColor(255, 255, 255, alpha);
-            triBuf.addVertex(mat, isX ? clampedX : 0, isY ? clampedY : 0, zOff).setColor(255, 255, 255, alpha);
-            triBuf.addVertex(mat, isX ? clampedX : 1, isY ? clampedY : 1, zOff).setColor(255, 255, 255, alpha);
+            triBuf.vertex(mat, 0.5f, 0.5f, zOff).color(255, 255, 255, alpha).endVertex();
+            triBuf.vertex(mat, isX ? clampedX : 0, isY ? clampedY : 0, zOff).color(255, 255, 255, alpha).endVertex();
+            triBuf.vertex(mat, isX ? clampedX : 1, isY ? clampedY : 1, zOff).color(255, 255, 255, alpha).endVertex();
         }
 
         poseStack.popPose();

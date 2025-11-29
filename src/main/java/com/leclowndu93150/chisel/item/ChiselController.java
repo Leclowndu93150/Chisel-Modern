@@ -7,7 +7,7 @@ import com.leclowndu93150.chisel.ChiselConfig;
 import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
-import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineHelper;
+//import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -21,18 +21,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@EventBusSubscriber
+@Mod.EventBusSubscriber
 public class ChiselController {
 
     // Cache to prevent double-firing of events
@@ -186,7 +186,7 @@ public class ChiselController {
 
     private static Iterable<? extends BlockPos> getCandidates(Player player, BlockPos pos, Direction side, IChiselMode mode) {
         if (ChiselConfig.enableUltimineCompat && ModList.get().isLoaded("ftbultimine")) {
-            Optional<Collection<BlockPos>> ultimineSelection = FTBUltimineHelper.getBlockSelection(player);
+            Optional<Collection<BlockPos>> ultimineSelection = null; //FTBUltimineHelper.getBlockSelection(player);
             if (ultimineSelection.isPresent()) {
                 return ultimineSelection.get();
             }

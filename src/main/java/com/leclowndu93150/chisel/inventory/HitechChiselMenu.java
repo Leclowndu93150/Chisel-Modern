@@ -50,7 +50,7 @@ public class HitechChiselMenu extends ChiselMenu {
     public static Supplier<MenuType<HitechChiselMenu>> MENU_TYPE_SUPPLIER;
 
     public HitechChiselMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
-        this(containerId, playerInv, buf.readBoolean() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+        this(containerId, playerInv, buf != null && buf.readBoolean() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
     }
 
     public HitechChiselMenu(int containerId, Inventory playerInv, InteractionHand hand) {

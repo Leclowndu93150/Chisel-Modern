@@ -101,7 +101,7 @@ public interface IChiselItem {
         if (chisel.isDamageableItem()) {
             int damageLeft = chisel.getMaxDamage() - chisel.getDamageValue() + 1;
             toCraft = Math.min(toCraft, damageLeft);
-            chisel.hurtAndBreak(toCraft, player, slot);
+            chisel.hurtAndBreak(toCraft, player, p -> p.broadcastBreakEvent(slot));
         }
 
         ItemStack res = target.copy();

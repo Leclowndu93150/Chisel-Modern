@@ -3,7 +3,6 @@ package com.leclowndu93150.chisel.api;
 import com.leclowndu93150.chisel.init.ChiselSounds;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.function.Supplier;
 

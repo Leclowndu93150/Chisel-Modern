@@ -3,7 +3,7 @@ package com.leclowndu93150.chisel.compat.kubejs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.ModList;
+// import net.minecraftforge.fml.ModList;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -16,18 +16,21 @@ import java.util.Set;
  *
  * IMPORTANT: This class must NOT directly reference any KubeJS classes.
  * All KubeJS interaction goes through KubeJSHandler which is only loaded when KubeJS is present.
+ *
+ * TEMPORARILY DISABLED FOR 1.20.1 BACKPORT - KubeJS not in dependencies
  */
 public class KubeJSCompat {
 
-    private static final boolean KUBEJS_LOADED = ModList.get().isLoaded("kubejs");
-    private static KubeJSHandler handler;
+    // Temporarily disabled for 1.20.1 backport
+    private static final boolean KUBEJS_LOADED = false; // ModList.get().isLoaded("kubejs");
+    // private static KubeJSHandler handler;
 
-    private static KubeJSHandler getHandler() {
-        if (handler == null && KUBEJS_LOADED) {
-            handler = new KubeJSHandler();
-        }
-        return handler;
-    }
+    // private static KubeJSHandler getHandler() {
+    //     if (handler == null && KUBEJS_LOADED) {
+    //         handler = new KubeJSHandler();
+    //     }
+    //     return handler;
+    // }
 
     /**
      * Check if a block should be included in a carving group.
@@ -35,24 +38,30 @@ public class KubeJSCompat {
      */
     @Nullable
     public static Boolean shouldIncludeBlock(TagKey<Block> groupTag, Block block) {
-        KubeJSHandler h = getHandler();
-        return h != null ? h.shouldIncludeBlock(groupTag, block) : null;
+        // Temporarily disabled for 1.20.1 backport
+        // KubeJSHandler h = getHandler();
+        // return h != null ? h.shouldIncludeBlock(groupTag, block) : null;
+        return null;
     }
 
     /**
      * Get additional blocks to add to a carving group.
      */
     public static Set<ResourceLocation> getAdditionalBlocks(TagKey<Block> groupTag) {
-        KubeJSHandler h = getHandler();
-        return h != null ? h.getAdditionalBlocks(groupTag) : Collections.emptySet();
+        // Temporarily disabled for 1.20.1 backport
+        // KubeJSHandler h = getHandler();
+        // return h != null ? h.getAdditionalBlocks(groupTag) : Collections.emptySet();
+        return Collections.emptySet();
     }
 
     /**
      * Check if a group was removed via KubeJS.
      */
     public static boolean isGroupRemoved(ResourceLocation groupId) {
-        KubeJSHandler h = getHandler();
-        return h != null && h.isGroupRemoved(groupId);
+        // Temporarily disabled for 1.20.1 backport
+        // KubeJSHandler h = getHandler();
+        // return h != null && h.isGroupRemoved(groupId);
+        return false;
     }
 
     /**
@@ -60,18 +69,21 @@ public class KubeJSCompat {
      */
     @Nullable
     public static TagKey<Block> getGroupForBlock(Block block) {
-        KubeJSHandler h = getHandler();
-        return h != null ? h.getGroupForBlock(block) : null;
+        // Temporarily disabled for 1.20.1 backport
+        // KubeJSHandler h = getHandler();
+        // return h != null ? h.getGroupForBlock(block) : null;
+        return null;
     }
 
     /**
      * Clear cached data.
      */
     public static void clearCache() {
-        KubeJSHandler h = getHandler();
-        if (h != null) {
-            h.clearCache();
-        }
+        // Temporarily disabled for 1.20.1 backport
+        // KubeJSHandler h = getHandler();
+        // if (h != null) {
+        //     h.clearCache();
+        // }
     }
 
     /**
@@ -79,8 +91,10 @@ public class KubeJSCompat {
      * Returns a map of group ID to the set of block IDs in that group.
      */
     public static Map<ResourceLocation, Set<ResourceLocation>> getCustomGroupsForJEI() {
-        KubeJSHandler h = getHandler();
-        return h != null ? h.getCustomGroupsForJEI() : Collections.emptyMap();
+        // Temporarily disabled for 1.20.1 backport
+        // KubeJSHandler h = getHandler();
+        // return h != null ? h.getCustomGroupsForJEI() : Collections.emptyMap();
+        return Collections.emptyMap();
     }
 
     /**

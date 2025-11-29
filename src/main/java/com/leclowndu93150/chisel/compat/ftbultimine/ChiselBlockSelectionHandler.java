@@ -1,5 +1,8 @@
 package com.leclowndu93150.chisel.compat.ftbultimine;
 
+// TEMPORARILY DISABLED FOR 1.20.1 BACKPORT - FTB Ultimine not in dependencies
+
+/*
 import com.leclowndu93150.chisel.ChiselConfig;
 import com.leclowndu93150.chisel.api.IChiselItem;
 import dev.ftb.mods.ftbultimine.api.blockselection.BlockSelectionHandler;
@@ -32,3 +35,4 @@ public enum ChiselBlockSelectionHandler implements BlockSelectionHandler {
         return Result.PASS;
     }
 }
+*/

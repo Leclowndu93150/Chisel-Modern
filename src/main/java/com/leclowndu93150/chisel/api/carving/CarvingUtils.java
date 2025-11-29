@@ -44,9 +44,9 @@ public class CarvingUtils {
     /**
      * Computes a hash code for an ItemStack including NBT.
      */
-    public static int hashStack(ItemStack stack) {
-        return Objects.hash(stack.getItem(), stack.getComponentsPatch());
-    }
+//    public static int hashStack(ItemStack stack) {
+//        return Objects.hash(stack.getItem(), stack.getComponentsPatch());
+//    }
 
     /**
      * Creates a carving group from a block tag.

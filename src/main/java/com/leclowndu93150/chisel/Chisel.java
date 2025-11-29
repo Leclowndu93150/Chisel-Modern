@@ -19,28 +19,27 @@ import com.leclowndu93150.chisel.init.ChiselMenus;
 import com.leclowndu93150.chisel.init.ChiselParticles;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.leclowndu93150.chisel.init.ChiselSounds;
+import com.leclowndu93150.chisel.network.ChiselNetwork;
 import com.mojang.logging.LogUtils;
-import net.neoforged.fml.ModList;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
-import net.neoforged.neoforge.registries.DeferredBlock;
 import org.slf4j.Logger;
 
 @Mod(Chisel.MODID)
@@ -48,11 +47,14 @@ public class Chisel {
     public static final String MODID = "chisel";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Chisel(IEventBus modEventBus, ModContainer modContainer) {
+    public Chisel() {
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModContainer modContainer = ModLoadingContext.get().getContainer();
         modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::registerCapabilities);
 
-        ChiselRebornCompat.registerAliases();
+        ChiselRebornCompat.init();
+
+        ChiselNetwork.register();
 
         ChiselRegistries.BLOCKS.register(modEventBus);
         ChiselRegistries.ITEMS.register(modEventBus);
@@ -60,7 +62,6 @@ public class Chisel {
         ChiselRegistries.BLOCK_ENTITY_TYPES.register(modEventBus);
         ChiselRegistries.MENU_TYPES.register(modEventBus);
         ChiselRegistries.SOUND_EVENTS.register(modEventBus);
-        ChiselRegistries.DATA_COMPONENT_TYPES.register(modEventBus);
         ChiselRegistries.PARTICLE_TYPES.register(modEventBus);
 
         ChiselSounds.init();
@@ -72,7 +73,7 @@ public class Chisel {
         ChiselDataComponents.init();
         ChiselBlockEntities.init();
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, ChiselConfig.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ChiselConfig.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -83,40 +84,11 @@ public class Chisel {
         }
     }
 
-    private void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
-                ChiselBlockEntities.AUTO_CHISEL.get(),
-                (blockEntity, side) -> {
-                    if (side == Direction.DOWN) {
-                        return blockEntity.getOutputInv();
-                    } else if (side == Direction.UP) {
-                        return blockEntity.getInputInv();
-                    } else if (side == null) {
-                        return new CombinedInvWrapper(
-                                blockEntity.getInputInv(),
-                                blockEntity.getOutputInv(),
-                                blockEntity.getChiselSlot(),
-                                blockEntity.getTargetSlot()
-                        );
-                    } else {
-                        return new CombinedInvWrapper(blockEntity.getInputInv(), blockEntity.getOutputInv());
-                    }
-                }
-        );
-
-        event.registerBlockEntity(
-                Capabilities.EnergyStorage.BLOCK,
-                ChiselBlockEntities.AUTO_CHISEL.get(),
-                (blockEntity, side) -> blockEntity.getEnergyStorage()
-        );
-    }
-
     public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+        return new ResourceLocation(MODID, path);
     }
 
-    @EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
@@ -150,17 +122,19 @@ public class Chisel {
         }
 
         private static void registerBlockRenderType(ChiselBlockType<?> blockType, RenderType renderType) {
-            for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
-                Block block = deferredBlock.get();
+            for (net.minecraftforge.registries.RegistryObject<?> registryObject : blockType.getAllBlocks()) {
+                Block block = (Block) registryObject.get();
                 ItemBlockRenderTypes.setRenderLayer(block, renderType);
             }
         }
 
         @SubscribeEvent
-        public static void registerMenuScreens(RegisterMenuScreensEvent event) {
-            event.register(ChiselMenus.CHISEL_MENU.get(), ChiselScreen::new);
-            event.register(ChiselMenus.HITECH_CHISEL_MENU.get(), HitechChiselScreen::new);
-            event.register(ChiselMenus.AUTO_CHISEL_MENU.get(), AutoChiselScreen::new);
+        public static void registerMenuScreens(FMLClientSetupEvent event) {
+            event.enqueueWork(() -> {
+                MenuScreens.register(ChiselMenus.CHISEL_MENU.get(), ChiselScreen::new);
+                MenuScreens.register(ChiselMenus.HITECH_CHISEL_MENU.get(), HitechChiselScreen::new);
+                MenuScreens.register(ChiselMenus.AUTO_CHISEL_MENU.get(), AutoChiselScreen::new);
+            });
         }
 
         @SubscribeEvent

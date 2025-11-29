@@ -1,13 +1,12 @@
 package com.leclowndu93150.chisel.compat.kubejs;
 
+// TEMPORARILY DISABLED FOR 1.20.1 BACKPORT - KubeJS not in dependencies
+
+/*
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
 
-/**
- * KubeJS plugin for Chisel mod integration.
- * Allows modpack makers to modify carving groups via server scripts.
- */
 public class ChiselKubeJSPlugin implements KubeJSPlugin {
 
     @Override
@@ -20,3 +19,4 @@ public class ChiselKubeJSPlugin implements KubeJSPlugin {
         bindings.add("Chisel", ChiselBinding.class);
     }
 }
+*/

@@ -1,7 +1,10 @@
 package com.leclowndu93150.chisel.client.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 
@@ -15,10 +18,25 @@ public class ClientUtil {
             false,
             true,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
-                    .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                    .setCullState(RenderStateShard.NO_CULL)
-                    .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+                    .setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionColorShader))
+                    .setTransparencyState(new RenderStateShard.TransparencyStateShard(
+                            "translucent_transparency",
+                            () -> {
+                                RenderSystem.enableBlend();
+                                RenderSystem.blendFuncSeparate(
+                                        GlStateManager.SourceFactor.SRC_ALPHA,
+                                        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                                        GlStateManager.SourceFactor.ONE,
+                                        GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
+                                );
+                            },
+                            () -> {
+                                RenderSystem.disableBlend();
+                                RenderSystem.defaultBlendFunc();
+                            }
+                    ))
+                    .setCullState(new RenderStateShard.CullStateShard(false))
+                    .setDepthTestState(new RenderStateShard.DepthTestStateShard("lequal", 515))
                     .createCompositeState(false)
     );
 }

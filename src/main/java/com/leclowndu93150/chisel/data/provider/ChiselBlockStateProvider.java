@@ -8,9 +8,9 @@ import com.leclowndu93150.chisel.data.ChiselModelTemplates;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.minecraftforge.client.model.generators.BlockStateProvider;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 
 /**
  * Data provider for generating blockstate and block model JSON files.
@@ -26,8 +26,8 @@ public class ChiselBlockStateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             ChiselModelTemplates.ModelTemplate defaultTemplate = blockType.getDefaultModelTemplate();
-            for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
-                Block block = deferredBlock.get();
+            for (RegistryObject<?> registryObject : blockType.getAllBlocks()) {
+                Block block = (Block) registryObject.get();
                 if (block instanceof ICarvable carvable) {
                     generateBlockStateAndModel(block, carvable.getVariation(), defaultTemplate);
                 }

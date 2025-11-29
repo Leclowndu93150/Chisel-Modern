@@ -4,11 +4,11 @@ import com.leclowndu93150.chisel.Chisel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ChiselCreativeTabs {
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CHISEL_TAB =
+    public static final RegistryObject<CreativeModeTab> CHISEL_TAB =
             ChiselRegistries.CREATIVE_TABS.register("chisel_tab", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.chisel"))
                     .icon(() -> ChiselItems.IRON_CHISEL.get().getDefaultInstance())

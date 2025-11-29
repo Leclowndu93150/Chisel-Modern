@@ -1,13 +1,12 @@
 package com.leclowndu93150.chisel.compat.kubejs;
 
+// TEMPORARILY DISABLED FOR 1.20.1 BACKPORT - KubeJS not in dependencies
+
+/*
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.ChiselSound;
 import dev.latvian.mods.kubejs.typings.Info;
 
-/**
- * Global Chisel binding for KubeJS scripts.
- * Provides utility methods and constants.
- */
 public class ChiselBinding {
 
     @Info("The Chisel mod ID")
@@ -35,3 +34,4 @@ public class ChiselBinding {
         return Chisel.MODID + ":carving/" + groupName;
     }
 }
+*/

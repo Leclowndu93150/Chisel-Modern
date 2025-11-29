@@ -26,9 +26,14 @@ public class ButtonChiselMode extends Button {
 
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
 
-        graphics.blitSprite(SPRITES.get(this.active, this.isHovered()), this.getX(), this.getY(), this.width, this.height);
+        int textureY = getTextureY();
+        graphics.blitNineSliced(WIDGETS_LOCATION, this.getX(), this.getY(), this.getWidth(), this.getHeight(), 20, 4, 200, 20, 0, textureY);
+
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         ResourceLocation spriteSheet = mode.getSpriteSheet();
         int[] spritePos = mode.getSpritePos();
@@ -46,6 +51,16 @@ public class ButtonChiselMode extends Button {
                 256,
                 256
         );
+    }
+
+    private int getTextureY() {
+        int i = 1;
+        if (!this.active) {
+            i = 0;
+        } else if (this.isHoveredOrFocused()) {
+            i = 2;
+        }
+        return 46 + i * 20;
     }
 
     @Override

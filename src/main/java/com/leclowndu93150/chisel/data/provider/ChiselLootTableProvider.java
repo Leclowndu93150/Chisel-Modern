@@ -2,38 +2,36 @@ package com.leclowndu93150.chisel.data.provider;
 
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class ChiselLootTableProvider extends LootTableProvider {
 
-    public ChiselLootTableProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+    public ChiselLootTableProvider(PackOutput output) {
         super(output, Set.of(), List.of(
                 new SubProviderEntry(ChiselBlockLoot::new, LootContextParamSets.BLOCK)
-        ), registries);
+        ));
     }
 
     private static class ChiselBlockLoot extends BlockLootSubProvider {
 
-        protected ChiselBlockLoot(HolderLookup.Provider provider) {
-            super(Set.of(), FeatureFlags.REGISTRY.allFlags(), provider);
+        protected ChiselBlockLoot() {
+            super(Set.of(), FeatureFlags.REGISTRY.allFlags());
         }
 
         @Override
         protected void generate() {
             for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
-                for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
-                    Block block = deferredBlock.get();
+                for (RegistryObject<?> registryObject : blockType.getAllBlocks()) {
+                    Block block = (Block) registryObject.get();
                     dropSelf(block);
                 }
             }
@@ -42,7 +40,7 @@ public class ChiselLootTableProvider extends LootTableProvider {
         @Override
         protected Iterable<Block> getKnownBlocks() {
             return ChiselBlocks.getAllBlocks().stream()
-                    .map(DeferredBlock::get)
+                    .map(RegistryObject::get)
                     .map(block -> (Block) block)
                     .toList();
         }

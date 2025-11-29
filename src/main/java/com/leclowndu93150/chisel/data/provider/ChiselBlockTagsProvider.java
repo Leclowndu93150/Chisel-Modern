@@ -8,9 +8,9 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.minecraftforge.common.data.BlockTagsProvider;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -30,8 +30,8 @@ public class ChiselBlockTagsProvider extends BlockTagsProvider {
 
             IntrinsicTagAppender<Block> tagBuilder = tag(carvingTag);
 
-            for (DeferredBlock<?> block : blockType.getAllBlocks()) {
-                tagBuilder.add(block.get());
+            for (RegistryObject<?> registryObject : blockType.getAllBlocks()) {
+                tagBuilder.add((Block) registryObject.get());
             }
 
             for (ResourceLocation vanillaId : blockType.getVanillaBlocks()) {
@@ -46,8 +46,8 @@ public class ChiselBlockTagsProvider extends BlockTagsProvider {
 
             for (TagKey<Block> blockTag : blockType.getBlockTags()) {
                 IntrinsicTagAppender<Block> miningTagBuilder = tag(blockTag);
-                for (DeferredBlock<?> block : blockType.getAllBlocks()) {
-                    miningTagBuilder.add(block.get());
+                for (RegistryObject<?> registryObject : blockType.getAllBlocks()) {
+                    miningTagBuilder.add((Block) registryObject.get());
                 }
             }
         }

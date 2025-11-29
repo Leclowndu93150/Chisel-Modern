@@ -9,9 +9,8 @@ import com.leclowndu93150.chisel.init.ChiselItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.data.LanguageProvider;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ChiselLanguageProvider extends LanguageProvider {
 
@@ -26,8 +25,8 @@ public class ChiselLanguageProvider extends LanguageProvider {
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             String groupName = blockType.getGroupName();
 
-            for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
-                Block block = deferredBlock.get();
+            for (RegistryObject<?> registryObject : blockType.getAllBlocks()) {
+                Block block = (Block) registryObject.get();
                 if (block instanceof ICarvable carvable) {
                     VariationData variation = carvable.getVariation();
                     String displayName = groupName + " - " + variation.localizedName();

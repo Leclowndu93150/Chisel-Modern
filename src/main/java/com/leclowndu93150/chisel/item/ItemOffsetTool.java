@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
 import com.leclowndu93150.chisel.api.chunkdata.OffsetData;
-import com.leclowndu93150.chisel.network.ChunkDataPayload;
+import com.leclowndu93150.chisel.network.client.ChunkDataPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import com.leclowndu93150.chisel.network.ChiselNetwork;
 
 import java.awt.geom.Line2D;
 import java.util.*;
@@ -74,10 +74,10 @@ public class ItemOffsetTool extends Item {
                 CompoundTag tag = new CompoundTag();
                 data.writeToNBT(tag);
 
-                PacketDistributor.sendToPlayersTrackingChunk(
-                        serverLevel,
-                        chunkPos,
-                        new ChunkDataPayload(chunkPos.x, chunkPos.z, tag)
+                LevelChunk trackingChunk = serverLevel.getChunk(chunkPos.x, chunkPos.z);
+                ChiselNetwork.sendToAllTrackingChunk(
+                        trackingChunk,
+                        new ChunkDataPacket(chunkPos.x, chunkPos.z, tag)
                 );
             }
         }
@@ -136,7 +136,7 @@ public class ItemOffsetTool extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("chisel.tooltip.offset_tool.1")
                 .withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("chisel.tooltip.offset_tool.2")

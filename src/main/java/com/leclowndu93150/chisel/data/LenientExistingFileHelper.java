@@ -2,7 +2,7 @@ package com.leclowndu93150.chisel.data;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

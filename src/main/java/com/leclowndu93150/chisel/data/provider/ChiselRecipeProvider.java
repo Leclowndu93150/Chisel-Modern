@@ -3,25 +3,24 @@ package com.leclowndu93150.chisel.data.provider;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselItems;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.Tags;
+import net.minecraftforge.common.Tags;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class ChiselRecipeProvider extends RecipeProvider {
 
-    public ChiselRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries);
+    public ChiselRecipeProvider(PackOutput output) {
+        super(output);
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput output) {
+    protected void buildRecipes(Consumer<FinishedRecipe> output) {
         buildToolRecipes(output);
         buildAutoChiselRecipe(output);
         buildFactoryRecipes(output);
@@ -45,7 +44,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildHolystoneRecipes(output);
     }
 
-    private void buildToolRecipes(RecipeOutput output) {
+    private void buildToolRecipes(Consumer<FinishedRecipe> output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ChiselItems.IRON_CHISEL.get())
                 .pattern(" I")
                 .pattern("S ")
@@ -70,32 +69,32 @@ public class ChiselRecipeProvider extends RecipeProvider {
                 .save(output);
     }
 
-    private void buildAutoChiselRecipe(RecipeOutput output) {
+    private void buildAutoChiselRecipe(Consumer<FinishedRecipe> output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ChiselItems.AUTO_CHISEL.get())
                 .pattern("GGG")
                 .pattern("GRG")
                 .pattern("III")
-                .define('G', Tags.Items.GLASS_BLOCKS)
+                .define('G', Tags.Items.GLASS)
                 .define('R', Tags.Items.DUSTS_REDSTONE)
                 .define('I', Tags.Items.INGOTS_IRON)
                 .unlockedBy("has_redstone", has(Tags.Items.DUSTS_REDSTONE))
                 .save(output);
     }
 
-    private void buildFactoryRecipes(RecipeOutput output) {
+    private void buildFactoryRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.FACTORY.getBlock("dots") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.FACTORY.getBlock("dots").get(), 32)
                     .pattern("SXS")
                     .pattern("X X")
                     .pattern("SXS")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('X', Tags.Items.INGOTS_IRON)
                     .unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON))
                     .save(output, Chisel.id("factory/dots"));
         }
     }
 
-    private void buildLaboratoryRecipes(RecipeOutput output) {
+    private void buildLaboratoryRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.LABORATORY.getBlock("largesteel") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.LABORATORY.getBlock("largesteel").get(), 8)
                     .pattern("SSS")
@@ -108,41 +107,41 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildAntiblockRecipes(RecipeOutput output) {
+    private void buildAntiblockRecipes(Consumer<FinishedRecipe> output) {
         var block = ChiselBlocks.ANTIBLOCK.getBlock("white");
         if (block != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block.get(), 8)
                     .pattern(" S ")
                     .pattern("SGS")
                     .pattern(" S ")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('G', Blocks.GLOWSTONE)
                     .unlockedBy("has_glowstone", has(Blocks.GLOWSTONE))
                     .save(output, Chisel.id("antiblock/white"));
         }
     }
 
-    private void buildBrownstoneRecipes(RecipeOutput output) {
+    private void buildBrownstoneRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.BROWNSTONE.getBlock("default") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.BROWNSTONE.getBlock("default").get(), 4)
                     .pattern(" S ")
                     .pattern("SCS")
                     .pattern(" S ")
-                    .define('S', Tags.Items.SANDSTONE_BLOCKS)
+                    .define('S', Tags.Items.SANDSTONE)
                     .define('C', Items.CLAY_BALL)
                     .unlockedBy("has_clay", has(Items.CLAY_BALL))
                     .save(output, Chisel.id("brownstone/default"));
         }
     }
 
-    private void buildVoidstoneRecipes(RecipeOutput output) {
+    private void buildVoidstoneRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.VOIDSTONE.getBlock("bevel") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.VOIDSTONE.getBlock("bevel").get(), 16)
                     .pattern(" E ")
                     .pattern("OOO")
                     .pattern(" E ")
                     .define('E', Items.ENDER_EYE)
-                    .define('O', Tags.Items.OBSIDIANS)
+                    .define('O', Tags.Items.OBSIDIAN)
                     .unlockedBy("has_ender_eye", has(Items.ENDER_EYE))
                     .save(output, Chisel.id("voidstone/bevel_from_obsidian"));
 
@@ -157,7 +156,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildCharcoalRecipes(RecipeOutput output) {
+    private void buildCharcoalRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.CHARCOAL.getBlock("raw") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.CHARCOAL.getBlock("raw").get())
                     .pattern("CCC")
@@ -174,7 +173,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildHexplatingRecipes(RecipeOutput output) {
+    private void buildHexplatingRecipes(Consumer<FinishedRecipe> output) {
         for (DyeColor color : DyeColor.values()) {
             var hexType = ChiselBlocks.HEX_PLATING.get(color);
             if (hexType != null) {
@@ -184,7 +183,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
                             .pattern("SSS")
                             .pattern("SDS")
                             .pattern("NNN")
-                            .define('S', Tags.Items.STONES)
+                            .define('S', Tags.Items.STONE)
                             .define('D', color.getTag())
                             .define('N', Tags.Items.NUGGETS_IRON)
                             .unlockedBy("has_dye", has(color.getTag()))
@@ -194,7 +193,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildFuturaRecipes(RecipeOutput output) {
+    private void buildFuturaRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.FUTURA.getBlock("controller") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.FUTURA.getBlock("controller").get(), 8)
                     .pattern("IGI")
@@ -208,7 +207,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildValentinesRecipes(RecipeOutput output) {
+    private void buildValentinesRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.VALENTINES.getBlock("companion") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.VALENTINES.getBlock("companion").get(), 8)
                     .pattern("WWW")
@@ -221,7 +220,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildCustomStoneRecipes(RecipeOutput output) {
+    private void buildCustomStoneRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.MARBLE.getBlock("raw") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.MARBLE.getBlock("raw").get(), 4)
                     .pattern("SB")
@@ -243,33 +242,33 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildWaterstoneRecipes(RecipeOutput output) {
+    private void buildWaterstoneRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.WATERSTONE.getBlock("cracked") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.WATERSTONE.getBlock("cracked").get(), 8)
                     .pattern("SSS")
                     .pattern("SWS")
                     .pattern("SSS")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('W', Items.WATER_BUCKET)
                     .unlockedBy("has_water_bucket", has(Items.WATER_BUCKET))
                     .save(output, Chisel.id("waterstone/cracked"));
         }
     }
 
-    private void buildLavastoneRecipes(RecipeOutput output) {
+    private void buildLavastoneRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.LAVASTONE.getBlock("cracked") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.LAVASTONE.getBlock("cracked").get(), 8)
                     .pattern("SSS")
                     .pattern("SLS")
                     .pattern("SSS")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('L', Items.LAVA_BUCKET)
                     .unlockedBy("has_lava_bucket", has(Items.LAVA_BUCKET))
                     .save(output, Chisel.id("lavastone/cracked"));
         }
     }
 
-    private void buildIceRecipes(RecipeOutput output) {
+    private void buildIceRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.ICE.getBlock("cube") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.ICE.getBlock("cube").get(), 8)
                     .pattern("III")
@@ -291,7 +290,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildMiscellaneousRecipes(RecipeOutput output) {
+    private void buildMiscellaneousRecipes(Consumer<FinishedRecipe> output) {
         if (ChiselBlocks.CLOUD.getBlock("cloud") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.CLOUD.getBlock("cloud").get(), 8)
                     .pattern("WWW")
@@ -330,7 +329,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .pattern("SPS")
                     .pattern("PEP")
                     .pattern("SPS")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('P', Blocks.PURPUR_BLOCK)
                     .define('E', Items.ENDER_EYE)
                     .unlockedBy("has_ender_eye", has(Items.ENDER_EYE))
@@ -342,9 +341,9 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .pattern("OOO")
                     .pattern("OGO")
                     .pattern("OOO")
-                    .define('O', Tags.Items.OBSIDIANS)
+                    .define('O', Tags.Items.OBSIDIAN)
                     .define('G', Blocks.GLOWSTONE)
-                    .unlockedBy("has_obsidian", has(Tags.Items.OBSIDIANS))
+                    .unlockedBy("has_obsidian", has(Tags.Items.OBSIDIAN))
                     .save(output, Chisel.id("energized_voidstone/raw"));
         }
 
@@ -353,7 +352,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .pattern("OOO")
                     .pattern("OEO")
                     .pattern("OOO")
-                    .define('O', Tags.Items.OBSIDIANS)
+                    .define('O', Tags.Items.OBSIDIAN)
                     .define('E', Items.ENDER_EYE)
                     .unlockedBy("has_ender_eye", has(Items.ENDER_EYE))
                     .save(output, Chisel.id("runic_voidstone/raw"));
@@ -383,8 +382,8 @@ public class ChiselRecipeProvider extends RecipeProvider {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.SANDSTONE_SCRIBBLES.getBlock("scribbles").get(), 4)
                     .pattern("SS")
                     .pattern("SS")
-                    .define('S', Tags.Items.SANDSTONE_BLOCKS)
-                    .unlockedBy("has_sandstone", has(Tags.Items.SANDSTONE_BLOCKS))
+                    .define('S', Tags.Items.SANDSTONE)
+                    .unlockedBy("has_sandstone", has(Tags.Items.SANDSTONE))
                     .save(output, Chisel.id("sandstone_scribbles/scribbles"));
         }
 
@@ -418,7 +417,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildGlassRecipes(RecipeOutput output) {
+    private void buildGlassRecipes(Consumer<FinishedRecipe> output) {
         for (DyeColor color : DyeColor.values()) {
             var dyedGlassType = ChiselBlocks.GLASS_DYED.get(color);
             if (dyedGlassType != null) {
@@ -428,16 +427,16 @@ public class ChiselRecipeProvider extends RecipeProvider {
                             .pattern("GGG")
                             .pattern("GDG")
                             .pattern("GGG")
-                            .define('G', Tags.Items.GLASS_BLOCKS_COLORLESS)
+                            .define('G', Tags.Items.GLASS_COLORLESS)
                             .define('D', color.getTag())
-                            .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS_COLORLESS))
+                            .unlockedBy("has_glass", has(Tags.Items.GLASS_COLORLESS))
                             .save(output, Chisel.id("glassdyed/" + color.getSerializedName() + "_bubble"));
                 }
             }
         }
     }
 
-    private void buildBookshelfRecipes(RecipeOutput output) {
+    private void buildBookshelfRecipes(Consumer<FinishedRecipe> output) {
         String[] woodTypes = {"spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "bamboo", "crimson", "warped"};
 
         for (String woodType : woodTypes) {
@@ -476,14 +475,14 @@ public class ChiselRecipeProvider extends RecipeProvider {
         };
     }
 
-    private void buildFantasyRecipes(RecipeOutput output) {
+    private void buildFantasyRecipes(Consumer<FinishedRecipe> output) {
         // Fantasy 1: Stone + Gold Nugget
         if (ChiselBlocks.FANTASY.getBlock("brick") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.FANTASY.getBlock("brick").get(), 8)
                     .pattern("SSS")
                     .pattern("SGS")
                     .pattern("SSS")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('G', Tags.Items.NUGGETS_GOLD)
                     .unlockedBy("has_gold_nugget", has(Tags.Items.NUGGETS_GOLD))
                     .save(output, Chisel.id("fantasy/brick"));
@@ -499,28 +498,28 @@ public class ChiselRecipeProvider extends RecipeProvider {
         }
     }
 
-    private void buildWarningRecipes(RecipeOutput output) {
+    private void buildWarningRecipes(Consumer<FinishedRecipe> output) {
         // Stone + Sign
         if (ChiselBlocks.WARNING.getBlock("radiation") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.WARNING.getBlock("radiation").get(), 4)
                     .pattern("SSS")
                     .pattern("SIS")
                     .pattern("SSS")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('I', Items.OAK_SIGN)
                     .unlockedBy("has_sign", has(Items.OAK_SIGN))
                     .save(output, Chisel.id("warning/radiation"));
         }
     }
 
-    private void buildHolystoneRecipes(RecipeOutput output) {
+    private void buildHolystoneRecipes(Consumer<FinishedRecipe> output) {
         // Stone + Feather
         if (ChiselBlocks.HOLYSTONE.getBlock("raw") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.HOLYSTONE.getBlock("raw").get(), 8)
                     .pattern("SSS")
                     .pattern("SFS")
                     .pattern("SSS")
-                    .define('S', Tags.Items.STONES)
+                    .define('S', Tags.Items.STONE)
                     .define('F', Items.FEATHER)
                     .unlockedBy("has_feather", has(Items.FEATHER))
                     .save(output, Chisel.id("holystone/raw"));

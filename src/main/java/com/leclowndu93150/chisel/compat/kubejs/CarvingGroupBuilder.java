@@ -1,15 +1,16 @@
 package com.leclowndu93150.chisel.compat.kubejs;
 
+// TEMPORARILY DISABLED FOR 1.20.1 BACKPORT - KubeJS not in dependencies
+
+/*
+
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 
-/**
- * Builder for modifying a carving group in KubeJS.
- * Provides a fluent API for adding/removing blocks.
- */
+
 @ReturnsSelf
 public class CarvingGroupBuilder {
 
@@ -96,3 +97,4 @@ public class CarvingGroupBuilder {
         return ResourceLocation.fromNamespaceAndPath("minecraft", id);
     }
 }
+*/

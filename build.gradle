@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.120'
+    id 'net.neoforged.moddev.legacyforge' version '2.+'
 }
 
 version = mod_version
@@ -21,14 +21,14 @@ repositories {
 }
 
 base {
-    archivesName = mod_id+"-1.21.1-NeoForge"
+    archivesName = mod_id+"-1.20.1-Forge"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-neoForge {
+legacyForge {
     // Specify the version of NeoForge to use.
-    version = project.neo_version
+    version = project.minecraft_version+"-"+project.neo_version
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -104,15 +104,31 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
-    implementation "curse.maven:ctm-267602:5587515"
-    implementation "curse.maven:jei-238222:7229074"
-    implementation "curse.maven:jade-324717:6853386"
-    runtimeOnly "curse.maven:mekanism-268560:7132168"
-    implementation "curse.maven:ftb-ultimine-forge-386134:7188395"
-    implementation "curse.maven:architectury-api-419699:5786327"
-    implementation "curse.maven:ftb-library-forge-404465:7260617"
-    implementation "curse.maven:kubejs-238086:7255073"
-    implementation "curse.maven:rhino-416294:7104526"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1"))
+
+    modImplementation "curse.maven:ctm-267602:5983309"
+    modImplementation "curse.maven:jei-238222:7270446"
+    modImplementation "curse.maven:jade-324717:6855440"
+    //runtimeOnly "curse.maven:mekanism-268560:6552911"
+    modImplementation "curse.maven:ftb-ultimine-forge-386134:6899418"
+    modImplementation "curse.maven:architectury-api-419699:5137938"
+    modImplementation "curse.maven:ftb-library-forge-404465:6807424"
+    //modImplementation "curse.maven:kubejs-238086:5853326"
+    //modImplementation "curse.maven:rhino-416294:6186971"
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+
+    config "${mod_id}.mixins.json"
+}
+
+jar {
+    manifest.attributes([
+            "MixinConfigs": "chisel.mixins.json"
+    ])
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -139,7 +155,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 // this works with both building through Gradle and the IDE.
 sourceSets.main.resources.srcDir generateModMetadata
 // To avoid having to run "generateModMetadata" manually, make it run on every project reload
-neoForge.ideSyncTask generateModMetadata
+legacyForge.ideSyncTask generateModMetadata
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {

@@ -3,22 +3,22 @@ package com.leclowndu93150.chisel.event;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
 import com.leclowndu93150.chisel.api.chunkdata.OffsetData;
-import com.leclowndu93150.chisel.network.ChunkDataPayload;
+import com.leclowndu93150.chisel.network.client.ChunkDataPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.level.ChunkDataEvent;
-import net.neoforged.neoforge.event.level.ChunkEvent;
-import net.neoforged.neoforge.event.level.ChunkWatchEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import com.leclowndu93150.chisel.network.ChiselNetwork;
+import net.minecraftforge.event.level.ChunkDataEvent;
+import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.level.ChunkWatchEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@EventBusSubscriber(modid = Chisel.MODID)
+@Mod.EventBusSubscriber(modid = Chisel.MODID)
 public class ChiselChunkEvents {
 
     @SubscribeEvent
@@ -40,7 +40,7 @@ public class ChiselChunkEvents {
     @SubscribeEvent
     public static void onChunkLoad(ChunkDataEvent.Load event) {
         ChunkAccess chunk = event.getChunk();
-        Level level = chunk.getLevel();
+        Level level = (Level) event.getLevel();
         if (level == null || level.isClientSide()) return;
 
         CompoundTag tag = event.getData().getCompound(ChunkData.NBT_KEY);
@@ -54,7 +54,7 @@ public class ChiselChunkEvents {
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
         ChunkAccess chunk = event.getChunk();
-        Level level = chunk.getLevel();
+        Level level = (Level) event.getLevel();
         if (level == null) return;
 
         if (level.isClientSide()) {
@@ -63,7 +63,8 @@ public class ChiselChunkEvents {
     }
 
     @SubscribeEvent
-    public static void onChunkSentToClient(ChunkWatchEvent.Sent event) {
+    public static void onChunkSentToClient(ChunkWatchEvent.Watch event) {
+        // TODO not sure of this event (used to be Sent)
         ServerLevel level = event.getLevel();
         LevelChunk chunk = event.getChunk();
         ChunkPos chunkPos = chunk.getPos();
@@ -73,9 +74,9 @@ public class ChiselChunkEvents {
             CompoundTag tag = new CompoundTag();
             data.writeToNBT(tag);
 
-            PacketDistributor.sendToPlayer(
+            ChiselNetwork.sendToPlayer(
                     event.getPlayer(),
-                    new ChunkDataPayload(chunkPos.x, chunkPos.z, tag)
+                    new ChunkDataPacket(chunkPos.x, chunkPos.z, tag)
             );
         }
     }

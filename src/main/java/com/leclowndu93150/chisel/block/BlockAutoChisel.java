@@ -5,6 +5,7 @@ import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,8 +27,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlockAutoChisel extends BaseEntityBlock {
 
-    public static final MapCodec<BlockAutoChisel> CODEC = simpleCodec(BlockAutoChisel::new);
-
     private static final VoxelShape COLLISION_SHAPE = Shapes.or(
             box(0, 0, 0, 16, 10, 16),
             box(0, 10, 0, 1, 16, 16),
@@ -44,17 +43,12 @@ public class BlockAutoChisel extends BaseEntityBlock {
     }
 
     @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
-
-    @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof AutoChiselBlockEntity autoChisel) {
@@ -67,7 +61,7 @@ public class BlockAutoChisel extends BaseEntityBlock {
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
+        if (stack.hasCustomHoverName()) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof AutoChiselBlockEntity autoChisel) {
                 autoChisel.setCustomName(stack.getHoverName());
@@ -76,7 +70,7 @@ public class BlockAutoChisel extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock())) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof AutoChiselBlockEntity autoChisel) {

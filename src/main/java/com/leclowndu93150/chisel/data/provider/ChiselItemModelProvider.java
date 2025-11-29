@@ -13,8 +13,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -40,12 +39,12 @@ public class ChiselItemModelProvider implements DataProvider {
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             for (var entry : blockType.getBlocks().entrySet()) {
                 String variantName = entry.getKey();
-                DeferredBlock<?> deferredBlock = entry.getValue();
-                DeferredItem<BlockItem> item = blockType.getItem(variantName);
+                RegistryObject<?> registryObject = entry.getValue();
+                RegistryObject<BlockItem> item = (RegistryObject<BlockItem>) blockType.getItem(variantName);
 
                 if (item != null) {
                     String registryPath = item.getId().getPath();
-                    Block block = deferredBlock.get();
+                    Block block = (Block) registryObject.get();
                     JsonObject json;
 
                     String texturePath = blockType.getName() + "/" + variantName;

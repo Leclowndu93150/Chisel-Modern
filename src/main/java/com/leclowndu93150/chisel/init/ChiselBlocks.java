@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1463,13 +1463,13 @@ public class ChiselBlocks {
     /**
      * Get all registered blocks across all types.
      */
-    public static List<DeferredBlock<?>> getAllBlocks() {
+    public static List<RegistryObject<?>> getAllBlocks() {
         return ALL_BLOCK_TYPES.stream()
                 .flatMap(type -> type.getAllBlocks().stream())
                 .collect(Collectors.toList());
     }
 
-    public static final DeferredBlock<BlockAutoChisel> AUTO_CHISEL = ChiselRegistries.BLOCKS.register("auto_chisel",
+    public static final RegistryObject<BlockAutoChisel> AUTO_CHISEL = ChiselRegistries.BLOCKS.register("auto_chisel",
             () -> new BlockAutoChisel(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(2.5F)

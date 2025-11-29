@@ -1,5 +1,7 @@
 package com.leclowndu93150.chisel.item;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import com.leclowndu93150.chisel.ChiselConfig;
 import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.api.carving.IChiselMode;
@@ -18,8 +20,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,7 +31,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,6 +38,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 public class ItemChisel extends Item implements IChiselItem {
+
+    private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public enum ChiselType {
         IRON(false, false),
@@ -81,6 +84,13 @@ public class ItemChisel extends Item implements IChiselItem {
     public ItemChisel(ChiselType type, Properties properties) {
         super(properties);
         this.type = type;
+
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+        builder.put(
+            Attributes.ATTACK_DAMAGE,
+            new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", (double) type.getAttackDamage(), AttributeModifier.Operation.ADDITION)
+        );
+        this.defaultModifiers = builder.build();
     }
 
     public ChiselType getChiselType() {
@@ -109,7 +119,7 @@ public class ItemChisel extends Item implements IChiselItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("chisel.tooltip.gui").withStyle(ChatFormatting.GRAY));
 
         if (type.canLeftClick()) {
@@ -127,17 +137,13 @@ public class ItemChisel extends Item implements IChiselItem {
     }
 
     @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-        return ItemAttributeModifiers.builder()
-                .add(Attributes.ATTACK_DAMAGE,
-                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, type.getAttackDamage(), AttributeModifier.Operation.ADD_VALUE),
-                        EquipmentSlotGroup.MAINHAND)
-                .build();
+    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        return slot == EquipmentSlot.MAINHAND ? this.defaultModifiers : super.getDefaultAttributeModifiers(slot);
     }
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
+        stack.hurtAndBreak(1, attacker, (entity) -> entity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
         return true;
     }
 
@@ -166,7 +172,7 @@ public class ItemChisel extends Item implements IChiselItem {
                         public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player p) {
                             return new HitechChiselMenu(containerId, playerInv, hand);
                         }
-                    }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
+                    });
                 } else {
                     serverPlayer.openMenu(new MenuProvider() {
                         @Override
@@ -178,7 +184,7 @@ public class ItemChisel extends Item implements IChiselItem {
                         public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player p) {
                             return new ChiselMenu(containerId, playerInv, hand);
                         }
-                    }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
+                    });
                 }
                 return InteractionResultHolder.consume(stack);
             }
@@ -224,7 +230,7 @@ public class ItemChisel extends Item implements IChiselItem {
     }
 
     public IChiselMode getMode(ItemStack stack) {
-        ChiselData data = stack.get(ChiselDataComponents.CHISEL_DATA.get());
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
         if (data != null) {
             IChiselMode mode = ChiselModeRegistry.INSTANCE.getModeByName(data.mode());
             if (mode != null) {
@@ -235,58 +241,58 @@ public class ItemChisel extends Item implements IChiselItem {
     }
 
     public void setMode(ItemStack stack, IChiselMode mode) {
-        ChiselData data = stack.getOrDefault(ChiselDataComponents.CHISEL_DATA.get(), ChiselData.DEFAULT);
-        stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withMode(mode.name()));
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withMode(mode.name()));
     }
 
     public int getPreviewType(ItemStack stack) {
-        ChiselData data = stack.get(ChiselDataComponents.CHISEL_DATA.get());
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
         return data != null ? data.previewType() : 0;
     }
 
     public void setPreviewType(ItemStack stack, int type) {
-        ChiselData data = stack.getOrDefault(ChiselDataComponents.CHISEL_DATA.get(), ChiselData.DEFAULT);
-        stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withPreviewType(type));
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withPreviewType(type));
     }
 
     public int getSelectionSlot(ItemStack stack) {
-        ChiselData data = stack.get(ChiselDataComponents.CHISEL_DATA.get());
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
         return data != null ? data.selectionSlot() : -1;
     }
 
     public void setSelectionSlot(ItemStack stack, int slot) {
-        ChiselData data = stack.getOrDefault(ChiselDataComponents.CHISEL_DATA.get(), ChiselData.DEFAULT);
-        stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withSelectionSlot(slot));
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withSelectionSlot(slot));
     }
 
     public int getTargetSlot(ItemStack stack) {
-        ChiselData data = stack.get(ChiselDataComponents.CHISEL_DATA.get());
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
         return data != null ? data.targetSlot() : -1;
     }
 
     public void setTargetSlot(ItemStack stack, int slot) {
-        ChiselData data = stack.getOrDefault(ChiselDataComponents.CHISEL_DATA.get(), ChiselData.DEFAULT);
-        stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withTargetSlot(slot));
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withTargetSlot(slot));
     }
 
     public boolean getRotate(ItemStack stack) {
-        ChiselData data = stack.get(ChiselDataComponents.CHISEL_DATA.get());
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
         return data != null && data.rotate();
     }
 
     public void setRotate(ItemStack stack, boolean rotate) {
-        ChiselData data = stack.getOrDefault(ChiselDataComponents.CHISEL_DATA.get(), ChiselData.DEFAULT);
-        stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withRotate(rotate));
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withRotate(rotate));
     }
 
     public ItemStack getTarget(ItemStack stack) {
-        ChiselData data = stack.get(ChiselDataComponents.CHISEL_DATA.get());
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
         return data != null ? data.target() : ItemStack.EMPTY;
     }
 
     public void setTarget(ItemStack stack, ItemStack target) {
-        ChiselData data = stack.getOrDefault(ChiselDataComponents.CHISEL_DATA.get(), ChiselData.DEFAULT);
-        stack.set(ChiselDataComponents.CHISEL_DATA.get(), data.withTarget(target));
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withTarget(target));
     }
 
     public void cycleMode(ItemStack stack, Player player, boolean forward) {
@@ -334,7 +340,7 @@ public class ItemChisel extends Item implements IChiselItem {
                     public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player p) {
                         return new HitechChiselMenu(containerId, playerInv, hand);
                     }
-                }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
+                });
             } else {
                 serverPlayer.openMenu(new MenuProvider() {
                     @Override
@@ -346,7 +352,7 @@ public class ItemChisel extends Item implements IChiselItem {
                     public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player p) {
                         return new ChiselMenu(containerId, playerInv, hand);
                     }
-                }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
+                });
             }
         }
     }

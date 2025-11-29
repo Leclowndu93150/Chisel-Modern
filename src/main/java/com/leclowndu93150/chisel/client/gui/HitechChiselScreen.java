@@ -5,9 +5,10 @@ import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import com.leclowndu93150.chisel.carving.ChiselModeRegistry;
 import com.leclowndu93150.chisel.inventory.HitechChiselMenu;
 import com.leclowndu93150.chisel.item.ItemChisel;
-import com.leclowndu93150.chisel.network.server.ChiselButtonPayload;
-import com.leclowndu93150.chisel.network.server.ChiselModePayload;
-import com.leclowndu93150.chisel.network.server.HitechSettingsPayload;
+import com.leclowndu93150.chisel.network.ChiselNetwork;
+import com.leclowndu93150.chisel.network.server.ChiselButtonPacket;
+import com.leclowndu93150.chisel.network.server.ChiselModePacket;
+import com.leclowndu93150.chisel.network.server.HitechSettingsPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -30,9 +31,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.core.BlockPos;
+import net.minecraftforge.client.model.data.ModelData;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
@@ -175,7 +175,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
             slots = new int[] { selection.index };
         }
 
-        PacketDistributor.sendToServer(new ChiselButtonPayload(slots));
+        ChiselNetwork.sendToServer(new ChiselButtonPacket(slots));
 
         menu.chiselSlots(slots);
     }
@@ -184,7 +184,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
         ItemStack chisel = menu.getChisel();
         if (chisel.getItem() instanceof ItemChisel itemChisel) {
             itemChisel.setMode(chisel, mode);
-            PacketDistributor.sendToServer(new ChiselModePayload(getChiselSlot(), mode));
+            ChiselNetwork.sendToServer(new ChiselModePacket(getChiselSlot(), mode));
 
             for (var widget : children()) {
                 if (widget instanceof ButtonChiselMode modeButton) {
@@ -200,7 +200,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
             itemChisel.setPreviewType(chisel, previewMode.ordinal());
             itemChisel.setRotate(chisel, autoRotate);
         }
-        PacketDistributor.sendToServer(new HitechSettingsPayload(previewMode, autoRotate, getChiselSlot()));
+        ChiselNetwork.sendToServer(new HitechSettingsPacket((byte) previewMode.ordinal(), autoRotate, getChiselSlot()));
     }
 
     @Override
@@ -340,7 +340,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+        this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTick);
         this.renderTooltip(graphics, mouseX, mouseY);
 
@@ -370,7 +370,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     }
 
     @Override
-    protected void renderSlot(GuiGraphics graphics, Slot slot) {
+    public void renderSlot(GuiGraphics graphics, Slot slot) {
         if (slot == menu.getInputSlot()) {
             return;
         }
@@ -434,13 +434,13 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         if (isInPreviewArea(mouseX, mouseY)) {
-            zoom += (float) scrollY * 0.1F;
+            zoom += (float) delta * 0.1F;
             zoom = Math.max(0.5F, Math.min(3.0F, zoom));
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return super.mouseScrolled(mouseX, mouseY, delta);
     }
 
     private boolean isInPreviewArea(double mouseX, double mouseY) {

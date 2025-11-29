@@ -17,10 +17,10 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
-import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
-import net.neoforged.neoforge.common.world.BiomeModifier;
-import net.neoforged.neoforge.common.world.BiomeModifiers;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.minecraftforge.common.world.BiomeModifier;
+import net.minecraftforge.common.world.ForgeBiomeModifiers;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Set;
@@ -50,11 +50,11 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
 
     // Biome Modifiers (add to biomes)
     public static final ResourceKey<BiomeModifier> ADD_MARBLE = ResourceKey.create(
-            NeoForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_marble"));
+            ForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_marble"));
     public static final ResourceKey<BiomeModifier> ADD_LIMESTONE = ResourceKey.create(
-            NeoForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_limestone"));
+            ForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_limestone"));
     public static final ResourceKey<BiomeModifier> ADD_DIABASE = ResourceKey.create(
-            NeoForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_diabase"));
+            ForgeRegistries.Keys.BIOME_MODIFIERS, Chisel.id("add_diabase"));
 
     private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             .add(Registries.CONFIGURED_FEATURE, context -> {
@@ -113,13 +113,13 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                                     VerticalAnchor.absolute(-64), VerticalAnchor.absolute(0)))));
                 }
             })
-            .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
+            .add(ForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
                 var biomes = context.lookup(Registries.BIOME);
                 var placedFeatures = context.lookup(Registries.PLACED_FEATURE);
                 var overworldTag = biomes.getOrThrow(BiomeTags.IS_OVERWORLD);
 
                 if (ChiselBlocks.MARBLE.getBlock("raw") != null) {
-                    context.register(ADD_MARBLE, new BiomeModifiers.AddFeaturesBiomeModifier(
+                    context.register(ADD_MARBLE, new ForgeBiomeModifiers.AddFeaturesBiomeModifier(
                             overworldTag,
                             HolderSet.direct(
                                     placedFeatures.getOrThrow(ORE_MARBLE_UPPER),
@@ -129,7 +129,7 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                 }
 
                 if (ChiselBlocks.LIMESTONE.getBlock("raw") != null) {
-                    context.register(ADD_LIMESTONE, new BiomeModifiers.AddFeaturesBiomeModifier(
+                    context.register(ADD_LIMESTONE, new ForgeBiomeModifiers.AddFeaturesBiomeModifier(
                             overworldTag,
                             HolderSet.direct(
                                     placedFeatures.getOrThrow(ORE_LIMESTONE_UPPER),
@@ -139,7 +139,7 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                 }
 
                 if (ChiselBlocks.DIABASE.getBlock("raw") != null) {
-                    context.register(ADD_DIABASE, new BiomeModifiers.AddFeaturesBiomeModifier(
+                    context.register(ADD_DIABASE, new ForgeBiomeModifiers.AddFeaturesBiomeModifier(
                             overworldTag,
                             HolderSet.direct(
                                     placedFeatures.getOrThrow(ORE_DIABASE_PLACED)

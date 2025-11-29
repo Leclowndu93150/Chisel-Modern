@@ -13,8 +13,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -35,7 +35,7 @@ public class ChiselItemTagsProvider extends ItemTagsProvider {
 
             IntrinsicTagAppender<Item> tagBuilder = tag(carvingItemTag);
 
-            for (DeferredItem<BlockItem> item : blockType.getAllItems()) {
+            for (RegistryObject<BlockItem> item : blockType.getAllItems()) {
                 tagBuilder.add(item.get());
             }
 
@@ -50,7 +50,7 @@ public class ChiselItemTagsProvider extends ItemTagsProvider {
 
             for (TagKey<Item> itemTag : blockType.getItemTags()) {
                 IntrinsicTagAppender<Item> itemTagBuilder = tag(itemTag);
-                for (DeferredItem<BlockItem> item : blockType.getAllItems()) {
+                for (RegistryObject<BlockItem> item : blockType.getAllItems()) {
                     itemTagBuilder.add(item.get());
                 }
             }

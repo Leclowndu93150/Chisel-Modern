@@ -14,8 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -53,8 +52,8 @@ public class ChiselBlockType<T extends Block & ICarvable> {
 
     private BiFunction<BlockBehaviour.Properties, VariationData, T> blockFactory;
 
-    private final Map<String, DeferredBlock<T>> registeredBlocks = new LinkedHashMap<>();
-    private final Map<String, DeferredItem<BlockItem>> registeredItems = new LinkedHashMap<>();
+    private final Map<String, RegistryObject<T>> registeredBlocks = new LinkedHashMap<>();
+    private final Map<String, RegistryObject<BlockItem>> registeredItems = new LinkedHashMap<>();
 
     @SuppressWarnings("unchecked")
     public ChiselBlockType(String name) {
@@ -233,31 +232,33 @@ public class ChiselBlockType<T extends Block & ICarvable> {
         for (VariationData variation : variations) {
             String registryName = name.replace("/", "_") + "/" + variation.name();
 
-            BlockBehaviour.Properties props;
-            if (customProperties != null) {
-                props = customProperties;
-            } else if (propertiesFrom != null) {
-                props = BlockBehaviour.Properties.ofFullCopy(propertiesFrom.get());
-            } else {
-                props = BlockBehaviour.Properties.of();
-            }
-
-            if (mapColor != null) {
-                props = props.mapColor(mapColor);
-            }
-
-            if (soundTypeSupplier != null) {
-                props = props.sound(soundTypeSupplier.get());
-            }
-
             final VariationData finalVariation = variation;
-            final BlockBehaviour.Properties finalProps = props;
 
-            DeferredBlock<T> block = ChiselRegistries.BLOCKS.register(registryName,
-                    () -> blockFactory.apply(finalProps, finalVariation));
+            RegistryObject<T> block = ChiselRegistries.BLOCKS.register(registryName,
+                    () -> {
+                        BlockBehaviour.Properties props;
+                        if (customProperties != null) {
+                            props = customProperties;
+                        } else if (propertiesFrom != null) {
+                            props = BlockBehaviour.Properties.copy(propertiesFrom.get());
+                        } else {
+                            props = BlockBehaviour.Properties.of();
+                        }
+
+                        if (mapColor != null) {
+                            props = props.mapColor(mapColor);
+                        }
+
+                        if (soundTypeSupplier != null) {
+                            props = props.sound(soundTypeSupplier.get());
+                        }
+
+                        return blockFactory.apply(props, finalVariation);
+                    });
             registeredBlocks.put(variation.name(), block);
 
-            DeferredItem<BlockItem> item = ChiselRegistries.ITEMS.registerSimpleBlockItem(registryName, block);
+            RegistryObject<BlockItem> item = ChiselRegistries.ITEMS.register(registryName,
+                    () -> new BlockItem(block.get(), new Item.Properties()));
             registeredItems.put(variation.name(), item);
         }
 
@@ -308,29 +309,29 @@ public class ChiselBlockType<T extends Block & ICarvable> {
         return chiselSound;
     }
 
-    public Map<String, DeferredBlock<T>> getBlocks() {
+    public Map<String, RegistryObject<T>> getBlocks() {
         return Collections.unmodifiableMap(registeredBlocks);
     }
 
-    public Map<String, DeferredItem<BlockItem>> getItems() {
+    public Map<String, RegistryObject<BlockItem>> getItems() {
         return Collections.unmodifiableMap(registeredItems);
     }
 
     @Nullable
-    public DeferredBlock<T> getBlock(String variationName) {
+    public RegistryObject<T> getBlock(String variationName) {
         return registeredBlocks.get(variationName);
     }
 
     @Nullable
-    public DeferredItem<BlockItem> getItem(String variationName) {
+    public RegistryObject<BlockItem> getItem(String variationName) {
         return registeredItems.get(variationName);
     }
 
-    public List<DeferredBlock<T>> getAllBlocks() {
+    public List<RegistryObject<T>> getAllBlocks() {
         return new ArrayList<>(registeredBlocks.values());
     }
 
-    public List<DeferredItem<BlockItem>> getAllItems() {
+    public List<RegistryObject<BlockItem>> getAllItems() {
         return new ArrayList<>(registeredItems.values());
     }
 

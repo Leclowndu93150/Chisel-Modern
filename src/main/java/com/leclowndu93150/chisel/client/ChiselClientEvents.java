@@ -9,17 +9,17 @@ import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.registries.RegistryObject;
 import team.chisel.ctm.client.texture.ctx.OffsetProviderRegistry;
 
 import java.util.Map;
 
-@EventBusSubscriber(modid = Chisel.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Chisel.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ChiselClientEvents {
 
     private static final int DEFAULT_WATER_COLOR = 0x3F76E4;
@@ -39,7 +39,7 @@ public class ChiselClientEvents {
             ChiselBlockType<?> blockType = entry.getValue();
 
             Block[] blocks = blockType.getAllBlocks().stream()
-                    .map(DeferredBlock::get)
+                    .map(RegistryObject::get)
                     .toArray(Block[]::new);
 
             event.register((state, level, pos, tintIndex) ->
@@ -47,7 +47,7 @@ public class ChiselClientEvents {
         }
 
         Block[] waterstoneBlocks = ChiselBlocks.WATERSTONE.getAllBlocks().stream()
-                .map(DeferredBlock::get)
+                .map(RegistryObject::get)
                 .toArray(Block[]::new);
 
         event.register((state, level, pos, tintIndex) -> {

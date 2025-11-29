@@ -51,7 +51,7 @@ public class ChiselMenu extends AbstractContainerMenu {
     public static Supplier<MenuType<ChiselMenu>> MENU_TYPE_SUPPLIER;
 
     public ChiselMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
-        this(containerId, playerInv, buf.readBoolean() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+        this(containerId, playerInv, buf != null && buf.readBoolean() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
     }
 
     public ChiselMenu(int containerId, Inventory playerInv, InteractionHand hand) {

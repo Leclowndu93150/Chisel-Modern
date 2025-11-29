@@ -5,7 +5,7 @@ import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import com.leclowndu93150.chisel.carving.ChiselModeRegistry;
 import com.leclowndu93150.chisel.inventory.ChiselMenu;
 import com.leclowndu93150.chisel.item.ItemChisel;
-import com.leclowndu93150.chisel.network.server.ChiselModePayload;
+import com.leclowndu93150.chisel.network.server.ChiselModePacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
@@ -20,7 +20,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import com.leclowndu93150.chisel.network.ChiselNetwork;
 
 import java.util.List;
 
@@ -102,7 +102,7 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
             int slot = menu.getHand() == InteractionHand.MAIN_HAND
                     ? minecraft.player.getInventory().selected
                     : 40; // Offhand slot
-            PacketDistributor.sendToServer(new ChiselModePayload(slot, mode));
+            ChiselNetwork.sendToServer(new ChiselModePacket(slot, mode));
         }
     }
 
@@ -119,7 +119,7 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
+        this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTick);
         this.renderTooltip(graphics, mouseX, mouseY);
     }
@@ -161,7 +161,7 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
     }
 
     @Override
-    protected void renderSlot(GuiGraphics graphics, Slot slot) {
+    public void renderSlot(GuiGraphics graphics, Slot slot) {
         if (slot == menu.getInputSlot()) {
             PoseStack poseStack = graphics.pose();
             poseStack.pushPose();
