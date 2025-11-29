@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 @Mod(Chisel.MODID)
 public class Chisel {
     public static final String MODID = "chisel";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public Chisel() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();

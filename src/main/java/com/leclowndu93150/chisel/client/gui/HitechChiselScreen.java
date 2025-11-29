@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -33,7 +34,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.client.model.data.ModelData;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
 
@@ -89,9 +89,14 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
                 .bounds(leftPos + PREVIEW_BUTTON_X, topPos + PREVIEW_BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
-        chiselButton = addRenderableWidget(Button.builder(Component.translatable("chisel.button.chisel"), this::onChiselClick)
+        chiselButton = addRenderableWidget(new Button.Builder(Component.translatable("chisel.button.chisel"), this::onChiselClick)
                 .bounds(leftPos + PREVIEW_BUTTON_X, topPos + CHISEL_BUTTON_Y, BUTTON_WIDTH, BUTTON_HEIGHT)
-                .build());
+                .build(builder -> new Button(builder) {
+                    @Override
+                    public void playDownSound(SoundManager handler) {
+                       // don't play anything
+                    }
+                }));
 
         addModeButtons();
 

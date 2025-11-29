@@ -8,8 +8,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -94,7 +97,10 @@ public class ChiselButtonPacket {
         }
 
         if (chiseledAny) {
-            CarvingHelper.playChiselSound(player.level(), player);
+            Block targetBlock = target.getItem() instanceof BlockItem blockItem
+                ? blockItem.getBlock()
+                : Blocks.AIR;
+            CarvingHelper.playChiselSound(player.level(), player, targetBlock);
         }
     }
 }

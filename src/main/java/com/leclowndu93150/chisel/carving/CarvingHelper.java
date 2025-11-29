@@ -244,7 +244,7 @@ public class CarvingHelper {
             chiselSound = ChiselSound.FALLBACK;
         }
         float randomValue = level.random.nextFloat();
-        level.playSound(player, player.blockPosition(), chiselSound.getSound(),
+        level.playSound(null, player.blockPosition(), chiselSound.getSound(),
                 SoundSource.PLAYERS, chiselSound.getVolume(randomValue), chiselSound.getPitch(randomValue));
     }
 
