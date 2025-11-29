@@ -85,7 +85,7 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                     context.register(ORE_MARBLE_UPPER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_MARBLE),
                             commonOrePlacement(6, HeightRangePlacement.uniform(
-                                    VerticalAnchor.absolute(64), VerticalAnchor.absolute(128)))));
+                                    VerticalAnchor.absolute(0), VerticalAnchor.absolute(60)))));
 
                     context.register(ORE_MARBLE_LOWER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_MARBLE),
@@ -97,7 +97,7 @@ public class ChiselWorldGenProvider extends DatapackBuiltinEntriesProvider {
                     context.register(ORE_LIMESTONE_UPPER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_LIMESTONE),
                             commonOrePlacement(6, HeightRangePlacement.uniform(
-                                    VerticalAnchor.absolute(64), VerticalAnchor.absolute(128)))));
+                                    VerticalAnchor.absolute(0), VerticalAnchor.absolute(60)))));
 
                     context.register(ORE_LIMESTONE_LOWER, new PlacedFeature(
                             configuredFeatures.getOrThrow(ORE_LIMESTONE),

@@ -111,6 +111,9 @@ public class ChiselController {
         if (!checkClickCache(player)) return;
 
         for (BlockPos pos : candidates) {
+            if (chisel.isEmpty()) {
+                break;
+            }
             setVariation(player, pos, origState, targetBlock, chisel, hand);
         }
     }
@@ -145,7 +148,10 @@ public class ChiselController {
 
         if (chiselStack.getItem() instanceof IChiselItem chisel) {
             EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
-            chisel.onChisel(level, player, chiselStack, targetBlock);
+
+            if (chisel.onChisel(level, player, chiselStack, targetBlock)) {
+                chiselStack.hurtAndBreak(1, player, slot);
+            }
 
             if (chiselStack.isEmpty() || chiselStack.getCount() <= 0) {
                 ItemStack targetItem = chisel.getTarget(chiselStack);

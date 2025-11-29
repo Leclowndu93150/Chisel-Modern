@@ -12,8 +12,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -220,6 +223,7 @@ public class HitechChiselMenu extends ChiselMenu {
 
         ItemStack targetStack = target.getItem();
         boolean chiseledAny = false;
+        Block targetBlock = targetStack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock() : Blocks.AIR;
 
         for (int slotIndex : slots) {
             Slot slot = getSlot(slotIndex);
@@ -238,17 +242,12 @@ public class HitechChiselMenu extends ChiselMenu {
             slot.set(converted);
             chiseledAny = true;
 
-            chiselItem.onChisel(inventoryPlayer.player.level(), inventoryPlayer.player, chisel,
-                    net.minecraft.world.level.block.Blocks.AIR);
+            chiselItem.onChisel(inventoryPlayer.player.level(), inventoryPlayer.player, chisel, targetBlock);
 
             if (chisel.isEmpty()) {
                 inventoryPlayer.setItem(chiselSlot, ItemStack.EMPTY);
                 break;
             }
-        }
-
-        if (chiseledAny) {
-            CarvingHelper.playChiselSound(inventoryPlayer.player.level(), inventoryPlayer.player);
         }
 
         if (selection != null && !selection.hasItem()) {
