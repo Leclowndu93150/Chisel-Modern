@@ -1,6 +1,5 @@
 package com.leclowndu93150.chisel.api.chunkdata;
 
-import com.leclowndu93150.chisel.mixin.RenderChunkRegionAccessor;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -32,7 +31,7 @@ public class ChunkData {
         if (world instanceof Level lvl) {
             level = lvl;
         } else if (world instanceof RenderChunkRegion region) {
-            level = ((RenderChunkRegionAccessor) region).chisel$getLevel();
+            level = region.level;
         }
 
         if (level == null) {
