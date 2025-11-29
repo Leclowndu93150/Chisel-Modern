@@ -93,6 +93,6 @@ public class ChiselDataComponents {
     public static final ChiselDataRegistryObject CHISEL_DATA = new ChiselDataRegistryObject();
 
     public static void init() {
-        // No-op for compatibility
+
     }
 }

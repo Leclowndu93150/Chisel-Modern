@@ -115,8 +115,8 @@ dependencies {
     modImplementation "curse.maven:ftb-ultimine-forge-386134:6899418"
     modImplementation "curse.maven:architectury-api-419699:5137938"
     modImplementation "curse.maven:ftb-library-forge-404465:6807424"
-    //modImplementation "curse.maven:kubejs-238086:5853326"
-    //modImplementation "curse.maven:rhino-416294:6186971"
+    modImplementation "curse.maven:kubejs-238086:5853326"
+    modImplementation "curse.maven:rhino-416294:6186971"
 }
 
 mixin {

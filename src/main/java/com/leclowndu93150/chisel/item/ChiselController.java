@@ -7,7 +7,7 @@ import com.leclowndu93150.chisel.ChiselConfig;
 import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
-//import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineHelper;
+import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -72,6 +72,15 @@ public class ChiselController {
         Iterable<? extends BlockPos> candidates = getCandidates(player, pos, side, chisel.getMode(held));
 
         ItemStack target = chisel.getTarget(held);
+
+        // iChisel requires a target to be selected
+        if (target.isEmpty() && held.getItem() instanceof ItemChisel itemChisel && itemChisel.getChiselType() == ItemChisel.ChiselType.HITECH) {
+            if (level.isClientSide) {
+                player.displayClientMessage(Component.translatable("chisel.message.no_target"), true);
+            }
+            event.setCanceled(true);
+            return;
+        }
 
         if (!target.isEmpty()) {
             TagKey<Item> targetGroup = CarvingHelper.getCarvingGroupForItem(target);
@@ -186,7 +195,7 @@ public class ChiselController {
 
     private static Iterable<? extends BlockPos> getCandidates(Player player, BlockPos pos, Direction side, IChiselMode mode) {
         if (ChiselConfig.enableUltimineCompat && ModList.get().isLoaded("ftbultimine")) {
-            Optional<Collection<BlockPos>> ultimineSelection = null; //FTBUltimineHelper.getBlockSelection(player);
+            Optional<Collection<BlockPos>> ultimineSelection = FTBUltimineHelper.getBlockSelection(player);
             if (ultimineSelection.isPresent()) {
                 return ultimineSelection.get();
             }

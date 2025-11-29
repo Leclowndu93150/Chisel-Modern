@@ -125,6 +125,9 @@ public class ItemChisel extends Item implements IChiselItem {
         if (type.canLeftClick()) {
             tooltip.add(Component.translatable("chisel.tooltip.leftclick.1").withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("chisel.tooltip.leftclick.2").withStyle(ChatFormatting.GRAY));
+            if (type == ChiselType.HITECH) {
+                tooltip.add(Component.translatable("chisel.tooltip.hitech.target").withStyle(ChatFormatting.YELLOW));
+            }
         }
 
         if (type.hasModes()) {

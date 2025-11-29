@@ -1,17 +1,10 @@
 package com.leclowndu93150.chisel.compat.kubejs;
 
-// TEMPORARILY DISABLED FOR 1.20.1 BACKPORT - KubeJS not in dependencies
-
-/*
-
 import dev.latvian.mods.kubejs.typings.Info;
-import dev.latvian.mods.rhino.util.ReturnsSelf;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 
-
-@ReturnsSelf
 public class CarvingGroupBuilder {
 
     private final ResourceLocation groupId;
@@ -92,9 +85,8 @@ public class CarvingGroupBuilder {
 
     private ResourceLocation parseBlockId(String id) {
         if (id.contains(":")) {
-            return ResourceLocation.parse(id);
+            return new ResourceLocation(id);
         }
-        return ResourceLocation.fromNamespaceAndPath("minecraft", id);
+        return new ResourceLocation("minecraft", id);
     }
 }
-*/

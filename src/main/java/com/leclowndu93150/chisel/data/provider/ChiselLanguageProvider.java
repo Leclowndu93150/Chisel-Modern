@@ -67,6 +67,9 @@ public class ChiselLanguageProvider extends LanguageProvider {
 
         add("chisel.message.mode_changed", "Mode changed to: %s");
         add("chisel.message.cooldown", "Chisel on cooldown: %ss");
+        add("chisel.message.no_target", "No target selected! Open GUI to select a target block.");
+
+        add("chisel.tooltip.hitech.target", "Requires a target block selected in the GUI to carve");
 
         add("chisel.mode.single", "Single");
         add("chisel.mode.single.desc", "Chisel a single block.");

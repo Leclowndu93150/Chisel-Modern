@@ -3,7 +3,9 @@
   "minVersion": "0.8",
   "package": "com.leclowndu93150.chisel.mixin",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "com.leclowndu93150.chisel.mixin.ChiselMixinPlugin",
   "mixins": [
+    "compat.ftbultimine.ShapeContextMixin"
   ],
   "client": [
     "RenderChunkRegionAccessor"

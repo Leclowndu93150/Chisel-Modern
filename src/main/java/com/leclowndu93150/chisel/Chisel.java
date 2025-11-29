@@ -8,7 +8,6 @@ import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
 import com.leclowndu93150.chisel.client.gui.ChiselScreen;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;
 import com.leclowndu93150.chisel.compat.ChiselRebornCompat;
-import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineCompat;
 import com.leclowndu93150.chisel.client.particle.HolystoneStarParticle;
 import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
@@ -23,7 +22,6 @@ import com.leclowndu93150.chisel.network.ChiselNetwork;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
@@ -37,7 +35,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import org.slf4j.Logger;
@@ -78,10 +75,6 @@ public class Chisel {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         ChiselMode.registerAll();
-
-        if (ModList.get().isLoaded("ftbultimine")) {
-            FTBUltimineCompat.init();
-        }
     }
 
     public static ResourceLocation id(String path) {
