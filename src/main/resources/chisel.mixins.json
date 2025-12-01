@@ -8,6 +8,7 @@
     "compat.ftbultimine.ShapeContextMixin"
   ],
   "client": [
+    "TextureMetaDataHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

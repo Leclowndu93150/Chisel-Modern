@@ -32,11 +32,11 @@ public class ChiselBlocks {
     public static final List<ChiselBlockType<?>> ALL_BLOCK_TYPES = new ArrayList<>();
 
     /**
-     * Creates a common tag for storage blocks (c:storage_blocks/metalname).
+     * Creates a common tag for storage blocks (forge:storage_blocks/metalname).
      * This allows modded metal blocks to be automatically included in chisel groups.
      */
     private static TagKey<Block> storageBlockTag(String metalName) {
-        return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/" + metalName));
+        return BlockTags.create(new ResourceLocation("forge", "storage_blocks/" + metalName));
     }
 
     public static final ChiselBlockType<BlockCarvable> ALUMINUM = registerType(
@@ -1296,87 +1296,91 @@ public class ChiselBlocks {
     }
 
     private static Block getConcreteBlock(DyeColor color) {
-        return switch (color) {
-            case WHITE -> Blocks.WHITE_CONCRETE;
-            case ORANGE -> Blocks.ORANGE_CONCRETE;
-            case MAGENTA -> Blocks.MAGENTA_CONCRETE;
-            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_CONCRETE;
-            case YELLOW -> Blocks.YELLOW_CONCRETE;
-            case LIME -> Blocks.LIME_CONCRETE;
-            case PINK -> Blocks.PINK_CONCRETE;
-            case GRAY -> Blocks.GRAY_CONCRETE;
-            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_CONCRETE;
-            case CYAN -> Blocks.CYAN_CONCRETE;
-            case PURPLE -> Blocks.PURPLE_CONCRETE;
-            case BLUE -> Blocks.BLUE_CONCRETE;
-            case BROWN -> Blocks.BROWN_CONCRETE;
-            case GREEN -> Blocks.GREEN_CONCRETE;
-            case RED -> Blocks.RED_CONCRETE;
-            case BLACK -> Blocks.BLACK_CONCRETE;
-        };
+        switch (color) {
+            case WHITE: return Blocks.WHITE_CONCRETE;
+            case ORANGE: return Blocks.ORANGE_CONCRETE;
+            case MAGENTA: return Blocks.MAGENTA_CONCRETE;
+            case LIGHT_BLUE: return Blocks.LIGHT_BLUE_CONCRETE;
+            case YELLOW: return Blocks.YELLOW_CONCRETE;
+            case LIME: return Blocks.LIME_CONCRETE;
+            case PINK: return Blocks.PINK_CONCRETE;
+            case GRAY: return Blocks.GRAY_CONCRETE;
+            case LIGHT_GRAY: return Blocks.LIGHT_GRAY_CONCRETE;
+            case CYAN: return Blocks.CYAN_CONCRETE;
+            case PURPLE: return Blocks.PURPLE_CONCRETE;
+            case BLUE: return Blocks.BLUE_CONCRETE;
+            case BROWN: return Blocks.BROWN_CONCRETE;
+            case GREEN: return Blocks.GREEN_CONCRETE;
+            case RED: return Blocks.RED_CONCRETE;
+            case BLACK: return Blocks.BLACK_CONCRETE;
+            default: return Blocks.WHITE_CONCRETE;
+        }
     }
 
     private static Block getWoolBlock(DyeColor color) {
-        return switch (color) {
-            case WHITE -> Blocks.WHITE_WOOL;
-            case ORANGE -> Blocks.ORANGE_WOOL;
-            case MAGENTA -> Blocks.MAGENTA_WOOL;
-            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_WOOL;
-            case YELLOW -> Blocks.YELLOW_WOOL;
-            case LIME -> Blocks.LIME_WOOL;
-            case PINK -> Blocks.PINK_WOOL;
-            case GRAY -> Blocks.GRAY_WOOL;
-            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_WOOL;
-            case CYAN -> Blocks.CYAN_WOOL;
-            case PURPLE -> Blocks.PURPLE_WOOL;
-            case BLUE -> Blocks.BLUE_WOOL;
-            case BROWN -> Blocks.BROWN_WOOL;
-            case GREEN -> Blocks.GREEN_WOOL;
-            case RED -> Blocks.RED_WOOL;
-            case BLACK -> Blocks.BLACK_WOOL;
-        };
+        switch (color) {
+            case WHITE: return Blocks.WHITE_WOOL;
+            case ORANGE: return Blocks.ORANGE_WOOL;
+            case MAGENTA: return Blocks.MAGENTA_WOOL;
+            case LIGHT_BLUE: return Blocks.LIGHT_BLUE_WOOL;
+            case YELLOW: return Blocks.YELLOW_WOOL;
+            case LIME: return Blocks.LIME_WOOL;
+            case PINK: return Blocks.PINK_WOOL;
+            case GRAY: return Blocks.GRAY_WOOL;
+            case LIGHT_GRAY: return Blocks.LIGHT_GRAY_WOOL;
+            case CYAN: return Blocks.CYAN_WOOL;
+            case PURPLE: return Blocks.PURPLE_WOOL;
+            case BLUE: return Blocks.BLUE_WOOL;
+            case BROWN: return Blocks.BROWN_WOOL;
+            case GREEN: return Blocks.GREEN_WOOL;
+            case RED: return Blocks.RED_WOOL;
+            case BLACK: return Blocks.BLACK_WOOL;
+            default: return Blocks.WHITE_WOOL;
+        }
     }
 
     private static Block getStainedGlassBlock(DyeColor color) {
-        return switch (color) {
-            case WHITE -> Blocks.WHITE_STAINED_GLASS;
-            case ORANGE -> Blocks.ORANGE_STAINED_GLASS;
-            case MAGENTA -> Blocks.MAGENTA_STAINED_GLASS;
-            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_STAINED_GLASS;
-            case YELLOW -> Blocks.YELLOW_STAINED_GLASS;
-            case LIME -> Blocks.LIME_STAINED_GLASS;
-            case PINK -> Blocks.PINK_STAINED_GLASS;
-            case GRAY -> Blocks.GRAY_STAINED_GLASS;
-            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_STAINED_GLASS;
-            case CYAN -> Blocks.CYAN_STAINED_GLASS;
-            case PURPLE -> Blocks.PURPLE_STAINED_GLASS;
-            case BLUE -> Blocks.BLUE_STAINED_GLASS;
-            case BROWN -> Blocks.BROWN_STAINED_GLASS;
-            case GREEN -> Blocks.GREEN_STAINED_GLASS;
-            case RED -> Blocks.RED_STAINED_GLASS;
-            case BLACK -> Blocks.BLACK_STAINED_GLASS;
-        };
+        switch (color) {
+            case WHITE: return Blocks.WHITE_STAINED_GLASS;
+            case ORANGE: return Blocks.ORANGE_STAINED_GLASS;
+            case MAGENTA: return Blocks.MAGENTA_STAINED_GLASS;
+            case LIGHT_BLUE: return Blocks.LIGHT_BLUE_STAINED_GLASS;
+            case YELLOW: return Blocks.YELLOW_STAINED_GLASS;
+            case LIME: return Blocks.LIME_STAINED_GLASS;
+            case PINK: return Blocks.PINK_STAINED_GLASS;
+            case GRAY: return Blocks.GRAY_STAINED_GLASS;
+            case LIGHT_GRAY: return Blocks.LIGHT_GRAY_STAINED_GLASS;
+            case CYAN: return Blocks.CYAN_STAINED_GLASS;
+            case PURPLE: return Blocks.PURPLE_STAINED_GLASS;
+            case BLUE: return Blocks.BLUE_STAINED_GLASS;
+            case BROWN: return Blocks.BROWN_STAINED_GLASS;
+            case GREEN: return Blocks.GREEN_STAINED_GLASS;
+            case RED: return Blocks.RED_STAINED_GLASS;
+            case BLACK: return Blocks.BLACK_STAINED_GLASS;
+            default: return Blocks.WHITE_STAINED_GLASS;
+        }
     }
 
     private static Block getStainedGlassPaneBlock(DyeColor color) {
-        return switch (color) {
-            case WHITE -> Blocks.WHITE_STAINED_GLASS_PANE;
-            case ORANGE -> Blocks.ORANGE_STAINED_GLASS_PANE;
-            case MAGENTA -> Blocks.MAGENTA_STAINED_GLASS_PANE;
-            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_STAINED_GLASS_PANE;
-            case YELLOW -> Blocks.YELLOW_STAINED_GLASS_PANE;
-            case LIME -> Blocks.LIME_STAINED_GLASS_PANE;
-            case PINK -> Blocks.PINK_STAINED_GLASS_PANE;
-            case GRAY -> Blocks.GRAY_STAINED_GLASS_PANE;
-            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_STAINED_GLASS_PANE;
-            case CYAN -> Blocks.CYAN_STAINED_GLASS_PANE;
-            case PURPLE -> Blocks.PURPLE_STAINED_GLASS_PANE;
-            case BLUE -> Blocks.BLUE_STAINED_GLASS_PANE;
-            case BROWN -> Blocks.BROWN_STAINED_GLASS_PANE;
-            case GREEN -> Blocks.GREEN_STAINED_GLASS_PANE;
-            case RED -> Blocks.RED_STAINED_GLASS_PANE;
-            case BLACK -> Blocks.BLACK_STAINED_GLASS_PANE;
-        };
+        switch (color) {
+            case WHITE: return Blocks.WHITE_STAINED_GLASS_PANE;
+            case ORANGE: return Blocks.ORANGE_STAINED_GLASS_PANE;
+            case MAGENTA: return Blocks.MAGENTA_STAINED_GLASS_PANE;
+            case LIGHT_BLUE: return Blocks.LIGHT_BLUE_STAINED_GLASS_PANE;
+            case YELLOW: return Blocks.YELLOW_STAINED_GLASS_PANE;
+            case LIME: return Blocks.LIME_STAINED_GLASS_PANE;
+            case PINK: return Blocks.PINK_STAINED_GLASS_PANE;
+            case GRAY: return Blocks.GRAY_STAINED_GLASS_PANE;
+            case LIGHT_GRAY: return Blocks.LIGHT_GRAY_STAINED_GLASS_PANE;
+            case CYAN: return Blocks.CYAN_STAINED_GLASS_PANE;
+            case PURPLE: return Blocks.PURPLE_STAINED_GLASS_PANE;
+            case BLUE: return Blocks.BLUE_STAINED_GLASS_PANE;
+            case BROWN: return Blocks.BROWN_STAINED_GLASS_PANE;
+            case GREEN: return Blocks.GREEN_STAINED_GLASS_PANE;
+            case RED: return Blocks.RED_STAINED_GLASS_PANE;
+            case BLACK: return Blocks.BLACK_STAINED_GLASS_PANE;
+            default: return Blocks.WHITE_STAINED_GLASS_PANE;
+        }
     }
 
     private static <T extends Block & com.leclowndu93150.chisel.api.block.ICarvable> Map<String, ChiselBlockType<T>> createWoodBlocks(
@@ -1392,35 +1396,25 @@ public class ChiselBlocks {
     }
 
     private static Block getPlanksBlock(String woodName) {
-        return switch (woodName) {
-            case "oak" -> Blocks.OAK_PLANKS;
-            case "spruce" -> Blocks.SPRUCE_PLANKS;
-            case "birch" -> Blocks.BIRCH_PLANKS;
-            case "jungle" -> Blocks.JUNGLE_PLANKS;
-            case "acacia" -> Blocks.ACACIA_PLANKS;
-            case "dark_oak" -> Blocks.DARK_OAK_PLANKS;
-            case "mangrove" -> Blocks.MANGROVE_PLANKS;
-            case "cherry" -> Blocks.CHERRY_PLANKS;
-            case "bamboo" -> Blocks.BAMBOO_PLANKS;
-            case "crimson" -> Blocks.CRIMSON_PLANKS;
-            case "warped" -> Blocks.WARPED_PLANKS;
-            default -> Blocks.OAK_PLANKS;
-        };
+        switch (woodName) {
+            case "oak": return Blocks.OAK_PLANKS;
+            case "spruce": return Blocks.SPRUCE_PLANKS;
+            case "birch": return Blocks.BIRCH_PLANKS;
+            case "jungle": return Blocks.JUNGLE_PLANKS;
+            case "acacia": return Blocks.ACACIA_PLANKS;
+            case "dark_oak": return Blocks.DARK_OAK_PLANKS;
+            case "mangrove": return Blocks.MANGROVE_PLANKS;
+            case "cherry": return Blocks.CHERRY_PLANKS;
+            case "bamboo": return Blocks.BAMBOO_PLANKS;
+            case "crimson": return Blocks.CRIMSON_PLANKS;
+            case "warped": return Blocks.WARPED_PLANKS;
+            default: return Blocks.OAK_PLANKS;
+        }
     }
 
     private static Block getBookshelfBlock(String woodName) {
-        return switch (woodName) {
-            case "birch" -> Blocks.BOOKSHELF;
-            case "jungle" -> Blocks.BOOKSHELF;
-            case "acacia" -> Blocks.BOOKSHELF;
-            case "dark_oak" -> Blocks.BOOKSHELF;
-            case "mangrove" -> Blocks.BOOKSHELF;
-            case "cherry" -> Blocks.BOOKSHELF;
-            case "bamboo" -> Blocks.BOOKSHELF;
-            case "crimson" -> Blocks.BOOKSHELF;
-            case "warped" -> Blocks.BOOKSHELF;
-            default -> Blocks.BOOKSHELF;
-        };
+        // All wood types use the vanilla bookshelf as a base
+        return Blocks.BOOKSHELF;
     }
 
     private static Map<String, ChiselBlockType<BlockCarvable>> createBookshelfBlocks() {
