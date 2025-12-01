@@ -4,7 +4,8 @@
   "package": "com.leclowndu93150.chisel.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "MappedRegistryMixin"
+    "MappedRegistryMixin",
+    "TextureMetadataHandlerMixin"
   ],
   "client": [
     "RenderChunkRegionAccessor"
