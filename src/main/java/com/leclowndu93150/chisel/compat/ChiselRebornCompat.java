@@ -37,6 +37,8 @@ public class ChiselRebornCompat {
 
     private static final Set<String> registeredAliases = new HashSet<>();
 
+    private static final String CHIPPED_INTEGRATION_MODID = "chisel_chipped_integration";
+
     private static final String[] COLORS = {
         "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
         "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
@@ -87,6 +89,10 @@ public class ChiselRebornCompat {
         count += registerFallbackAliases();
 
         LOGGER.info("Registered {} Chisel Reborn compatibility aliases", count);
+
+        // Chisel Chipped Integration mod aliases
+        int chippedCount = registerChiselChippedIntegrationAliases();
+        LOGGER.info("Registered {} Chisel Chipped Integration compatibility aliases", chippedCount);
     }
 
     private static String mapVariant(String rebornVariant) {
@@ -501,5 +507,260 @@ public class ChiselRebornCompat {
         ChiselRegistries.BLOCKS.addAlias(from, to);
         ChiselRegistries.ITEMS.addAlias(from, to);
         return true;
+    }
+
+    private static boolean registerCrossModAlias(String fromMod, String fromPath, String toPath) {
+        String key = fromMod + ":" + fromPath;
+        if (registeredAliases.contains(key)) {
+            return false;
+        }
+        registeredAliases.add(key);
+
+        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(fromMod, fromPath);
+        ResourceLocation to = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, toPath);
+
+        ChiselRegistries.BLOCKS.addAlias(from, to);
+        ChiselRegistries.ITEMS.addAlias(from, to);
+        return true;
+    }
+
+    private static boolean registerCrossModAliasToVanilla(String fromMod, String fromPath, String vanillaBlock) {
+        String key = fromMod + ":" + fromPath;
+        if (registeredAliases.contains(key)) {
+            return false;
+        }
+        registeredAliases.add(key);
+
+        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(fromMod, fromPath);
+        ResourceLocation to = ResourceLocation.withDefaultNamespace(vanillaBlock);
+
+        ChiselRegistries.BLOCKS.addAlias(from, to);
+        ChiselRegistries.ITEMS.addAlias(from, to);
+        return true;
+    }
+
+    // ==================== Chisel Chipped Integration Aliases ====================
+
+    private static int registerChiselChippedIntegrationAliases() {
+        int count = 0;
+
+        // Wool blocks - target format is wool_{color}/{variant}
+        for (String color : COLORS) {
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "wool_legacy_" + color, "wool_" + color + "/legacy") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "wool_llama_" + color, "wool_" + color + "/llama") ? 1 : 0;
+        }
+
+        // Carpet blocks -> vanilla carpets
+        for (String color : COLORS) {
+            count += registerCrossModAliasToVanilla(CHIPPED_INTEGRATION_MODID, "carpet_legacy_" + color, color + "_carpet") ? 1 : 0;
+            count += registerCrossModAliasToVanilla(CHIPPED_INTEGRATION_MODID, "carpet_llama_" + color, color + "_carpet") ? 1 : 0;
+        }
+
+        // Factory blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_blue_circuits", "factory/tilemosaic") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_blue_framed_circuit", "factory/frameblue") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_blue_wireframe", "factory/wireframeblue") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_circuit", "factory/circuit") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_dotted_rusty_plate", "factory/dots") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_gold_framed_purple_plates", "factory/goldplating") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_gold_plated_circuit", "factory/goldplate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_grinder", "factory/grinder") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_ice_ice_ice", "factory/iceiceice") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_metalbox", "factory/metalbox") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_metal_column", "factory/column") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_old_vents", "factory/plating") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_orange_white_caution_stripes", "factory/hazardorange") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_purple_wireframe", "factory/wireframe") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_rusty_plate", "factory/rust2") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_segmented_rusty_plates", "factory/rustplates") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_slighly_rusty_plate", "factory/platex") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_vents", "factory/vent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_very_rusty_plate", "factory/rust") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_wireframe", "factory/wireframewhite") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "factory_yellow_black_caution_stripes", "factory/hazard") ? 1 : 0;
+
+        // Laboratory blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_checkered_tiles", "laboratory/checkertile") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_console", "laboratory/infocon") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_dark_medium_tiles", "laboratory/floortile") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_dotted_panel", "laboratory/dottedpanel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_fuzzy_screen", "laboratory/fuzzscreen") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_large_steel", "laboratory/largesteel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_large_tiles", "laboratory/largetile") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_left_faced_arrows", "laboratory/directionleft") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_medium_tiles", "laboratory/smalltile") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_right_faced_arrows", "laboratory/directionright") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_roundel", "laboratory/roundel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_screen", "laboratory/fuzzscreen") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_small_steel", "laboratory/smallsteel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_tiles", "laboratory/floortile") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_vents", "laboratory/wallvents") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_white_panel", "laboratory/wallpanel") ? 1 : 0;
+
+        // Technical blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_cables", "technical/cables") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_caution_framed_plates", "technical/cautiontape") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_engineering_pipes_0", "technical/engineering") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_engineering_pipes_1", "technical/engineering") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_engineering_pipes_2", "technical/engineering") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_engineering_pipes_3", "technical/engineering") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_exhaust_plating", "technical/exhaustplating") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_extremely_corroded_panels", "technical/weatheredgreenpanels") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_extremely_rusted_panels", "technical/weatheredorangepanels") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_fan", "technical/fanfast") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_gears", "technical/spinningstuffanim") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_glowing_vent", "technical/ventglowing") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_grate", "technical/grate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_industrial_relic", "technical/industrialrelic") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_insulation", "technical/insulationv2") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_large_pipes", "technical/pipeslarge") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_large_rusty_scaffold", "technical/scaffoldlarge") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_make_shift_plating", "technical/makeshiftpanels") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_malfunction_fan", "technical/malfunctionfan") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_massive_fan", "technical/massivefan") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_massive_hexagonal_plating", "technical/massivehexplating") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_megacell", "technical/megacell") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_old_vent", "technical/vent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_pipes", "technical/piping") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_rusty_bolted_plates", "technical/rustyboltedplates") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_rusty_grate", "technical/graterusty") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_rusty_scaffold", "technical/scaffold") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_small_pipes", "technical/pipessmall") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_still_fan", "technical/fanstill") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_sturdy", "technical/sturdy") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_fan", "technical/fanfasttransparent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_rusty_scaffold", "technical/scaffoldtransparent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_still_fan", "technical/fanstilltransparent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_vent", "technical/vent") ? 1 : 0;
+
+        // Tyrian blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_black_scaled_plates", "tyrian/black") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_black_strips", "tyrian/black2") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_blue_plates", "tyrian/blueplating") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_dent", "tyrian/dent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_diagonal_plates", "tyrian/diagonal") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_disordered_metal_bits", "tyrian/shining") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_disordered_purple_bits", "tyrian/chaotic") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_metal_plates", "tyrian/tyrian") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_opening", "tyrian/opening") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_platform", "tyrian/platform") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_purple_plates", "tyrian/softplate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_routes", "tyrian/routes") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_rust", "tyrian/rust") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_shiny_plate", "tyrian/plate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_shiny_plates", "tyrian/elaborate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "tyrian_small_uneven_tiles", "tyrian/platetiles") ? 1 : 0;
+
+        // Metal blocks - iron and gold use "iron/{variant}" and "gold/{variant}"
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_iron_bolted", "iron/bolted") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_iron_caution", "iron/caution") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_iron_egregious", "iron/badgreggy") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_iron_industrial_relic", "iron/machine") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_iron_scaffold", "iron/scaffold") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_iron_shipping_crate", "iron/crate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_iron_thermal", "iron/thermal") ? 1 : 0;
+
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_gold_bolted", "gold/bolted") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_gold_caution", "gold/caution") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_gold_egregious", "gold/badgreggy") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_gold_industrial_relic", "gold/machine") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_gold_scaffold", "gold/scaffold") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_gold_shipping_crate", "gold/crate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_gold_thermal", "gold/thermal") ? 1 : 0;
+
+        // Other metals use "metals_{metal}/{variant}" format (metals/aluminum -> metals_aluminum)
+        String[] otherMetals = {"aluminum", "bronze", "cobalt", "copper", "electrum", "invar", "lead", "nickel", "platinum", "silver", "steel", "tin", "uranium"};
+        for (String metal : otherMetals) {
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_" + metal + "_bolted", "metals_" + metal + "/bolted") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_" + metal + "_caution", "metals_" + metal + "/caution") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_" + metal + "_egregious", "metals_" + metal + "/badgreggy") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_" + metal + "_industrial_relic", "metals_" + metal + "/machine") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_" + metal + "_scaffold", "metals_" + metal + "/scaffold") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_" + metal + "_shipping_crate", "metals_" + metal + "/crate") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "metal_" + metal + "_thermal", "metals_" + metal + "/thermal") ? 1 : 0;
+        }
+
+        // Futura blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_me_controller", "futura/controller") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_gray_screen", "futura/screen_metallic") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_cyan_screen", "futura/screen_cyan") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_rainbowliciously_wavy", "futura/wavy") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_purple_me_controller", "futura/controller_purple") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_fabulously_wavy", "futura/uber_wavy") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_me_controller_ae_2", "futura/controller") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_mysterious_cube", "futura/controller") ? 1 : 0;
+
+        // Diamond blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_bismuth", "diamond/terrain_diamond_bismuth") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_cells", "diamond/terrain_diamond_cells") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_crushed", "diamond/terrain_diamond_crushed") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_embossed", "diamond/terrain_diamond_embossed") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_gem", "diamond/terrain_diamond_gem") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_gold_encrusted", "diamond/terrain_diamond_ornatelayer") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_ornate_tiles", "diamond/terrain_diamond_fourornate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_simple", "diamond/terrain_diamond_simple") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_purple_space", "diamond/terrain_diamond_space") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_space", "diamond/terrain_diamond_spaceblack") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_tiles", "diamond/terrain_diamond_four") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_zelda", "diamond/terrain_diamond_zelda") ? 1 : 0;
+
+        // Emerald blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_bismuth", "emerald/cellbismuth") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_cell", "emerald/cell") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_circular", "emerald/emeraldcircle") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_cobble", "emerald/chunk") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_gold_encrusted", "emerald/goldborder") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_masonry", "emerald/masonryemerald") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_ornate", "emerald/ornate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_ornate_tiles", "emerald/fourornate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_panel", "emerald/panelclassic") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_prism", "emerald/emeraldprismatic") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_smooth", "emerald/smooth") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_tile", "emerald/panel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_tiles", "emerald/four") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_emerald_zelda", "emerald/zelda") ? 1 : 0;
+
+        // Lapis blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_cobble", "lapis/terrain_lapisblock_chunky") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_gold_encrusted", "lapis/a1_blocklapis_ornatelayer") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_masonry", "lapis/masonrylapis") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_panel", "lapis/terrain_lapistile") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_shiny_tile", "lapis/a1_blocklapis_panel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_smooth", "lapis/a1_blocklapis_smooth") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_tile", "lapis/terrain_lapisblock_panel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_wood_framed", "lapis/terrain_lapisornate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_lapis_zelda", "lapis/terrain_lapisblock_zelda") ? 1 : 0;
+
+        // Redstone blocks
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_arrayed_bricks", "redstone/array") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_big_tile", "redstone/tiles_large") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_braid", "redstone/braid") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_bricks", "redstone/solid_bricks") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_circular", "redstone/circular") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_cracked", "redstone/cracked") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_cracked_bricks", "redstone/cracked_bricks") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_dent", "redstone/dent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_disordered_tiles", "redstone/chaotic_medium") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_encased_bricks", "redstone/encased_bricks") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_french_1", "redstone/french_1") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_french_2", "redstone/french_2") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_jellybean", "redstone/jellybean") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_layers", "redstone/layers") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_mosaic", "redstone/mosaic") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_ornate", "redstone/ornate") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_panel", "redstone/panel") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_pillar", "redstone/pillar") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_prism", "redstone/prism") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_road", "redstone/road") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_slanted", "redstone/slanted") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_small_bricks", "redstone/small_bricks") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_small_disordered_tiles", "redstone/chaotic_small") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_small_tiles", "redstone/tiles_small") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_tiles", "redstone/tiles_medium") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_twisted", "redstone/twisted") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_weathered_bricks", "redstone/soft_bricks") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_wide_bricks", "redstone/triple_bricks") ? 1 : 0;
+
+        return count;
     }
 }
