@@ -16,7 +16,8 @@ public class TextureMetaDataHandlerMixin {
 
     @Redirect(
             method = "onModelBake(Lnet/minecraftforge/client/event/ModelEvent$ModifyBakingResult;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/BakedModel;isCustomRenderer()Z")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/BakedModel;isCustomRenderer()Z"),
+            remap = true
     )
     private boolean chisel$nullSafeIsCustomRenderer(BakedModel baked) {
         if (baked == null) {

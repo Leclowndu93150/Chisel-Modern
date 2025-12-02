@@ -112,6 +112,7 @@ dependencies {
     modImplementation "curse.maven:jei-238222:7270446"
     modImplementation "curse.maven:jade-324717:6855440"
     //runtimeOnly "curse.maven:mekanism-268560:6552911"
+    modImplementation "curse.maven:baguettelib-1264423:7282717"
     modImplementation "curse.maven:ftb-ultimine-forge-386134:6899418"
     modImplementation "curse.maven:architectury-api-419699:5137938"
     modImplementation "curse.maven:ftb-library-forge-404465:6807424"
