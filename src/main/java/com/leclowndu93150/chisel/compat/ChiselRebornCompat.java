@@ -550,10 +550,10 @@ public class ChiselRebornCompat {
             count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "wool_llama_" + color, "wool_" + color + "/llama") ? 1 : 0;
         }
 
-        // Carpet blocks -> vanilla carpets
+        // Carpet blocks -> chisel carpets
         for (String color : COLORS) {
-            count += registerCrossModAliasToVanilla(CHIPPED_INTEGRATION_MODID, "carpet_legacy_" + color, color + "_carpet") ? 1 : 0;
-            count += registerCrossModAliasToVanilla(CHIPPED_INTEGRATION_MODID, "carpet_llama_" + color, color + "_carpet") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "carpet_legacy_" + color, "carpet_" + color + "/legacy") ? 1 : 0;
+            count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "carpet_llama_" + color, "carpet_" + color + "/llama") ? 1 : 0;
         }
 
         // Factory blocks
