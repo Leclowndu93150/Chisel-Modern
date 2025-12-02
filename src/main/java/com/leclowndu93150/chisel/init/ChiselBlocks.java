@@ -5,6 +5,7 @@ import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockAutoChisel;
 import com.leclowndu93150.chisel.block.BlockBrownstone;
 import com.leclowndu93150.chisel.block.BlockCarvable;
+import com.leclowndu93150.chisel.block.BlockCarvableCarpet;
 import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.block.BlockHolystone;
@@ -1163,8 +1164,20 @@ public class ChiselBlocks {
                     .addVanillaBlock(getWoolBlock(color))
                     .properties(() -> getWoolBlock(color))
                     .tag(BlockTags.WOOL)
-                    .variation("legacy", "Legacy")
-                    .variation("llama", "Llama")
+                    .variation("legacy", "Legacy", woolCtm())
+                    .variation("llama", "Llama", woolCtm())
+                    .build()
+    );
+
+    public static final Map<DyeColor, ChiselBlockType<BlockCarvableCarpet>> CARPET = createColoredBlocks("carpet",
+            color -> new ChiselBlockType<BlockCarvableCarpet>("carpet/" + color.getSerializedName(),
+                    (props, data) -> new BlockCarvableCarpet(props, data, "carpet/" + color.getSerializedName()))
+                    .groupName(toEnglishName(color.getSerializedName()) + " Carpet")
+                    .addVanillaBlock(getCarpetBlock(color))
+                    .properties(() -> getCarpetBlock(color))
+                    .tag(BlockTags.WOOL_CARPETS)
+                    .variation("legacy", "Legacy", carpetCtm())
+                    .variation("llama", "Llama", carpetCtm())
                     .build()
     );
 
@@ -1376,6 +1389,27 @@ public class ChiselBlocks {
             case GREEN -> Blocks.GREEN_STAINED_GLASS_PANE;
             case RED -> Blocks.RED_STAINED_GLASS_PANE;
             case BLACK -> Blocks.BLACK_STAINED_GLASS_PANE;
+        };
+    }
+
+    private static Block getCarpetBlock(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Blocks.WHITE_CARPET;
+            case ORANGE -> Blocks.ORANGE_CARPET;
+            case MAGENTA -> Blocks.MAGENTA_CARPET;
+            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_CARPET;
+            case YELLOW -> Blocks.YELLOW_CARPET;
+            case LIME -> Blocks.LIME_CARPET;
+            case PINK -> Blocks.PINK_CARPET;
+            case GRAY -> Blocks.GRAY_CARPET;
+            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_CARPET;
+            case CYAN -> Blocks.CYAN_CARPET;
+            case PURPLE -> Blocks.PURPLE_CARPET;
+            case BLUE -> Blocks.BLUE_CARPET;
+            case BROWN -> Blocks.BROWN_CARPET;
+            case GREEN -> Blocks.GREEN_CARPET;
+            case RED -> Blocks.RED_CARPET;
+            case BLACK -> Blocks.BLACK_CARPET;
         };
     }
 

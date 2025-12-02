@@ -113,6 +113,7 @@ dependencies {
     implementation "curse.maven:ftb-library-forge-404465:7260617"
     implementation "curse.maven:kubejs-238086:7255073"
     implementation "curse.maven:rhino-416294:7104526"
+    implementation "curse.maven:baguettelib-1264423:7282690"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

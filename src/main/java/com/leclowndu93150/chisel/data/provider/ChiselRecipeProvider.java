@@ -43,6 +43,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildFantasyRecipes(output);
         buildWarningRecipes(output);
         buildHolystoneRecipes(output);
+        buildCarpetRecipes(output);
     }
 
     private void buildToolRecipes(RecipeOutput output) {
@@ -524,6 +525,38 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .define('F', Items.FEATHER)
                     .unlockedBy("has_feather", has(Items.FEATHER))
                     .save(output, Chisel.id("holystone/raw"));
+        }
+    }
+
+    private void buildCarpetRecipes(RecipeOutput output) {
+        // Carpet recipes: 2 wool variants -> 3 carpet variants (like vanilla)
+        for (DyeColor color : DyeColor.values()) {
+            var carpetType = ChiselBlocks.CARPET.get(color);
+            var woolType = ChiselBlocks.WOOL.get(color);
+
+            if (carpetType != null && woolType != null) {
+                // Legacy carpet from legacy wool
+                var legacyWool = woolType.getBlock("legacy");
+                var legacyCarpet = carpetType.getBlock("legacy");
+                if (legacyWool != null && legacyCarpet != null) {
+                    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, legacyCarpet.get(), 3)
+                            .pattern("WW")
+                            .define('W', legacyWool.get())
+                            .unlockedBy("has_wool", has(legacyWool.get()))
+                            .save(output, Chisel.id("carpet/" + color.getSerializedName() + "_legacy"));
+                }
+
+                // Llama carpet from llama wool
+                var llamaWool = woolType.getBlock("llama");
+                var llamaCarpet = carpetType.getBlock("llama");
+                if (llamaWool != null && llamaCarpet != null) {
+                    ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, llamaCarpet.get(), 3)
+                            .pattern("WW")
+                            .define('W', llamaWool.get())
+                            .unlockedBy("has_wool", has(llamaWool.get()))
+                            .save(output, Chisel.id("carpet/" + color.getSerializedName() + "_llama"));
+                }
+            }
         }
     }
 

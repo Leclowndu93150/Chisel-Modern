@@ -685,4 +685,35 @@ public class ChiselModelTemplates {
         builder.part().modelFile(sideAltModel).rotationY(90).addModel()
                 .condition(CrossCollisionBlock.WEST, true).end();
     }
+
+    /**
+     * Wool CTM model template - full cube with connected textures.
+     * Uses cube_ctm model with all + connected_tex textures.
+     */
+    public static ModelTemplate woolCtm() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("cube_ctm"))
+                    .texture("all", Chisel.id(texPath))
+                    .texture("connected_tex", Chisel.id(texPath + "-ctm")));
+        };
+    }
+
+    /**
+     * Carpet CTM model template - thin 1-pixel carpet with connected textures.
+     * Uses wool textures based on the carpet color and variant.
+     */
+    public static ModelTemplate carpetCtm() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            // Carpet textures reuse wool textures: carpet/{color}/{variant} -> wool/{color}/{variant}
+            String texPath = "block/" + texturePath(block).replace("carpet/", "wool/");
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("block/carpet_ctm"))
+                    .texture("all", Chisel.id(texPath))
+                    .texture("all_ctm", Chisel.id(texPath + "-ctm")));
+        };
+    }
 }
