@@ -145,6 +145,20 @@ public class ChiselModelTemplates {
         };
     }
 
+    /**
+     * Cube column block with cutout render type (for transparent blocks with top/side textures).
+     */
+    public static ModelTemplate cubeColumnCutout() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models().cubeColumn(modelName,
+                    Chisel.id(texPath + "-side"),
+                    Chisel.id(texPath + "-top"))
+                    .renderType("cutout"));
+        };
+    }
+
     public static ModelTemplate cubeColumn(String side, String top) {
         return (prov, block) -> {
             String modelName = "block/" + name(block);

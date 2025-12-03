@@ -685,9 +685,13 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> TECHNICAL = registerType(
-            new ChiselBlockType<BlockCarvable>("technical")
-                    .properties(() -> Blocks.IRON_BLOCK)
+    public static final ChiselBlockType<BlockCarvableGlass> TECHNICAL = registerType(
+            new ChiselBlockType<BlockCarvableGlass>("technical",
+                    (props, data) -> new BlockCarvableGlass(props, data, "technical"))
+                    .properties(BlockBehaviour.Properties.of()
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .noOcclusion())
                     .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
                     .sound(ChiselSoundTypes.METAL_SUPPLIER)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -708,9 +712,9 @@ public class ChiselBlocks {
                     .variation("grate", "Grate")
                     .variation("malfunctionfan", "Fan (Malfunctioning)", cubeColumn())
                     .variation("graterusty", "Rusty Grate")
-                    .variation("scaffoldtransparent", "Rusty Scaffold - Transparent")
-                    .variation("fanfasttransparent", "Fan (Fast) - Transparent", cubeColumn())
-                    .variation("fanstilltransparent", "Fan (Still) - Transparent", cubeColumn())
+                    .variation("scaffoldtransparent", "Rusty Scaffold - Transparent", simpleBlockCutout())
+                    .variation("fanfasttransparent", "Fan (Fast) - Transparent", cubeColumnCutout())
+                    .variation("fanstilltransparent", "Fan (Still) - Transparent", cubeColumnCutout())
                     .variation("massivefan", "Massive Fan")
                     .variation("massivehexplating", "Massive Hexagonal Plating")
                     .variation("weatheredgreenpanels", "Extremely Corroded Panels")

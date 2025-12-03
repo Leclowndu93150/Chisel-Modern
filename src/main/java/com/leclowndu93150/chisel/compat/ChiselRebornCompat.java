@@ -38,6 +38,7 @@ public class ChiselRebornCompat {
     private static final Set<String> registeredAliases = new HashSet<>();
 
     private static final String CHIPPED_INTEGRATION_MODID = "chisel_chipped_integration";
+    private static final String ANTIBLOCKS_RECHISELED_MODID = "antiblocksrechiseled";
 
     private static final String[] COLORS = {
         "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
@@ -93,6 +94,10 @@ public class ChiselRebornCompat {
         // Chisel Chipped Integration mod aliases
         int chippedCount = registerChiselChippedIntegrationAliases();
         LOGGER.info("Registered {} Chisel Chipped Integration compatibility aliases", chippedCount);
+
+        // AntiBlocks ReChiseled mod aliases
+        int antiBlocksCount = registerAntiBlocksReChiseledAliases();
+        LOGGER.info("Registered {} AntiBlocks ReChiseled compatibility aliases", antiBlocksCount);
     }
 
     private static String mapVariant(String rebornVariant) {
@@ -760,6 +765,29 @@ public class ChiselRebornCompat {
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_twisted", "redstone/twisted") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_weathered_bricks", "redstone/soft_bricks") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_redstone_wide_bricks", "redstone/triple_bricks") ? 1 : 0;
+
+        return count;
+    }
+
+    // ==================== AntiBlocks ReChiseled Aliases ====================
+
+    private static int registerAntiBlocksReChiseledAliases() {
+        int count = 0;
+
+        // Wool colors -> antiblock (15 colors, no black in wool)
+//        String[] woolColors = {"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
+//                "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red"};
+//        for (String color : woolColors) {
+//            count += registerCrossModAlias(ANTIBLOCKS_RECHISELED_MODID, "wool_" + color, "antiblock/" + color) ? 1 : 0;
+//            count += registerCrossModAlias(ANTIBLOCKS_RECHISELED_MODID, "wool_" + color + "_border", "antiblock/" + color) ? 1 : 0;
+//        }
+
+        // Bright colors -> antiblock (9 colors)
+//        String[] brightColors = {"white", "orange", "magenta", "yellow", "cyan", "blue", "green", "red", "black"};
+//        for (String color : brightColors) {
+//            count += registerCrossModAlias(ANTIBLOCKS_RECHISELED_MODID, "bright_" + color, "antiblock/" + color) ? 1 : 0;
+//            count += registerCrossModAlias(ANTIBLOCKS_RECHISELED_MODID, "bright_" + color + "_border", "antiblock/" + color) ? 1 : 0;
+//        }
 
         return count;
     }
