@@ -659,6 +659,8 @@ public class ChiselBlocks {
                     .variation("wavy", "Rainbowliciously Wavy", twoLayerTopShaded("rainbow_wave_particle", "rainbow_wave_base", "rainbow_wave"))
                     .variation("controller_purple", "Purple ME Controller", threeLayerTopShaded("controller_unity_particle", "unity_lines_plating", "unity_lines", "lines_invalid"))
                     .variation("uber_wavy", "Fabulously Wavy", threeLayerTopShaded("orange_frame_particle", "orange_frame", "uber_rainbow", "screen_discoherent"))
+                    .variation("mysterious_cube", "Mysterious Cube", mysteriousCube())
+                    .variation("ae2_controller", "AE2 Controller", ae2Controller())
                     .build()
     );
 

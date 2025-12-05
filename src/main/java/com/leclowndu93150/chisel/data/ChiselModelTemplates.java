@@ -730,4 +730,38 @@ public class ChiselModelTemplates {
                     .texture("all_ctm", Chisel.id(texPath + "-ctm")));
         };
     }
+
+    /**
+     * Mysterious Cube model template - two-layer cube with animated core and fullbright frame overlay.
+     * Based on AE2 Mysterious Cube from Chisel Chipped Integration.
+     */
+    public static ModelTemplate mysteriousCube() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("block/futura/mysterious_cube_base"))
+                    .texture("core", Chisel.id(replaceVariant(texPath, "mysterious_cube_core")))
+                    .texture("side", Chisel.id(replaceVariant(texPath, "mysterious_cube_side")))
+                    .texture("top", Chisel.id(replaceVariant(texPath, "mysterious_cube_top")))
+                    .texture("bottom", Chisel.id(replaceVariant(texPath, "mysterious_cube_bottom")))
+                    .renderType("cutout"));
+        };
+    }
+
+    /**
+     * AE2 Controller model template - two-layer cube with animated lights overlay.
+     * Based on AE2 ME Controller block.
+     */
+    public static ModelTemplate ae2Controller() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("block/futura/ae2_controller_base"))
+                    .texture("block", Chisel.id(replaceVariant(texPath, "ae2_controller")))
+                    .texture("lights", Chisel.id(replaceVariant(texPath, "ae2_controller_lights")))
+                    .renderType("cutout"));
+        };
+    }
 }

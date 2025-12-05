@@ -692,8 +692,8 @@ public class ChiselRebornCompat {
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_rainbowliciously_wavy", "futura/wavy") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_purple_me_controller", "futura/controller_purple") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_fabulously_wavy", "futura/uber_wavy") ? 1 : 0;
-        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_me_controller_ae_2", "futura/controller") ? 1 : 0;
-        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_mysterious_cube", "futura/controller") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_me_controller_ae_2", "futura/ae2_controller") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "futura_mysterious_cube", "futura/mysterious_cube") ? 1 : 0;
 
         // Diamond blocks
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "gem_diamond_bismuth", "diamond/terrain_diamond_bismuth") ? 1 : 0;
