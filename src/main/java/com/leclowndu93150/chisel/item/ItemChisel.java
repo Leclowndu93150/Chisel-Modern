@@ -79,7 +79,7 @@ public class ItemChisel extends Item implements IChiselItem {
     private final ChiselType type;
 
     public ItemChisel(ChiselType type, Properties properties) {
-        super(properties.durability(type.getMaxDamage()));
+        super(properties);
         this.type = type;
     }
 

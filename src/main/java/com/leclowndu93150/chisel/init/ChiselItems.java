@@ -10,13 +10,13 @@ import net.neoforged.neoforge.registries.DeferredItem;
 public class ChiselItems {
 
     public static final DeferredItem<ItemChisel> IRON_CHISEL = ChiselRegistries.ITEMS.register("iron_chisel",
-            () -> new ItemChisel(ChiselType.IRON, new Item.Properties().stacksTo(1)));
+            () -> new ItemChisel(ChiselType.IRON, new Item.Properties().stacksTo(1).durability(ChiselType.IRON.getMaxDamage())));
 
     public static final DeferredItem<ItemChisel> DIAMOND_CHISEL = ChiselRegistries.ITEMS.register("diamond_chisel",
-            () -> new ItemChisel(ChiselType.DIAMOND, new Item.Properties().stacksTo(1)));
+            () -> new ItemChisel(ChiselType.DIAMOND, new Item.Properties().stacksTo(1).durability(ChiselType.DIAMOND.getMaxDamage())));
 
     public static final DeferredItem<ItemChisel> HITECH_CHISEL = ChiselRegistries.ITEMS.register("hitech_chisel",
-            () -> new ItemChisel(ChiselType.HITECH, new Item.Properties().stacksTo(1)));
+            () -> new ItemChisel(ChiselType.HITECH, new Item.Properties().stacksTo(1).durability(ChiselType.HITECH.getMaxDamage())));
 
     public static final DeferredItem<ItemOffsetTool> OFFSET_TOOL = ChiselRegistries.ITEMS.register("offset_tool",
             () -> new ItemOffsetTool(new Item.Properties().stacksTo(1)));
