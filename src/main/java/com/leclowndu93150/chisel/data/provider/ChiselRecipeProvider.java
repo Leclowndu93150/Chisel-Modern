@@ -69,6 +69,14 @@ public class ChiselRecipeProvider extends RecipeProvider {
                 .requires(Tags.Items.DUSTS_REDSTONE)
                 .unlockedBy("has_diamond_chisel", has(ChiselItems.DIAMOND_CHISEL.get()))
                 .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ChiselItems.OFFSET_TOOL.get())
+                .pattern(" E")
+                .pattern("S ")
+                .define('E', Tags.Items.ENDER_PEARLS)
+                .define('S', Tags.Items.RODS_WOODEN)
+                .unlockedBy("has_ender_pearl", has(Tags.Items.ENDER_PEARLS))
+                .save(output);
     }
 
     private void buildAutoChiselRecipe(RecipeOutput output) {

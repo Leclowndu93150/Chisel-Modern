@@ -10,6 +10,7 @@ import com.leclowndu93150.chisel.network.server.ChiselModePayload;
 import com.leclowndu93150.chisel.network.server.HitechSettingsPayload;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -20,8 +21,11 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -177,7 +181,7 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
                 slots[i + 1] = duplicates.get(i).index;
             }
         } else {
-            slots = new int[] { selection.index };
+            slots = new int[]{selection.index};
         }
 
         PacketDistributor.sendToServer(new ChiselButtonPayload(slots));
@@ -322,14 +326,13 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
             ModelData modelData = model.getModelData(blockGetter, blockPos, state, ModelData.EMPTY);
 
             for (RenderType renderType : model.getRenderTypes(state, minecraft.level.random, modelData)) {
-                blockRenderer.getModelRenderer().renderModel(
+                renderModelWithFaceCulling(
                         poseStack.last(),
                         bufferSource.getBuffer(renderType),
                         state,
                         model,
-                        1.0F, 1.0F, 1.0F,
-                        LightTexture.FULL_BRIGHT,
-                        OverlayTexture.NO_OVERLAY,
+                        blockGetter,
+                        blockPos,
                         modelData,
                         renderType
                 );
@@ -341,6 +344,42 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
         bufferSource.endBatch();
         poseStack.popPose();
         graphics.disableScissor();
+    }
+
+    /**
+     * Renders a block model with proper face culling for glass-like blocks.
+     * Checks skipRendering for each face direction before rendering quads for that face.
+     */
+    private void renderModelWithFaceCulling(
+            PoseStack.Pose pose,
+            VertexConsumer buffer,
+            BlockState state,
+            BakedModel model,
+            PreviewBlockGetter blockGetter,
+            BlockPos pos,
+            ModelData modelData,
+            RenderType renderType
+    ) {
+        RandomSource random = RandomSource.create();
+
+        for (Direction direction : Direction.values()) {
+            random.setSeed(42L);
+            BlockPos adjacentPos = pos.relative(direction);
+            BlockState adjacentState = blockGetter.getBlockState(adjacentPos);
+
+            if (state.skipRendering(adjacentState, direction)) {
+                continue;
+            }
+
+            for (BakedQuad quad : model.getQuads(state, direction, random, modelData, renderType)) {
+                buffer.putBulkData(pose, quad, 1.0F, 1.0F, 1.0F, 1.0F, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            }
+        }
+
+        random.setSeed(42L);
+        for (BakedQuad quad : model.getQuads(state, null, random, modelData, renderType)) {
+            buffer.putBulkData(pose, quad, 1.0F, 1.0F, 1.0F, 1.0F, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        }
     }
 
     @Override
@@ -483,9 +522,20 @@ public class HitechChiselScreen extends AbstractContainerScreen<HitechChiselMenu
             this.positions = positions;
         }
 
-        public float getScale() { return scale; }
-        public float getCenterX() { return centerX; }
-        public float getCenterY() { return centerY; }
-        public int[][] getPositions() { return positions; }
+        public float getScale() {
+            return scale;
+        }
+
+        public float getCenterX() {
+            return centerX;
+        }
+
+        public float getCenterY() {
+            return centerY;
+        }
+
+        public int[][] getPositions() {
+            return positions;
+        }
     }
 }

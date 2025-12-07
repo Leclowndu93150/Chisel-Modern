@@ -88,6 +88,7 @@ public class ChiselRebornCompat {
         count += registerDirtAliases();
         count += registerNetherbrickAliases();
         count += registerFallbackAliases();
+        count += registerTechnicalTransparentAliases();
 
         LOGGER.info("Registered {} Chisel Reborn compatibility aliases", count);
 
@@ -482,6 +483,18 @@ public class ChiselRebornCompat {
         return count;
     }
 
+    /**
+     * Registers aliases for technical transparent blocks that were moved from
+     * the technical category to technical_transparent category.
+     */
+    private static int registerTechnicalTransparentAliases() {
+        int count = 0;
+        count += registerAlias("technical/scaffoldtransparent", "technical_transparent/scaffoldtransparent") ? 1 : 0;
+        count += registerAlias("technical/fanfasttransparent", "technical_transparent/fanfasttransparent") ? 1 : 0;
+        count += registerAlias("technical/fanstilltransparent", "technical_transparent/fanstilltransparent") ? 1 : 0;
+        return count;
+    }
+
     private static boolean registerAlias(String fromPath, String toPath) {
         if (registeredAliases.contains(fromPath)) {
             LOGGER.debug("Skipping duplicate alias: {} (already registered)", fromPath);
@@ -633,9 +646,9 @@ public class ChiselRebornCompat {
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_small_pipes", "technical/pipessmall") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_still_fan", "technical/fanstill") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_sturdy", "technical/sturdy") ? 1 : 0;
-        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_fan", "technical/fanfasttransparent") ? 1 : 0;
-        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_rusty_scaffold", "technical/scaffoldtransparent") ? 1 : 0;
-        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_still_fan", "technical/fanstilltransparent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_fan", "technical_transparent/fanfasttransparent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_rusty_scaffold", "technical_transparent/scaffoldtransparent") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_transparent_still_fan", "technical_transparent/fanstilltransparent") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "technical_vent", "technical/vent") ? 1 : 0;
 
         // Tyrian blocks
