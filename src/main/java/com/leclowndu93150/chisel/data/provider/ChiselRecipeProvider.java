@@ -439,10 +439,12 @@ public class ChiselRecipeProvider extends RecipeProvider {
             if (dyedGlassType != null) {
                 var baseBlock = dyedGlassType.getBlock("bubble");
                 if (baseBlock != null) {
-
-                    ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, baseBlock.get())
-                            .requires(getStainedGlassBlock(color))
-                            .requires(color.getTag())
+                    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, baseBlock.get(), 8)
+                            .pattern("GGG")
+                            .pattern("GDG")
+                            .pattern("GGG")
+                            .define('G', getStainedGlassBlock(color))
+                            .define('D', color.getTag())
                             .unlockedBy("has_stained_glass", has(getStainedGlassBlock(color)))
                             .save(output, Chisel.id("glassdyed/" + color.getSerializedName() + "_bubble"));
                 }
