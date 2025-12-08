@@ -3,14 +3,19 @@ package com.leclowndu93150.chisel.data.provider;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselItems;
+import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.registries.DeferredBlock;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -44,6 +49,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildWarningRecipes(output);
         buildHolystoneRecipes(output);
         buildCarpetRecipes(output);
+        buildStonecutterRecipes(output);
     }
 
     private void buildToolRecipes(RecipeOutput output) {
@@ -565,6 +571,34 @@ public class ChiselRecipeProvider extends RecipeProvider {
                 }
             }
         }
+    }
+
+    /**
+     * Generates stonecutter recipes for all chisel carving groups.
+     * Each chisel block variant can be crafted from any block in its carving group tag.
+     */
+    private void buildStonecutterRecipes(RecipeOutput output) {
+        for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
+            TagKey<Item> itemTag = ItemTags.create(blockType.getCarvingGroupTag().location());
+
+            for (DeferredBlock<?> block : blockType.getAllBlocks()) {
+                String variantName = getVariantName(block);
+
+                SingleItemRecipeBuilder.stonecutting(
+                                Ingredient.of(itemTag),
+                                RecipeCategory.BUILDING_BLOCKS,
+                                block.get()
+                        )
+                        .unlockedBy("has_block", has(itemTag))
+                        .save(output, Chisel.id(blockType.getName().replace("/", "_") + "/" + variantName + "_from_stonecutting"));
+            }
+        }
+    }
+
+    private String getVariantName(DeferredBlock<?> block) {
+        String fullName = block.getId().getPath();
+        int lastSlash = fullName.lastIndexOf('/');
+        return lastSlash >= 0 ? fullName.substring(lastSlash + 1) : fullName;
     }
 
 }
