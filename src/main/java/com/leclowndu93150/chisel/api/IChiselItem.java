@@ -1,5 +1,6 @@
 package com.leclowndu93150.chisel.api;
 
+import com.leclowndu93150.chisel.ChiselConfig;
 import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
@@ -98,7 +99,7 @@ public interface IChiselItem {
 
         int toCraft = Math.min(source.getCount(), target.getMaxStackSize());
 
-        if (chisel.isDamageableItem()) {
+        if (chisel.isDamageableItem() && ChiselConfig.allowChiselDamage) {
             int damageLeft = chisel.getMaxDamage() - chisel.getDamageValue() + 1;
             toCraft = Math.min(toCraft, damageLeft);
             chisel.hurtAndBreak(toCraft, player, p -> p.broadcastBreakEvent(slot));

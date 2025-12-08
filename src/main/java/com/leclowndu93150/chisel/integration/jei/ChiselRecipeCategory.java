@@ -2,10 +2,8 @@ package com.leclowndu93150.chisel.integration.jei;
 
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.carving.ICarvingGroup;
-import com.leclowndu93150.chisel.carving.CarvingGroup;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
 import com.leclowndu93150.chisel.init.ChiselItems;
-import com.mojang.blaze3d.vertex.PoseStack;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
@@ -19,7 +17,6 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -131,9 +128,12 @@ public class ChiselRecipeCategory implements IRecipeCategory<ICarvingGroup> {
         for (int i = 0; i < stacks.size(); i++) {
             int x = xStart + (i % rowWidth) * 18;
             int y = yStart + (i / rowWidth) * 18;
+            recipeLayout.addSlot(RecipeIngredientRole.OUTPUT, x, y).addItemStacks(stacks.get(i));
+        }
 
-            IRecipeSlotBuilder outputSlot = recipeLayout.addSlot(RecipeIngredientRole.OUTPUT, x, y);
-            outputSlot.addItemStacks(stacks.get(i));
+        ItemStack craftableBlock = CraftableBlockCache.get(group.getId());
+        if (!craftableBlock.isEmpty()) {
+            recipeLayout.addSlot(RecipeIngredientRole.RENDER_ONLY, 147, 4).addItemStack(craftableBlock);
         }
     }
 }

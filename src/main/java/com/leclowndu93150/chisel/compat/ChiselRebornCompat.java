@@ -94,6 +94,7 @@ public class ChiselRebornCompat {
         count += registerDirtAliases();
         count += registerNetherbrickAliases();
         count += registerFallbackAliases();
+        count += registerTechnicalTransparentAliases();
 
         LOGGER.info("Initialized {} Chisel Reborn compatibility mappings", count);
     }
@@ -521,6 +522,18 @@ public class ChiselRebornCompat {
         // blackstone -> basalt
         count += registerAlias("pillar/blackstone", "basalt/pillar") ? 1 : 0;
 
+        return count;
+    }
+
+    /**
+     * Registers aliases for technical transparent blocks that were moved from
+     * the technical category to technical_transparent category.
+     */
+    private static int registerTechnicalTransparentAliases() {
+        int count = 0;
+        count += registerAlias("technical/scaffoldtransparent", "technical_transparent/scaffoldtransparent") ? 1 : 0;
+        count += registerAlias("technical/fanfasttransparent", "technical_transparent/fanfasttransparent") ? 1 : 0;
+        count += registerAlias("technical/fanstilltransparent", "technical_transparent/fanstilltransparent") ? 1 : 0;
         return count;
     }
 

@@ -154,6 +154,20 @@ public class ChiselModelTemplates {
     }
 
     /**
+     * Cube column block with cutout render type (for transparent blocks with top/side textures).
+     */
+    public static ModelTemplate cubeColumnCutout() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models().cubeColumn(modelName,
+                    Chisel.id(texPath + "-side"),
+                    Chisel.id(texPath + "-top"))
+                    .renderType("cutout"));
+        };
+    }
+
+    /**
      * Bookshelf model - uses oak planks as base with bookshelf texture overlaid on sides.
      * Top/bottom are solid oak planks, sides are oak planks + bookshelf overlay.
      */
@@ -682,5 +696,39 @@ public class ChiselModelTemplates {
 
         builder.part().modelFile(sideAltModel).rotationY(90).addModel()
                 .condition(CrossCollisionBlock.WEST, true).end();
+    }
+
+    /**
+     * Mysterious Cube model template - two-layer cube with animated core and fullbright frame overlay.
+     * Based on AE2 Mysterious Cube from Chisel Chipped Integration.
+     */
+    public static ModelTemplate mysteriousCube() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("block/futura/mysterious_cube_base"))
+                    .texture("core", Chisel.id(replaceVariant(texPath, "mysterious_cube_core")))
+                    .texture("side", Chisel.id(replaceVariant(texPath, "mysterious_cube_side")))
+                    .texture("top", Chisel.id(replaceVariant(texPath, "mysterious_cube_top")))
+                    .texture("bottom", Chisel.id(replaceVariant(texPath, "mysterious_cube_bottom")))
+                    .renderType("cutout"));
+        };
+    }
+
+    /**
+     * AE2 Controller model template - two-layer cube with animated lights overlay.
+     * Based on AE2 ME Controller block.
+     */
+    public static ModelTemplate ae2Controller() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models()
+                    .withExistingParent(modelName, Chisel.id("block/futura/ae2_controller_base"))
+                    .texture("block", Chisel.id(replaceVariant(texPath, "ae2_controller")))
+                    .texture("lights", Chisel.id(replaceVariant(texPath, "ae2_controller_lights")))
+                    .renderType("cutout"));
+        };
     }
 }

@@ -67,6 +67,14 @@ public class ChiselRecipeProvider extends RecipeProvider {
                 .requires(Tags.Items.DUSTS_REDSTONE)
                 .unlockedBy("has_diamond_chisel", has(ChiselItems.DIAMOND_CHISEL.get()))
                 .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ChiselItems.OFFSET_TOOL.get())
+                .pattern(" E")
+                .pattern("S ")
+                .define('E', Tags.Items.ENDER_PEARLS)
+                .define('S', Tags.Items.RODS_WOODEN)
+                .unlockedBy("has_ender_pearl", has(Tags.Items.ENDER_PEARLS))
+                .save(output);
     }
 
     private void buildAutoChiselRecipe(Consumer<FinishedRecipe> output) {
@@ -326,13 +334,12 @@ public class ChiselRecipeProvider extends RecipeProvider {
 
         if (ChiselBlocks.TYRIAN.getBlock("tyrian") != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.TYRIAN.getBlock("tyrian").get(), 8)
+                    .pattern("SSS")
                     .pattern("SPS")
-                    .pattern("PEP")
-                    .pattern("SPS")
+                    .pattern("SSS")
                     .define('S', Tags.Items.STONE)
                     .define('P', Blocks.PURPUR_BLOCK)
-                    .define('E', Items.ENDER_EYE)
-                    .unlockedBy("has_ender_eye", has(Items.ENDER_EYE))
+                    .unlockedBy("has_purpur", has(Blocks.PURPUR_BLOCK))
                     .save(output, Chisel.id("tyrian/tyrian"));
         }
 
@@ -347,15 +354,15 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .save(output, Chisel.id("energized_voidstone/raw"));
         }
 
-        if (ChiselBlocks.VOIDSTONE_RUNIC.getBlock("raw") != null) {
-            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.VOIDSTONE_RUNIC.getBlock("raw").get(), 8)
+        if (ChiselBlocks.VOIDSTONE_RUNIC.getBlock("black") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.VOIDSTONE_RUNIC.getBlock("black").get(), 8)
                     .pattern("OOO")
                     .pattern("OEO")
                     .pattern("OOO")
                     .define('O', Tags.Items.OBSIDIAN)
                     .define('E', Items.ENDER_EYE)
                     .unlockedBy("has_ender_eye", has(Items.ENDER_EYE))
-                    .save(output, Chisel.id("runic_voidstone/raw"));
+                    .save(output, Chisel.id("runic_voidstone/black"));
         }
 
         if (ChiselBlocks.MARBLE_PILLAR.getBlock("pillar") != null) {
@@ -378,22 +385,22 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .save(output, Chisel.id("paper/box"));
         }
 
-        if (ChiselBlocks.SANDSTONE_SCRIBBLES.getBlock("scribbles") != null) {
-            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.SANDSTONE_SCRIBBLES.getBlock("scribbles").get(), 4)
+        if (ChiselBlocks.SANDSTONE_SCRIBBLES.getBlock("scribbles_0") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.SANDSTONE_SCRIBBLES.getBlock("scribbles_0").get(), 4)
                     .pattern("SS")
                     .pattern("SS")
                     .define('S', Tags.Items.SANDSTONE)
                     .unlockedBy("has_sandstone", has(Tags.Items.SANDSTONE))
-                    .save(output, Chisel.id("sandstone_scribbles/scribbles"));
+                    .save(output, Chisel.id("sandstone_scribbles/scribbles_0"));
         }
 
-        if (ChiselBlocks.RED_SANDSTONE_SCRIBBLES.getBlock("scribbles") != null) {
-            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.RED_SANDSTONE_SCRIBBLES.getBlock("scribbles").get(), 4)
+        if (ChiselBlocks.RED_SANDSTONE_SCRIBBLES.getBlock("scribbles_0") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.RED_SANDSTONE_SCRIBBLES.getBlock("scribbles_0").get(), 4)
                     .pattern("SS")
                     .pattern("SS")
                     .define('S', Blocks.RED_SANDSTONE)
                     .unlockedBy("has_red_sandstone", has(Blocks.RED_SANDSTONE))
-                    .save(output, Chisel.id("red_sandstone_scribbles/scribbles"));
+                    .save(output, Chisel.id("red_sandstone_scribbles/scribbles_0"));
         }
 
         if (ChiselBlocks.TEMPLE.getBlock("bricks") != null) {

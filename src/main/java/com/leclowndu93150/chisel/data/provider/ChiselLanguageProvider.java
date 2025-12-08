@@ -41,6 +41,7 @@ public class ChiselLanguageProvider extends LanguageProvider {
         add(ChiselItems.OFFSET_TOOL.get(), "Ender Offset Wand");
 
         add("jei.chisel.chiseling", "Chiseling");
+        add("jei.chisel.no_craftable", "No Craftable Block");
 
         add("chisel.tooltip.gui", "Right-click to open GUI");
         add("chisel.tooltip.leftclick.1", "Left-click blocks to cycle variants forward");

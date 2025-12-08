@@ -658,6 +658,8 @@ public class ChiselBlocks {
                     .variation("wavy", "Rainbowliciously Wavy", twoLayerTopShaded("rainbow_wave_particle", "rainbow_wave_base", "rainbow_wave"))
                     .variation("controller_purple", "Purple ME Controller", threeLayerTopShaded("controller_unity_particle", "unity_lines_plating", "unity_lines", "lines_invalid"))
                     .variation("uber_wavy", "Fabulously Wavy", threeLayerTopShaded("orange_frame_particle", "orange_frame", "uber_rainbow", "screen_discoherent"))
+                    .variation("mysterious_cube", "Mysterious Cube", mysteriousCube())
+                    .variation("ae2_controller", "AE2 Controller", ae2Controller())
                     .build()
     );
 
@@ -707,9 +709,6 @@ public class ChiselBlocks {
                     .variation("grate", "Grate")
                     .variation("malfunctionfan", "Fan (Malfunctioning)", cubeColumn())
                     .variation("graterusty", "Rusty Grate")
-                    .variation("scaffoldtransparent", "Rusty Scaffold - Transparent")
-                    .variation("fanfasttransparent", "Fan (Fast) - Transparent", cubeColumn())
-                    .variation("fanstilltransparent", "Fan (Still) - Transparent", cubeColumn())
                     .variation("massivefan", "Massive Fan")
                     .variation("massivehexplating", "Massive Hexagonal Plating")
                     .variation("weatheredgreenpanels", "Extremely Corroded Panels")
@@ -723,6 +722,25 @@ public class ChiselBlocks {
                     .variation("piping", "Pipes")
                     .variation("oldetimeyserveranim", "Oldetimey Server")
                     .variation("tapedrive", "Tape Drive")
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvableGlass> TECHNICAL_TRANSPARENT = registerType(
+            new ChiselBlockType<BlockCarvableGlass>("technical_transparent",
+                    (props, data) -> new BlockCarvableGlass(props, data, "technical_transparent"))
+                    .groupName("Technical Block (Transparent)")
+                    .properties(BlockBehaviour.Properties.of()
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops()
+                            .noOcclusion())
+                    .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .tag(BlockTags.NEEDS_STONE_TOOL)
+                    .carvingGroup(BlockTags.create(new ResourceLocation("chisel", "carving/technical")))
+                    .variation("scaffoldtransparent", "Rusty Scaffold", simpleBlockCutout())
+                    .variation("fanfasttransparent", "Fan (Fast)", cubeColumnCutout())
+                    .variation("fanstilltransparent", "Fan (Still)", cubeColumnCutout())
                     .build()
     );
 
