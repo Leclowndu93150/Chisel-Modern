@@ -13,6 +13,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -438,17 +439,36 @@ public class ChiselRecipeProvider extends RecipeProvider {
             if (dyedGlassType != null) {
                 var baseBlock = dyedGlassType.getBlock("bubble");
                 if (baseBlock != null) {
-                    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, baseBlock.get(), 8)
-                            .pattern("GGG")
-                            .pattern("GDG")
-                            .pattern("GGG")
-                            .define('G', Tags.Items.GLASS_BLOCKS_COLORLESS)
-                            .define('D', color.getTag())
-                            .unlockedBy("has_glass", has(Tags.Items.GLASS_BLOCKS_COLORLESS))
+
+                    ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, baseBlock.get())
+                            .requires(getStainedGlassBlock(color))
+                            .requires(color.getTag())
+                            .unlockedBy("has_stained_glass", has(getStainedGlassBlock(color)))
                             .save(output, Chisel.id("glassdyed/" + color.getSerializedName() + "_bubble"));
                 }
             }
         }
+    }
+
+    private static Block getStainedGlassBlock(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Blocks.WHITE_STAINED_GLASS;
+            case ORANGE -> Blocks.ORANGE_STAINED_GLASS;
+            case MAGENTA -> Blocks.MAGENTA_STAINED_GLASS;
+            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_STAINED_GLASS;
+            case YELLOW -> Blocks.YELLOW_STAINED_GLASS;
+            case LIME -> Blocks.LIME_STAINED_GLASS;
+            case PINK -> Blocks.PINK_STAINED_GLASS;
+            case GRAY -> Blocks.GRAY_STAINED_GLASS;
+            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_STAINED_GLASS;
+            case CYAN -> Blocks.CYAN_STAINED_GLASS;
+            case PURPLE -> Blocks.PURPLE_STAINED_GLASS;
+            case BLUE -> Blocks.BLUE_STAINED_GLASS;
+            case BROWN -> Blocks.BROWN_STAINED_GLASS;
+            case GREEN -> Blocks.GREEN_STAINED_GLASS;
+            case RED -> Blocks.RED_STAINED_GLASS;
+            case BLACK -> Blocks.BLACK_STAINED_GLASS;
+        };
     }
 
     private void buildBookshelfRecipes(RecipeOutput output) {
