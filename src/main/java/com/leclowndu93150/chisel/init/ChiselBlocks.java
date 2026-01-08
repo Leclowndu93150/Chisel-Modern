@@ -558,6 +558,7 @@ public class ChiselBlocks {
                     .properties(() -> Blocks.PACKED_ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.ICE)
+                    .defaultModelTemplate(simpleBlockTranslucent())
                     .variations(VariantTemplates.ROCK)
                     .build()
     );
@@ -568,6 +569,7 @@ public class ChiselBlocks {
                     .properties(() -> Blocks.ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.ICE)
+                    .defaultModelTemplate(simpleBlockTranslucent())
                     .variations(VariantTemplates.PILLAR)
                     .build()
     );

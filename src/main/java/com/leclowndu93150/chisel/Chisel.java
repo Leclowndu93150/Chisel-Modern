@@ -149,6 +149,9 @@ public class Chisel {
 
                 registerBlockRenderType(ChiselBlocks.CLOUD, RenderType.cutout());
 
+                registerBlockRenderType(ChiselBlocks.ICE, RenderType.translucent());
+                registerBlockRenderType(ChiselBlocks.ICE_PILLAR, RenderType.translucent());
+
                 ItemBlockRenderTypes.setRenderLayer(ChiselBlocks.AUTO_CHISEL.get(), RenderType.cutout());
             });
         }
