@@ -4,6 +4,7 @@ import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
 import com.leclowndu93150.chisel.carving.ChiselMode;
+import com.leclowndu93150.chisel.command.ChiselDebugCommands;
 import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
 import com.leclowndu93150.chisel.client.gui.ChiselScreen;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;
@@ -41,6 +42,8 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.slf4j.Logger;
@@ -53,6 +56,8 @@ public class Chisel {
     public Chisel(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerCapabilities);
+
+        NeoForge.EVENT_BUS.addListener(this::registerCommands);
 
         ChiselRebornCompat.registerAliases();
 
@@ -85,6 +90,10 @@ public class Chisel {
         if (ModList.get().isLoaded("ftbultimine")) {
             FTBUltimineCompat.init();
         }
+    }
+
+    private void registerCommands(RegisterCommandsEvent event) {
+        ChiselDebugCommands.register(event.getDispatcher());
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {

@@ -39,6 +39,7 @@ public class ChiselRebornCompat {
 
     private static final String CHIPPED_INTEGRATION_MODID = "chisel_chipped_integration";
     private static final String ANTIBLOCKS_RECHISELED_MODID = "antiblocksrechiseled";
+    private static final String FACTORY_BLOCKS_MODID = "factory_blocks";
 
     private static final String[] COLORS = {
         "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
@@ -99,6 +100,9 @@ public class ChiselRebornCompat {
         // AntiBlocks ReChiseled mod aliases
         int antiBlocksCount = registerAntiBlocksReChiseledAliases();
         LOGGER.info("Registered {} AntiBlocks ReChiseled compatibility aliases", antiBlocksCount);
+
+        int factoryBlocksCount = registerFactoryBlocksAliases();
+        LOGGER.info("Registered {} Factory Blocks compatibility aliases", factoryBlocksCount);
     }
 
     private static String mapVariant(String rebornVariant) {
@@ -801,6 +805,63 @@ public class ChiselRebornCompat {
 //            count += registerCrossModAlias(ANTIBLOCKS_RECHISELED_MODID, "bright_" + color, "antiblock/" + color) ? 1 : 0;
 //            count += registerCrossModAlias(ANTIBLOCKS_RECHISELED_MODID, "bright_" + color + "_border", "antiblock/" + color) ? 1 : 0;
 //        }
+
+        return count;
+    }
+
+    private static int registerFactoryBlocksAliases() {
+        int count = 0;
+
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "factory", "factory/dots") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "rust", "factory/rust") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "vrust", "factory/rust2") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "srust", "factory/platex") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "wireframe", "factory/wireframewhite") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "pwireframe", "factory/wireframe") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "hazard", "factory/hazard") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "hazardo", "factory/hazardorange") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "circuit", "factory/circuit") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "metalbox", "factory/metalbox") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "gcircuit", "factory/goldplate") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "pgcircuit", "factory/goldplating") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "grinder", "factory/grinder") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "old_vents", "factory/plating") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "rust_plates", "factory/rustplates") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "bcircuit", "factory/frameblue") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "ice", "factory/iceiceice") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "mosaic", "factory/tilemosaic") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "bwireframe", "factory/wireframeblue") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "fan_side", "factory/column") ? 1 : 0;
+
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "rusty_scaffold", "technical/scaffold") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "caution", "technical/cautiontape") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "large_pipes", "technical/pipeslarge") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "small_pipes", "technical/pipessmall") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "vent", "technical/vent") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "gvent", "technical/ventglowing") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "insulation", "technical/insulationv2") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "gears", "technical/spinningstuffanim") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "cables", "technical/cables") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "rust_bplates", "technical/rustyboltedplates") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "grate", "technical/grate") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "rgrate", "technical/graterusty") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "hex", "technical/massivehexplating") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "wgpanel", "technical/weatheredgreenpanels") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "wopanel", "technical/weatheredorangepanels") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "sturdy", "technical/sturdy") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "megacell", "technical/megacell") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "exhaust", "technical/exhaustplating") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "engineer", "technical/engineering") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "scaffold", "technical/scaffoldlarge") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "piping", "technical/piping") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "large_plating", "technical/makeshiftpanels") ? 1 : 0;
+
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "fan_on", "technical/fanfast") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "fan_four_on", "technical/massivefan") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "fan_malfunction_on", "technical/malfunctionfan") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "fan", "technical/fanstill") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "fan_four", "technical/massivefan") ? 1 : 0;
+        count += registerCrossModAlias(FACTORY_BLOCKS_MODID, "fan_malfunction", "technical/malfunctionfan") ? 1 : 0;
 
         return count;
     }
