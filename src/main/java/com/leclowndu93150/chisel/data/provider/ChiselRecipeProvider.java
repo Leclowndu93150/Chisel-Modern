@@ -51,6 +51,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildWarningRecipes(output);
         buildHolystoneRecipes(output);
         buildCarpetRecipes(output);
+        buildCubitsRecipes(output);
         buildStonecutterRecipes(output);
     }
 
@@ -581,6 +582,19 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .define('F', Items.FEATHER)
                     .unlockedBy("has_feather", has(Items.FEATHER))
                     .save(output, Chisel.id("holystone/raw"));
+        }
+    }
+
+    private void buildCubitsRecipes(RecipeOutput output) {
+        if (ChiselBlocks.CUBITS.getBlock("15") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.CUBITS.getBlock("15").get(), 8)
+                    .pattern("QQQ")
+                    .pattern("QCQ")
+                    .pattern("QQQ")
+                    .define('Q', Items.QUARTZ)
+                    .define('C', Items.COAL)
+                    .unlockedBy("has_quartz", has(Items.QUARTZ))
+                    .save(output, Chisel.id("cubits/15"));
         }
     }
 

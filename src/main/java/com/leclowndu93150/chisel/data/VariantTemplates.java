@@ -260,6 +260,24 @@ public class VariantTemplates {
             new VariationData("hexnew", "Hex New", hexPlate("hexnew"))
     );
 
+    public static final List<VariationData> CUBITS = List.of(
+            new VariationData("1", "Cubit 1", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("2", "Cubit 2", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("3", "Cubit 3", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("4", "Cubit 4", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("5", "Cubit 5", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("6", "Cubit 6", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("7", "Cubit 7", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("8", "Cubit 8", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("9", "Cubit 9", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("10", "Cubit 10", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("11", "Cubit 11", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("12", "Cubit 12", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("13", "Cubit 13", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("14", "Cubit 14", simpleBlock()).withTooltip("Mobs cannot spawn on this block"),
+            new VariationData("15", "Cubit 15", simpleBlock()).withTooltip("Mobs cannot spawn on this block")
+    );
+
     public static final List<VariationData> LAVASTONE = List.of(
             new VariationData("cracked", "Cracked", fluidCube("lava")),
             new VariationData("soft_bricks", "Weathered Bricks", fluidCube("lava")),

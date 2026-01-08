@@ -583,6 +583,15 @@ public class ChiselBlocks {
                     .build()
     );
 
+    public static final ChiselBlockType<BlockCarvable> CUBITS = registerType(
+            new ChiselBlockType<BlockCarvable>("cubits")
+                    .properties(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).isValidSpawn((state, level, pos, type) -> false))
+                    .mapColor(MapColor.QUARTZ)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.CUBITS)
+                    .build()
+    );
+
     public static final ChiselBlockType<BlockBrownstone> BROWNSTONE = registerType(
             new ChiselBlockType<>("brownstone", (props, data) -> new BlockBrownstone(props, data, "brownstone"))
                     .properties(BlockBehaviour.Properties.of()
