@@ -104,7 +104,7 @@ public class VariantTemplates {
             new VariationData("slanted", "Slanted", simpleBlock()),
             new VariationData("zag", "Zag", simpleBlock()),
             new VariationData("circular", "Circular", simpleBlock()),
-            new VariationData("circularct", "Circular", ctm("circular")).withTooltip("Has CTM"),
+            new VariationData("circularct", "Circular", ctm("circularct")).withTooltip("Has CTM"),
             new VariationData("weaver", "Celtic", simpleBlock()),
             new VariationData("pillar", "Pillar", cubeColumn()),
             new VariationData("twisted", "Twisted", cubeColumn()),
@@ -123,7 +123,7 @@ public class VariantTemplates {
 
     private static ModelTemplate mossyModel(String base, VariationData variant) {
         if (variant.name().equals("circularct")) {
-            return mossyCtm(base, "circular");
+            return mossyCtm(base, "circularct");
         } else if (variant.name().equals("pillar") || variant.name().equals("twisted")) {
             return mossyColumn(base);
         } else {
@@ -282,7 +282,7 @@ public class VariantTemplates {
             new VariationData("road", "Road", fluidCube("lava")),
             new VariationData("slanted", "Slanted", fluidPassCube("lava")),
             new VariationData("zag", "Zag", fluidCube("lava")),
-            new VariationData("circularct", "Circular", fluidCubeCTM("lava", "circular")),
+            new VariationData("circularct", "Circular", fluidCubeCTM("lava", "circularct")),
             new VariationData("weaver", "Celtic", fluidPassCube("lava")),
             new VariationData("solid_bricks", "Bricks", fluidCube("lava")),
             new VariationData("small_bricks", "Small Bricks", fluidCube("lava")),
@@ -317,7 +317,7 @@ public class VariantTemplates {
             new VariationData("road", "Road", fluidCube("water")),
             new VariationData("slanted", "Slanted", fluidPassCube("water")),
             new VariationData("zag", "Zag", fluidCube("water")),
-            new VariationData("circularct", "Circular", fluidCubeCTM("water", "circular")),
+            new VariationData("circularct", "Circular", fluidCubeCTM("water", "circularct")),
             new VariationData("weaver", "Celtic", fluidPassCube("water")),
             new VariationData("solid_bricks", "Bricks", fluidCube("water")),
             new VariationData("small_bricks", "Small Bricks", fluidCube("water")),
