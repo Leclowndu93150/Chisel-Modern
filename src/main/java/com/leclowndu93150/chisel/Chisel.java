@@ -14,6 +14,7 @@ import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselCreativeTabs;
 import com.leclowndu93150.chisel.init.ChiselDataComponents;
+import com.leclowndu93150.chisel.init.ChiselEntities;
 import com.leclowndu93150.chisel.init.ChiselItems;
 import com.leclowndu93150.chisel.init.ChiselMenus;
 import com.leclowndu93150.chisel.init.ChiselParticles;
@@ -37,6 +38,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
@@ -62,6 +64,7 @@ public class Chisel {
         ChiselRegistries.SOUND_EVENTS.register(modEventBus);
         ChiselRegistries.DATA_COMPONENT_TYPES.register(modEventBus);
         ChiselRegistries.PARTICLE_TYPES.register(modEventBus);
+        ChiselRegistries.ENTITY_TYPES.register(modEventBus);
 
         ChiselSounds.init();
         ChiselParticles.init();
@@ -71,6 +74,7 @@ public class Chisel {
         ChiselCreativeTabs.init();
         ChiselDataComponents.init();
         ChiselBlockEntities.init();
+        ChiselEntities.init();
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ChiselConfig.SPEC);
     }
@@ -166,6 +170,14 @@ public class Chisel {
         @SubscribeEvent
         public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(ChiselParticles.HOLYSTONE_STAR.get(), HolystoneStarParticle.Provider::new);
+        }
+
+        @SubscribeEvent
+        public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerEntityRenderer(ChiselEntities.BALL_O_MOSS.get(),
+                    context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
+            event.registerEntityRenderer(ChiselEntities.CLOUD_IN_A_BOTTLE.get(),
+                    context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
         }
     }
 }

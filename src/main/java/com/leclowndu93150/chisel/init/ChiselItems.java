@@ -1,7 +1,9 @@
 package com.leclowndu93150.chisel.init;
 
+import com.leclowndu93150.chisel.item.ItemBallOMoss;
 import com.leclowndu93150.chisel.item.ItemChisel;
 import com.leclowndu93150.chisel.item.ItemChisel.ChiselType;
+import com.leclowndu93150.chisel.item.ItemCloudInABottle;
 import com.leclowndu93150.chisel.item.ItemOffsetTool;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -23,6 +25,12 @@ public class ChiselItems {
 
     public static final DeferredItem<BlockItem> AUTO_CHISEL = ChiselRegistries.ITEMS.register("auto_chisel",
             () -> new BlockItem(ChiselBlocks.AUTO_CHISEL.get(), new Item.Properties()));
+
+    public static final DeferredItem<ItemBallOMoss> BALL_O_MOSS = ChiselRegistries.ITEMS.register("ball_o_moss",
+            () -> new ItemBallOMoss(new Item.Properties().stacksTo(16)));
+
+    public static final DeferredItem<ItemCloudInABottle> CLOUD_IN_A_BOTTLE = ChiselRegistries.ITEMS.register("cloud_in_a_bottle",
+            () -> new ItemCloudInABottle(new Item.Properties().stacksTo(16)));
 
     public static void init() {
     }

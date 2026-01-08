@@ -40,6 +40,8 @@ public class ChiselLanguageProvider extends LanguageProvider {
         add(ChiselItems.DIAMOND_CHISEL.get(), "Diamond Chisel");
         add(ChiselItems.HITECH_CHISEL.get(), "iChisel");
         add(ChiselItems.OFFSET_TOOL.get(), "Ender Offset Wand");
+        add(ChiselItems.BALL_O_MOSS.get(), "Ball O' Moss");
+        add(ChiselItems.CLOUD_IN_A_BOTTLE.get(), "Cloud in a Bottle");
 
         add("jei.chisel.chiseling", "Chiseling");
         add("jei.chisel.no_craftable", "No Craftable Block");

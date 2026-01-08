@@ -30,6 +30,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
     protected void buildRecipes(RecipeOutput output) {
         buildToolRecipes(output);
         buildAutoChiselRecipe(output);
+        buildThrowableItemRecipes(output);
         buildFactoryRecipes(output);
         buildLaboratoryRecipes(output);
         buildAntiblockRecipes(output);
@@ -95,6 +96,26 @@ public class ChiselRecipeProvider extends RecipeProvider {
                 .define('R', Tags.Items.DUSTS_REDSTONE)
                 .define('I', Tags.Items.INGOTS_IRON)
                 .unlockedBy("has_redstone", has(Tags.Items.DUSTS_REDSTONE))
+                .save(output);
+    }
+
+    private void buildThrowableItemRecipes(RecipeOutput output) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ChiselItems.BALL_O_MOSS.get())
+                .pattern("VSV")
+                .pattern("SVS")
+                .pattern("VSV")
+                .define('V', Blocks.VINE)
+                .define('S', Tags.Items.RODS_WOODEN)
+                .unlockedBy("has_vine", has(Blocks.VINE))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ChiselItems.CLOUD_IN_A_BOTTLE.get())
+                .pattern(" G ")
+                .pattern("GQG")
+                .pattern(" G ")
+                .define('G', Tags.Items.GLASS_BLOCKS)
+                .define('Q', Items.QUARTZ)
+                .unlockedBy("has_quartz", has(Items.QUARTZ))
                 .save(output);
     }
 

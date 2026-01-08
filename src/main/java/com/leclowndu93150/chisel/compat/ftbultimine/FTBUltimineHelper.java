@@ -10,6 +10,15 @@ import java.util.Optional;
 public class FTBUltimineHelper {
 
     public static Optional<Collection<BlockPos>> getBlockSelection(Player player) {
-        return FTBUltimineAPI.api().currentBlockSelection(player);
+        try {
+            var api = FTBUltimineAPI.api();
+            if (api == null) {
+                return Optional.empty();
+            }
+            return api.currentBlockSelection(player);
+        } catch (Exception e) {
+            // FTB Ultimine API may not be fully initialized
+            return Optional.empty();
+        }
     }
 }
