@@ -92,5 +92,6 @@ public class ChiselLanguageProvider extends LanguageProvider {
 
         add("chisel.tooltip.brownstone.speed", "Walking on this block increases your speed");
         add("chisel.tooltip.holystone.glow", "Emits a holy glow and sparkles");
+        add("chisel.tooltip.ctm", "Has CTM");
     }
 }

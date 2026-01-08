@@ -4,6 +4,7 @@ import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
 import com.leclowndu93150.chisel.block.BlockCarvable;
+import com.leclowndu93150.chisel.client.util.CTMDetection;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.world.item.DyeColor;
@@ -29,6 +30,8 @@ public class ChiselClientEvents {
         event.enqueueWork(() -> {
             OffsetProviderRegistry.INSTANCE.registerProvider((world, pos) ->
                     ChunkData.getOffsetData(world, pos).getOffset(pos));
+
+            CTMDetection.init();
         });
     }
 
