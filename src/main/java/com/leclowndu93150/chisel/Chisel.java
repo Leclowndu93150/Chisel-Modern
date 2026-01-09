@@ -21,7 +21,9 @@ import com.leclowndu93150.chisel.init.ChiselMenus;
 import com.leclowndu93150.chisel.init.ChiselParticles;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.leclowndu93150.chisel.init.ChiselSounds;
+import com.leclowndu93150.chisel.worldgen.ChiselBiomeModifiers;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.fml.ModList;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -70,6 +72,8 @@ public class Chisel {
         ChiselRegistries.DATA_COMPONENT_TYPES.register(modEventBus);
         ChiselRegistries.PARTICLE_TYPES.register(modEventBus);
         ChiselRegistries.ENTITY_TYPES.register(modEventBus);
+
+        ChiselBiomeModifiers.BIOME_MODIFIER_SERIALIZERS.register(modEventBus);
 
         ChiselSounds.init();
         ChiselParticles.init();
@@ -187,9 +191,9 @@ public class Chisel {
         @SubscribeEvent
         public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(ChiselEntities.BALL_O_MOSS.get(),
-                    context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
+                    ThrownItemRenderer::new);
             event.registerEntityRenderer(ChiselEntities.CLOUD_IN_A_BOTTLE.get(),
-                    context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
+                    ThrownItemRenderer::new);
         }
     }
 }
