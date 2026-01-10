@@ -75,7 +75,7 @@ public class ChiselChunkEvents {
 
             PacketDistributor.sendToPlayer(
                     event.getPlayer(),
-                    new ChunkDataPayload(chunkPos.x, chunkPos.z, tag)
+                    new ChunkDataPayload(level.dimension(), chunkPos.x, chunkPos.z, tag)
             );
         }
     }

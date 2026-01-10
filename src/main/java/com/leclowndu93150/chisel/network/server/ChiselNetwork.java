@@ -19,7 +19,7 @@ public class ChiselNetwork {
 
     @SubscribeEvent
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(Chisel.MODID).versioned("1.0.0");
+        PayloadRegistrar registrar = event.registrar(Chisel.MODID).versioned("1.0.1");
 
         registrar.playToServer(
                 ChiselModePayload.TYPE,

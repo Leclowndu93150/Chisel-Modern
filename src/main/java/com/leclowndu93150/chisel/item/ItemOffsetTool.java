@@ -77,7 +77,7 @@ public class ItemOffsetTool extends Item {
                 PacketDistributor.sendToPlayersTrackingChunk(
                         serverLevel,
                         chunkPos,
-                        new ChunkDataPayload(chunkPos.x, chunkPos.z, tag)
+                        new ChunkDataPayload(serverLevel.dimension(), chunkPos.x, chunkPos.z, tag)
                 );
             }
         }

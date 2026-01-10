@@ -40,7 +40,7 @@ public class ClientPayloadHandler {
     public static void handleChunkData(ChunkDataPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             var mc = Minecraft.getInstance();
-            if (mc.level != null) {
+            if (mc.level != null && mc.level.dimension().equals(payload.dimension())) {
                 ChunkPos chunkPos = new ChunkPos(payload.chunkX(), payload.chunkZ());
 
                 if (payload.data().isEmpty()) {
