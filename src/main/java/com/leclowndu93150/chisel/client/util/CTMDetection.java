@@ -86,7 +86,7 @@ public class CTMDetection {
                         content.append(line);
                     }
 
-                    return content.toString().contains("\"ctm\"");
+                    return content.toString().contains("\"ctm\"") || content.toString().contains("\"CTMH\"");
                 }
             }
         } catch (Exception ignored) {
