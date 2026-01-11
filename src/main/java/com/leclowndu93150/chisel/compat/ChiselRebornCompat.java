@@ -42,27 +42,27 @@ public class ChiselRebornCompat {
     private static final String FACTORY_BLOCKS_MODID = "factory_blocks";
 
     private static final String[] COLORS = {
-        "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
-        "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
+            "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
+            "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
     };
 
     private static final String[] WOOD_TYPES = {
-        "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "crimson"
+            "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "crimson"
     };
 
     private static final String[] ROCK_VARIANTS_REBORN = {
-        "array", "braid", "chaotic_bricks", "chaotic_medium", "chaotic_small",
-        "circular", "cracked", "cracked_bricks", "cut", "dent", "encased_bricks",
-        "french", "jellybean", "large_tile", "layer", "mosaic", "ornate", "panel",
-        "pillar", "prism", "road", "slant", "small_bricks", "soft_bricks",
-        "solid_bricks", "tiles_medium", "tiles_small", "triple_bricks", "twist",
-        "weaver", "zag"
+            "array", "braid", "chaotic_bricks", "chaotic_medium", "chaotic_small",
+            "circular", "cracked", "cracked_bricks", "cut", "dent", "encased_bricks",
+            "french", "jellybean", "large_tile", "layer", "mosaic", "ornate", "panel",
+            "pillar", "prism", "road", "slant", "small_bricks", "soft_bricks",
+            "solid_bricks", "tiles_medium", "tiles_small", "triple_bricks", "twist",
+            "weaver", "zag"
     };
 
     private static final String[] PLANK_VARIANTS_REBORN = {
-        "braid", "crude_horizontal", "crude_paneling", "crude_vertical",
-        "encased", "encased_large", "encased_smooth", "large", "log_bordered",
-        "paneling", "shipping_crate", "smooth", "stacked", "vertical"
+            "braid", "crude_horizontal", "crude_paneling", "crude_vertical",
+            "encased", "encased_large", "encased_smooth", "large", "log_bordered",
+            "paneling", "shipping_crate", "smooth", "stacked", "vertical"
     };
 
     /**
@@ -162,8 +162,8 @@ public class ChiselRebornCompat {
         int count = 0;
 
         String[] directMappingBases = {
-            "andesite", "bricks", "cobblestone", "diorite", "end_stone",
-            "granite", "prismarine", "sandstone", "red_sandstone", "ice"
+                "andesite", "bricks", "cobblestone", "diorite", "end_stone",
+                "granite", "prismarine", "sandstone", "red_sandstone", "ice"
         };
 
         for (String base : directMappingBases) {
@@ -374,11 +374,11 @@ public class ChiselRebornCompat {
         int count = 0;
 
         String[] stoneVariants = {
-            "array", "braid", "chaotic_medium", "chaotic_small", "circular",
-            "cracked", "cracked_bricks", "dent", "encased_bricks", "french",
-            "jellybean", "large_tile", "layer", "mosaic", "ornate", "panel",
-            "pillar", "prism", "road", "slant", "small_bricks", "soft_bricks",
-            "solid_bricks", "tiles_medium", "tiles_small", "triple_bricks", "twist"
+                "array", "braid", "chaotic_medium", "chaotic_small", "circular",
+                "cracked", "cracked_bricks", "dent", "encased_bricks", "french",
+                "jellybean", "large_tile", "layer", "mosaic", "ornate", "panel",
+                "pillar", "prism", "road", "slant", "small_bricks", "soft_bricks",
+                "solid_bricks", "tiles_medium", "tiles_small", "triple_bricks", "twist"
         };
 
         for (String rebornVariant : stoneVariants) {
@@ -419,11 +419,11 @@ public class ChiselRebornCompat {
         int count = 0;
 
         String[] stoneVariants = {
-            "array", "braid", "chaotic_medium", "chaotic_small", "circular",
-            "cracked", "cracked_bricks", "dent", "encased_bricks", "french",
-            "jellybean", "large_tile", "layer", "mosaic", "ornate", "panel",
-            "pillar", "prism", "road", "slant", "small_bricks", "soft_bricks",
-            "solid_bricks", "tiles_medium", "tiles_small", "triple_bricks", "twist"
+                "array", "braid", "chaotic_medium", "chaotic_small", "circular",
+                "cracked", "cracked_bricks", "dent", "encased_bricks", "french",
+                "jellybean", "large_tile", "layer", "mosaic", "ornate", "panel",
+                "pillar", "prism", "road", "slant", "small_bricks", "soft_bricks",
+                "solid_bricks", "tiles_medium", "tiles_small", "triple_bricks", "twist"
         };
 
         for (String rebornVariant : stoneVariants) {
@@ -615,7 +615,7 @@ public class ChiselRebornCompat {
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_roundel", "laboratory/roundel") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_screen", "laboratory/fuzzscreen") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_small_steel", "laboratory/smallsteel") ? 1 : 0;
-        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_tiles", "laboratory/floortile") ? 1 : 0;
+        count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_tiles", "laboratory/largetile") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_vents", "laboratory/wallvents") ? 1 : 0;
         count += registerCrossModAlias(CHIPPED_INTEGRATION_MODID, "laboratory_white_panel", "laboratory/wallpanel") ? 1 : 0;
 
