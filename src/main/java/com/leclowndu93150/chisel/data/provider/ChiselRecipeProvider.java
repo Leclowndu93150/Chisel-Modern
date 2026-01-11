@@ -390,9 +390,9 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .pattern("OOO")
                     .pattern("OEO")
                     .pattern("OOO")
-                    .define('O', Tags.Items.OBSIDIANS)
+                    .define('O', Blocks.CRYING_OBSIDIAN)
                     .define('E', Items.ENDER_EYE)
-                    .unlockedBy("has_ender_eye", has(Items.ENDER_EYE))
+                    .unlockedBy("has_crying_obsidian", has(Blocks.CRYING_OBSIDIAN))
                     .save(output, Chisel.id("runic_voidstone/black"));
         }
 
