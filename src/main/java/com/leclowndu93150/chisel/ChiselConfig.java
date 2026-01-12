@@ -73,11 +73,11 @@ public class ChiselConfig {
 
     private static final ModConfigSpec.IntValue MARBLE_VEIN_COUNT = BUILDER
             .comment("Number of marble veins per chunk")
-            .defineInRange("worldgen.marble.veinCount", 8, 0, 64);
+            .defineInRange("worldgen.marble.veinCount", 1, 0, 64);
 
     private static final ModConfigSpec.IntValue MARBLE_VEIN_SIZE = BUILDER
             .comment("Maximum size of marble veins")
-            .defineInRange("worldgen.marble.veinSize", 64, 1, 128);
+            .defineInRange("worldgen.marble.veinSize", 48, 1, 128);
 
     private static final ModConfigSpec.IntValue MARBLE_MIN_Y = BUILDER
             .comment("Minimum Y level for marble generation")
@@ -94,11 +94,11 @@ public class ChiselConfig {
 
     private static final ModConfigSpec.IntValue LIMESTONE_VEIN_COUNT = BUILDER
             .comment("Number of limestone veins per chunk")
-            .defineInRange("worldgen.limestone.veinCount", 8, 0, 64);
+            .defineInRange("worldgen.limestone.veinCount", 1, 0, 64);
 
     private static final ModConfigSpec.IntValue LIMESTONE_VEIN_SIZE = BUILDER
             .comment("Maximum size of limestone veins")
-            .defineInRange("worldgen.limestone.veinSize", 64, 1, 128);
+            .defineInRange("worldgen.limestone.veinSize", 48, 1, 128);
 
     private static final ModConfigSpec.IntValue LIMESTONE_MIN_Y = BUILDER
             .comment("Minimum Y level for limestone generation")
@@ -115,11 +115,11 @@ public class ChiselConfig {
 
     private static final ModConfigSpec.IntValue DIABASE_VEIN_COUNT = BUILDER
             .comment("Number of diabase veins per chunk")
-            .defineInRange("worldgen.diabase.veinCount", 8, 0, 64);
+            .defineInRange("worldgen.diabase.veinCount", 1, 0, 64);
 
     private static final ModConfigSpec.IntValue DIABASE_VEIN_SIZE = BUILDER
             .comment("Maximum size of diabase veins")
-            .defineInRange("worldgen.diabase.veinSize", 32, 1, 128);
+            .defineInRange("worldgen.diabase.veinSize", 48, 1, 128);
 
     private static final ModConfigSpec.IntValue DIABASE_MIN_Y = BUILDER
             .comment("Minimum Y level for diabase generation (near lava level)")
@@ -136,11 +136,11 @@ public class ChiselConfig {
 
     private static final ModConfigSpec.IntValue BASALT_VEIN_COUNT = BUILDER
             .comment("Number of basalt veins per chunk")
-            .defineInRange("worldgen.basalt.veinCount", 6, 0, 64);
+            .defineInRange("worldgen.basalt.veinCount", 1, 0, 64);
 
     private static final ModConfigSpec.IntValue BASALT_VEIN_SIZE = BUILDER
             .comment("Maximum size of basalt veins")
-            .defineInRange("worldgen.basalt.veinSize", 32, 1, 128);
+            .defineInRange("worldgen.basalt.veinSize", 48, 1, 128);
 
     private static final ModConfigSpec.IntValue BASALT_MIN_Y = BUILDER
             .comment("Minimum Y level for basalt generation")
