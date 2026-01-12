@@ -4,6 +4,7 @@ import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.network.client.AutoChiselFXPacket;
 import com.leclowndu93150.chisel.network.client.ChunkDataPacket;
 import com.leclowndu93150.chisel.network.server.ChiselButtonPacket;
+import com.leclowndu93150.chisel.network.server.ChiselFuzzyPacket;
 import com.leclowndu93150.chisel.network.server.ChiselModePacket;
 import com.leclowndu93150.chisel.network.server.HitechSettingsPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +21,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
  */
 public class ChiselNetwork {
 
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "2";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(Chisel.MODID, "main"),
             () -> PROTOCOL_VERSION,
@@ -52,6 +53,12 @@ public class ChiselNetwork {
                 .encoder(HitechSettingsPacket::encode)
                 .decoder(HitechSettingsPacket::decode)
                 .consumerMainThread(HitechSettingsPacket::handle)
+                .add();
+
+        CHANNEL.messageBuilder(ChiselFuzzyPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .encoder(ChiselFuzzyPacket::encode)
+                .decoder(ChiselFuzzyPacket::decode)
+                .consumerMainThread(ChiselFuzzyPacket::handle)
                 .add();
 
         CHANNEL.messageBuilder(AutoChiselFXPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)

@@ -21,14 +21,14 @@ repositories {
 }
 
 base {
-    archivesName = mod_id+"-1.20.1-Forge"
+    archivesName = mod_id + "-1.20.1-Forge"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 legacyForge {
     // Specify the version of NeoForge to use.
-    version = project.minecraft_version+"-"+project.neo_version
+    version = project.minecraft_version + "-" + project.neo_version
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -118,6 +118,7 @@ dependencies {
     modImplementation "curse.maven:ftb-library-forge-404465:6807424"
     modImplementation "curse.maven:kubejs-238086:5853326"
     modImplementation "curse.maven:rhino-416294:6186971"
+    modRuntimeOnly "curse.maven:advanced-xray-256256:4840340"
 }
 
 mixin {

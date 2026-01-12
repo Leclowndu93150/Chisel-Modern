@@ -2,6 +2,7 @@ package com.leclowndu93150.chisel.api.chunkdata;
 
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -14,10 +15,10 @@ public class ChunkData {
     public static final String NBT_KEY = "chisel:offset_data";
 
     private static final IOffsetData DUMMY = pos -> BlockPos.ZERO;
-    private static final Map<Long, OffsetData> serverDataCache = new ConcurrentHashMap<>();
-    private static final Map<Long, OffsetData> clientDataCache = new ConcurrentHashMap<>();
+    private static final Map<LevelChunkKey, OffsetData> serverDataCache = new ConcurrentHashMap<>();
+    private static final Map<LevelChunkKey, OffsetData> clientDataCache = new ConcurrentHashMap<>();
 
-    private static Map<Long, OffsetData> getCache(Level level) {
+    private static Map<LevelChunkKey, OffsetData> getCache(Level level) {
         return level.isClientSide() ? clientDataCache : serverDataCache;
     }
 
@@ -39,24 +40,24 @@ public class ChunkData {
         }
 
         ChunkPos chunkPos = new ChunkPos(pos);
-        long key = getKey(chunkPos);
+        LevelChunkKey key = getKey(level, chunkPos);
 
         OffsetData data = getCache(level).get(key);
         return data != null ? data : DUMMY;
     }
 
     public static OffsetData getOrCreateData(Level level, ChunkPos chunkPos) {
-        long key = getKey(chunkPos);
+        LevelChunkKey key = getKey(level, chunkPos);
         return getCache(level).computeIfAbsent(key, k -> new OffsetData());
     }
 
     public static OffsetData getData(Level level, ChunkPos chunkPos) {
-        long key = getKey(chunkPos);
+        LevelChunkKey key = getKey(level, chunkPos);
         return getCache(level).get(key);
     }
 
     public static void setData(Level level, ChunkPos chunkPos, OffsetData data) {
-        long key = getKey(chunkPos);
+        LevelChunkKey key = getKey(level, chunkPos);
         if (data == null || data.isEmpty()) {
             getCache(level).remove(key);
         } else {
@@ -65,12 +66,14 @@ public class ChunkData {
     }
 
     public static void removeData(Level level, ChunkPos chunkPos) {
-        long key = getKey(chunkPos);
+        LevelChunkKey key = getKey(level, chunkPos);
         getCache(level).remove(key);
     }
 
     public static void clearDataForLevel(Level level) {
-        getCache(level).clear();
+        Map<LevelChunkKey, OffsetData> cache = getCache(level);
+        ResourceKey<Level> dimension = level.dimension();
+        cache.keySet().removeIf(key -> key.dimension().equals(dimension));
     }
 
     public static void clearAll() {
@@ -78,7 +81,10 @@ public class ChunkData {
         clientDataCache.clear();
     }
 
-    private static long getKey(ChunkPos pos) {
-        return pos.toLong();
+    private static LevelChunkKey getKey(Level level, ChunkPos pos) {
+        return new LevelChunkKey(level.dimension(), pos.toLong());
+    }
+
+    private record LevelChunkKey(ResourceKey<Level> dimension, long chunkPos) {
     }
 }

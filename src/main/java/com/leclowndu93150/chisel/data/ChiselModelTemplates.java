@@ -161,8 +161,8 @@ public class ChiselModelTemplates {
             String modelName = "block/" + name(block);
             String texPath = "block/" + texturePath(block);
             prov.simpleBlock(block, prov.models().cubeColumn(modelName,
-                    Chisel.id(texPath + "-side"),
-                    Chisel.id(texPath + "-top"))
+                            Chisel.id(texPath + "-side"),
+                            Chisel.id(texPath + "-top"))
                     .renderType("cutout"));
         };
     }
@@ -201,9 +201,12 @@ public class ChiselModelTemplates {
             String modelName = "block/" + name(block);
             String texPath = "block/" + texturePath(block);
             String texName = replaceVariant(texPath, variant);
+            // For CTM variants like "circularct", strip the "ct" suffix for the -ctm texture
+            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
+            String ctmTexName = replaceVariant(texPath, ctmVariant);
             prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("cube_ctm"))
                     .texture("all", texName)
-                    .texture("connected_tex", texName + "-ctm"));
+                    .texture("connected_tex", ctmTexName + "-ctm"));
         };
     }
 
@@ -269,9 +272,13 @@ public class ChiselModelTemplates {
             String texPath = "block/" + texturePath(block);
             String texName = replaceBlock(texPath, base);
             texName = replaceVariant(texName, variant);
+            // For CTM variants like "circularct", strip the "ct" suffix for the -ctm texture
+            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
+            String ctmTexName = replaceBlock(texPath, base);
+            ctmTexName = replaceVariant(ctmTexName, ctmVariant);
             prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/mossy/mossy_ctm"))
                     .texture("bot", texName)
-                    .texture("connect_bot", texName + "-ctm"));
+                    .texture("connect_bot", ctmTexName + "-ctm"));
         };
     }
 
@@ -325,11 +332,13 @@ public class ChiselModelTemplates {
     public static ModelTemplate fluidCubeCTM(String fluid, String variant) {
         return (prov, block) -> {
             String modelName = "block/" + name(block);
+            // For CTM variants like "circularct", strip the "ct" suffix for the -ctm texture
+            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
 
             prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/cube_ctm_" + fluid))
                     .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
                     .texture("top", Chisel.id("block/fluid/" + variant))
-                    .texture("connect_top", Chisel.id("block/fluid/" + variant + "-ctm")));
+                    .texture("connect_top", Chisel.id("block/fluid/" + ctmVariant + "-ctm")));
         };
     }
 
@@ -434,7 +443,7 @@ public class ChiselModelTemplates {
      * This matches exactly how vanilla handles glass panes.
      */
     private static void paneBlockVanillaStyle(BlockStateProvider prov, Block block, String name,
-                                               ResourceLocation paneTexture, ResourceLocation edgeTexture) {
+                                              ResourceLocation paneTexture, ResourceLocation edgeTexture) {
         MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
 
         var postModel = prov.models()
@@ -609,7 +618,7 @@ public class ChiselModelTemplates {
      * This matches exactly how vanilla handles iron bars.
      */
     private static void ironBarsVanillaStyle(BlockStateProvider prov, Block block, String name,
-                                              ResourceLocation barsTexture, ResourceLocation edgeTexture) {
+                                             ResourceLocation barsTexture, ResourceLocation edgeTexture) {
         MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
 
         var postEndsModel = prov.models()

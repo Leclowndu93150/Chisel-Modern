@@ -1,9 +1,0 @@
-{
-  "type": "forge:add_features",
-  "biomes": "#minecraft:is_overworld",
-  "features": [
-    "chisel:ore_limestone_upper",
-    "chisel:ore_limestone_lower"
-  ],
-  "step": "underground_ores"
-}

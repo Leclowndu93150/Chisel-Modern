@@ -1,0 +1,10 @@
+{
+    "ctm": {
+        "ctm_version": 1,
+        "type": "ctm",
+        "layer": "SOLID",
+        "textures": [
+            "chisel:block/redstone/circular-ctm"
+        ]
+    }
+}

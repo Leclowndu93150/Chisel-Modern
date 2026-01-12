@@ -7,6 +7,7 @@ import com.leclowndu93150.chisel.ChiselConfig;
 import com.leclowndu93150.chisel.api.IChiselItem;
 import com.leclowndu93150.chisel.api.carving.IChiselMode;
 import com.leclowndu93150.chisel.carving.CarvingHelper;
+import com.leclowndu93150.chisel.carving.ChiselMode;
 import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -69,7 +70,8 @@ public class ChiselController {
             return;
         }
 
-        Iterable<? extends BlockPos> candidates = getCandidates(player, pos, side, chisel.getMode(held));
+        boolean fuzzy = chisel.isFuzzyMode(held);
+        Iterable<? extends BlockPos> candidates = getCandidates(player, pos, side, chisel.getMode(held), fuzzy);
 
         ItemStack target = chisel.getTarget(held);
 
@@ -87,7 +89,7 @@ public class ChiselController {
             if (blockGroup.equals(targetGroup)) {
                 Block targetBlock = Block.byItem(target.getItem());
                 if (targetBlock != null) {
-                    setAll(candidates, player, state, targetBlock, held, event.getHand());
+                    setAll(candidates, player, state, targetBlock, held, event.getHand(), fuzzy);
                     event.setCanceled(true);
                 }
             }
@@ -110,17 +112,20 @@ public class ChiselController {
 
             Block nextBlock = Block.byItem(variations.get(index));
             if (nextBlock != null) {
-                setAll(candidates, player, state, nextBlock, held, event.getHand());
+                setAll(candidates, player, state, nextBlock, held, event.getHand(), fuzzy);
                 event.setCanceled(true);
             }
         }
     }
 
-    private static void setAll(Iterable<? extends BlockPos> candidates, Player player, BlockState origState, Block targetBlock, ItemStack chisel, InteractionHand hand) {
+    private static void setAll(Iterable<? extends BlockPos> candidates, Player player, BlockState origState, Block targetBlock, ItemStack chiselStack, InteractionHand hand, boolean fuzzy) {
         if (!checkClickCache(player)) return;
 
         for (BlockPos pos : candidates) {
-            setVariation(player, pos, origState, targetBlock, chisel, hand);
+            if (chiselStack.isEmpty()) {
+                break;
+            }
+            setVariation(player, pos, origState, targetBlock, chiselStack, hand, fuzzy);
         }
     }
 
@@ -140,7 +145,7 @@ public class ChiselController {
         return true;
     }
 
-    private static void setVariation(Player player, BlockPos pos, BlockState origState, Block targetBlock, ItemStack chiselStack, InteractionHand hand) {
+    private static void setVariation(Player player, BlockPos pos, BlockState origState, Block targetBlock, ItemStack chiselStack, InteractionHand hand, boolean fuzzy) {
         Level level = player.level();
         BlockState curState = level.getBlockState(pos);
 
@@ -148,8 +153,16 @@ public class ChiselController {
             return;
         }
 
-        if (origState != curState) {
-            return;
+        // In fuzzy mode, check if blocks are in the same carving group
+        // In non-fuzzy mode, require exact state match
+        if (fuzzy) {
+            if (!CarvingHelper.areInSameGroup(origState, curState)) {
+                return;
+            }
+        } else {
+            if (origState != curState) {
+                return;
+            }
         }
 
         if (chiselStack.getItem() instanceof IChiselItem chisel) {
@@ -193,12 +206,15 @@ public class ChiselController {
         }
     }
 
-    private static Iterable<? extends BlockPos> getCandidates(Player player, BlockPos pos, Direction side, IChiselMode mode) {
+    private static Iterable<? extends BlockPos> getCandidates(Player player, BlockPos pos, Direction side, IChiselMode mode, boolean fuzzy) {
         if (ChiselConfig.enableUltimineCompat && ModList.get().isLoaded("ftbultimine")) {
             Optional<Collection<BlockPos>> ultimineSelection = FTBUltimineHelper.getBlockSelection(player);
             if (ultimineSelection.isPresent()) {
                 return ultimineSelection.get();
             }
+        }
+        if (mode instanceof ChiselMode chiselMode) {
+            return chiselMode.getCandidates(player, pos, side, fuzzy);
         }
         return mode.getCandidates(player, pos, side);
     }

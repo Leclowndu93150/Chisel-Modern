@@ -44,6 +44,7 @@ public class ChiselDataGenerators {
         generator.addProvider(event.includeServer(), new ChiselItemTagsProvider(output, lookupProvider, blockTagsProvider.contentsGetter(), existingFileHelper));
         generator.addProvider(event.includeServer(), new ChiselRecipeProvider(output));
         generator.addProvider(event.includeServer(), new ChiselLootTableProvider(output));
+        generator.addProvider(event.includeServer(), new ChiselWorldGenProvider(output, lookupProvider));
 
         Runtime.getRuntime().addShutdownHook(new Thread(lenientHelper::printMissingSummary));
     }

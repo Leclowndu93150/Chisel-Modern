@@ -557,6 +557,7 @@ public class ChiselBlocks {
                     .properties(() -> Blocks.PACKED_ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.ICE)
+                    .defaultModelTemplate(simpleBlockTranslucent())
                     .variations(VariantTemplates.ROCK)
                     .build()
     );
@@ -567,6 +568,7 @@ public class ChiselBlocks {
                     .properties(() -> Blocks.ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.ICE)
+                    .defaultModelTemplate(simpleBlockTranslucent())
                     .variations(VariantTemplates.PILLAR)
                     .build()
     );
@@ -577,6 +579,15 @@ public class ChiselBlocks {
                     .mapColor(MapColor.COLOR_RED)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .variations(VariantTemplates.ANTIBLOCK)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> CUBITS = registerType(
+            new ChiselBlockType<BlockCarvable>("cubits")
+                    .properties(BlockBehaviour.Properties.copy(Blocks.STONE).isValidSpawn((state, level, pos, type) -> false))
+                    .mapColor(MapColor.QUARTZ)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.CUBITS)
                     .build()
     );
 
@@ -594,8 +605,8 @@ public class ChiselBlocks {
                     .variation("weathered_block", "Weathered Big Tile")
                     .variation("weathered_doubleslab", "Weathered Bisected", cubeColumn("weathered_doubleslab-side", "weathered_block"))
                     .variation("weathered_blocks", "Weathered Tiles")
-                    .variation("weathered_half", "Half-Weathered", cubeBottomTop("weathered_half-side", "default", "weathered"))
-                    .variation("weathered_block_half", "Half-Weathered Big Tile", cubeBottomTop("weathered_block_half-side", "block", "weathered_block"))
+                    .variation("weathered_half", "Half-Weathered", cubeBottomTop("weathered_half-side", "weathered", "default"))
+                    .variation("weathered_block_half", "Half-Weathered Big Tile", cubeBottomTop("weathered_block_half-side", "weathered_block", "block"))
                     .build()
     );
 

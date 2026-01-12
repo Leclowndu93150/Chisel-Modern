@@ -7,18 +7,21 @@ import com.leclowndu93150.chisel.carving.ChiselMode;
 import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
 import com.leclowndu93150.chisel.client.gui.ChiselScreen;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;
+import com.leclowndu93150.chisel.command.ChiselDebugCommands;
 import com.leclowndu93150.chisel.compat.ChiselRebornCompat;
 import com.leclowndu93150.chisel.client.particle.HolystoneStarParticle;
 import com.leclowndu93150.chisel.init.ChiselBlockEntities;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselCreativeTabs;
 import com.leclowndu93150.chisel.init.ChiselDataComponents;
+import com.leclowndu93150.chisel.init.ChiselEntities;
 import com.leclowndu93150.chisel.init.ChiselItems;
 import com.leclowndu93150.chisel.init.ChiselMenus;
 import com.leclowndu93150.chisel.init.ChiselParticles;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.leclowndu93150.chisel.init.ChiselSounds;
 import com.leclowndu93150.chisel.network.ChiselNetwork;
+import com.leclowndu93150.chisel.worldgen.ChiselBiomeModifiers;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
@@ -32,6 +35,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -49,6 +54,8 @@ public class Chisel {
         ModContainer modContainer = ModLoadingContext.get().getContainer();
         modEventBus.addListener(this::commonSetup);
 
+        MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
+
         ChiselRebornCompat.init();
 
         ChiselNetwork.register();
@@ -60,6 +67,9 @@ public class Chisel {
         ChiselRegistries.MENU_TYPES.register(modEventBus);
         ChiselRegistries.SOUND_EVENTS.register(modEventBus);
         ChiselRegistries.PARTICLE_TYPES.register(modEventBus);
+        ChiselRegistries.ENTITY_TYPES.register(modEventBus);
+
+        ChiselBiomeModifiers.BIOME_MODIFIER_SERIALIZERS.register(modEventBus);
 
         ChiselSounds.init();
         ChiselParticles.init();
@@ -69,12 +79,17 @@ public class Chisel {
         ChiselCreativeTabs.init();
         ChiselDataComponents.init();
         ChiselBlockEntities.init();
+        ChiselEntities.init();
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ChiselConfig.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         ChiselMode.registerAll();
+    }
+
+    private void registerCommands(RegisterCommandsEvent event) {
+        ChiselDebugCommands.register(event.getDispatcher());
     }
 
     public static ResourceLocation id(String path) {
@@ -109,6 +124,9 @@ public class Chisel {
                 registerBlockRenderType(ChiselBlocks.ANTIBLOCK, RenderType.cutout());
 
                 registerBlockRenderType(ChiselBlocks.CLOUD, RenderType.cutout());
+
+                registerBlockRenderType(ChiselBlocks.ICE, RenderType.translucent());
+                registerBlockRenderType(ChiselBlocks.ICE_PILLAR, RenderType.translucent());
 
                 ItemBlockRenderTypes.setRenderLayer(ChiselBlocks.AUTO_CHISEL.get(), RenderType.cutout());
             });

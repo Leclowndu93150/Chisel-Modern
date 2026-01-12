@@ -16,6 +16,7 @@ public class ChiselDataComponents {
     private static final String SELECTION_SLOT_KEY = "selection_slot";
     private static final String TARGET_SLOT_KEY = "target_slot";
     private static final String ROTATE_KEY = "rotate";
+    private static final String FUZZY_KEY = "fuzzy";
     private static final String TARGET_KEY = "target";
 
     /**
@@ -45,13 +46,14 @@ public class ChiselDataComponents {
             int selectionSlot = data.contains(SELECTION_SLOT_KEY) ? data.getInt(SELECTION_SLOT_KEY) : -1;
             int targetSlot = data.contains(TARGET_SLOT_KEY) ? data.getInt(TARGET_SLOT_KEY) : -1;
             boolean rotate = data.contains(ROTATE_KEY) && data.getBoolean(ROTATE_KEY);
+            boolean fuzzy = data.contains(FUZZY_KEY) && data.getBoolean(FUZZY_KEY);
 
             ItemStack target = ItemStack.EMPTY;
             if (data.contains(TARGET_KEY)) {
                 target = ItemStack.of(data.getCompound(TARGET_KEY));
             }
 
-            return new ChiselData(mode, previewType, selectionSlot, targetSlot, rotate, target);
+            return new ChiselData(mode, previewType, selectionSlot, targetSlot, rotate, fuzzy, target);
         }
 
         /**
@@ -66,6 +68,7 @@ public class ChiselDataComponents {
             data.putInt(SELECTION_SLOT_KEY, chiselData.selectionSlot());
             data.putInt(TARGET_SLOT_KEY, chiselData.targetSlot());
             data.putBoolean(ROTATE_KEY, chiselData.rotate());
+            data.putBoolean(FUZZY_KEY, chiselData.fuzzy());
 
             if (!chiselData.target().isEmpty()) {
                 CompoundTag targetTag = new CompoundTag();

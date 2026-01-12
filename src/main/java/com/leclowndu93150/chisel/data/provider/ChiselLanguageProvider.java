@@ -39,6 +39,8 @@ public class ChiselLanguageProvider extends LanguageProvider {
         add(ChiselItems.DIAMOND_CHISEL.get(), "Diamond Chisel");
         add(ChiselItems.HITECH_CHISEL.get(), "iChisel");
         add(ChiselItems.OFFSET_TOOL.get(), "Ender Offset Wand");
+        add(ChiselItems.BALL_O_MOSS.get(), "Ball O' Moss");
+        add(ChiselItems.CLOUD_IN_A_BOTTLE.get(), "Cloud in a Bottle");
 
         add("jei.chisel.chiseling", "Chiseling");
         add("jei.chisel.no_craftable", "No Craftable Block");
@@ -49,6 +51,10 @@ public class ChiselLanguageProvider extends LanguageProvider {
         add("chisel.tooltip.target", "Set a target in the GUI to chisel to a specific variant");
         add("chisel.tooltip.modes", "Shift + Right-click to change mode");
         add("chisel.tooltip.selectedmode", "Selected mode: %s");
+        add("chisel.tooltip.fuzzy", "Fuzzy mode: %s");
+        add("chisel.tooltip.fuzzy.enabled", "Enabled");
+        add("chisel.tooltip.fuzzy.disabled", "Disabled");
+        add("chisel.tooltip.fuzzy.hint", "Ctrl + Shift + Right-click to toggle fuzzy mode");
 
         add("chisel.tooltip.offset_tool.1", "Right-click a block to cycle texture offset");
         add("chisel.tooltip.offset_tool.2", "Sneak + Right-click to reset offset");
@@ -69,6 +75,8 @@ public class ChiselLanguageProvider extends LanguageProvider {
         add("chisel.message.mode_changed", "Mode changed to: %s");
         add("chisel.message.cooldown", "Chisel on cooldown: %ss");
         add("chisel.message.no_target", "No target selected! Open GUI to select a target block.");
+        add("chisel.message.fuzzy_enabled", "Fuzzy mode enabled");
+        add("chisel.message.fuzzy_disabled", "Fuzzy mode disabled");
 
         add("chisel.tooltip.hitech.target", "Requires a target block selected in the GUI to carve");
 
@@ -92,5 +100,6 @@ public class ChiselLanguageProvider extends LanguageProvider {
 
         add("chisel.tooltip.brownstone.speed", "Walking on this block increases your speed");
         add("chisel.tooltip.holystone.glow", "Emits a holy glow and sparkles");
+        add("chisel.tooltip.ctm", "Has CTM");
     }
 }

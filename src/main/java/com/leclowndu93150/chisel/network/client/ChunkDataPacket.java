@@ -3,9 +3,12 @@ package com.leclowndu93150.chisel.network.client;
 import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
 import com.leclowndu93150.chisel.api.chunkdata.OffsetData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
@@ -17,27 +20,31 @@ import java.util.function.Supplier;
  */
 public class ChunkDataPacket {
 
+    private final ResourceKey<Level> dimension;
     private final int chunkX;
     private final int chunkZ;
     private final CompoundTag data;
 
-    public ChunkDataPacket(int chunkX, int chunkZ, CompoundTag data) {
+    public ChunkDataPacket(ResourceKey<Level> dimension, int chunkX, int chunkZ, CompoundTag data) {
+        this.dimension = dimension;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.data = data != null ? data : new CompoundTag();
     }
 
     public static void encode(ChunkDataPacket packet, FriendlyByteBuf buf) {
+        buf.writeResourceKey(packet.dimension);
         buf.writeInt(packet.chunkX);
         buf.writeInt(packet.chunkZ);
         buf.writeNbt(packet.data);
     }
 
     public static ChunkDataPacket decode(FriendlyByteBuf buf) {
+        ResourceKey<Level> dimension = buf.readResourceKey(Registries.DIMENSION);
         int chunkX = buf.readInt();
         int chunkZ = buf.readInt();
         CompoundTag data = buf.readNbt();
-        return new ChunkDataPacket(chunkX, chunkZ, data);
+        return new ChunkDataPacket(dimension, chunkX, chunkZ, data);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -45,7 +52,7 @@ public class ChunkDataPacket {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             var mc = Minecraft.getInstance();
-            if (mc.level != null) {
+            if (mc.level != null && mc.level.dimension().equals(packet.dimension)) {
                 ChunkPos chunkPos = new ChunkPos(packet.chunkX, packet.chunkZ);
 
                 if (packet.data.isEmpty()) {

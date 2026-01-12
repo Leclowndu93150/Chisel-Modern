@@ -18,6 +18,8 @@ public class ChiselCreativeTabs {
                         output.accept(ChiselItems.HITECH_CHISEL.get());
                         output.accept(ChiselItems.OFFSET_TOOL.get());
                         output.accept(ChiselItems.AUTO_CHISEL.get());
+                        output.accept(ChiselItems.BALL_O_MOSS.get());
+                        output.accept(ChiselItems.CLOUD_IN_A_BOTTLE.get());
                         ChiselBlocks.ALL_BLOCK_TYPES.forEach(blockType -> {
                             blockType.getAllItems().forEach(item -> output.accept(item.get()));
                         });

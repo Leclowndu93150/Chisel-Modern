@@ -1,15 +1,21 @@
 package com.leclowndu93150.chisel.data.provider;
 
 import com.leclowndu93150.chisel.Chisel;
+import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.leclowndu93150.chisel.init.ChiselItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Consumer;
 
@@ -23,6 +29,7 @@ public class ChiselRecipeProvider extends RecipeProvider {
     protected void buildRecipes(Consumer<FinishedRecipe> output) {
         buildToolRecipes(output);
         buildAutoChiselRecipe(output);
+        buildThrowableItemRecipes(output);
         buildFactoryRecipes(output);
         buildLaboratoryRecipes(output);
         buildAntiblockRecipes(output);
@@ -42,6 +49,8 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildFantasyRecipes(output);
         buildWarningRecipes(output);
         buildHolystoneRecipes(output);
+        buildCubitsRecipes(output);
+        buildStonecutterRecipes(output);
     }
 
     private void buildToolRecipes(Consumer<FinishedRecipe> output) {
@@ -86,6 +95,26 @@ public class ChiselRecipeProvider extends RecipeProvider {
                 .define('R', Tags.Items.DUSTS_REDSTONE)
                 .define('I', Tags.Items.INGOTS_IRON)
                 .unlockedBy("has_redstone", has(Tags.Items.DUSTS_REDSTONE))
+                .save(output);
+    }
+
+    private void buildThrowableItemRecipes(Consumer<FinishedRecipe> output) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ChiselItems.BALL_O_MOSS.get())
+                .pattern("VSV")
+                .pattern("SVS")
+                .pattern("VSV")
+                .define('V', Blocks.VINE)
+                .define('S', Tags.Items.RODS_WOODEN)
+                .unlockedBy("has_vine", has(Blocks.VINE))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ChiselItems.CLOUD_IN_A_BOTTLE.get())
+                .pattern(" G ")
+                .pattern("GQG")
+                .pattern(" G ")
+                .define('G', Tags.Items.GLASS)
+                .define('Q', Items.QUARTZ)
+                .unlockedBy("has_quartz", has(Items.QUARTZ))
                 .save(output);
     }
 
@@ -359,9 +388,9 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .pattern("OOO")
                     .pattern("OEO")
                     .pattern("OOO")
-                    .define('O', Tags.Items.OBSIDIAN)
+                    .define('O', Blocks.CRYING_OBSIDIAN)
                     .define('E', Items.ENDER_EYE)
-                    .unlockedBy("has_ender_eye", has(Items.ENDER_EYE))
+                    .unlockedBy("has_crying_obsidian", has(Blocks.CRYING_OBSIDIAN))
                     .save(output, Chisel.id("runic_voidstone/black"));
         }
 
@@ -434,13 +463,34 @@ public class ChiselRecipeProvider extends RecipeProvider {
                             .pattern("GGG")
                             .pattern("GDG")
                             .pattern("GGG")
-                            .define('G', Tags.Items.GLASS_COLORLESS)
+                            .define('G', getStainedGlassBlock(color))
                             .define('D', color.getTag())
-                            .unlockedBy("has_glass", has(Tags.Items.GLASS_COLORLESS))
+                            .unlockedBy("has_stained_glass", has(getStainedGlassBlock(color)))
                             .save(output, Chisel.id("glassdyed/" + color.getSerializedName() + "_bubble"));
                 }
             }
         }
+    }
+
+    private static Block getStainedGlassBlock(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Blocks.WHITE_STAINED_GLASS;
+            case ORANGE -> Blocks.ORANGE_STAINED_GLASS;
+            case MAGENTA -> Blocks.MAGENTA_STAINED_GLASS;
+            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_STAINED_GLASS;
+            case YELLOW -> Blocks.YELLOW_STAINED_GLASS;
+            case LIME -> Blocks.LIME_STAINED_GLASS;
+            case PINK -> Blocks.PINK_STAINED_GLASS;
+            case GRAY -> Blocks.GRAY_STAINED_GLASS;
+            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_STAINED_GLASS;
+            case CYAN -> Blocks.CYAN_STAINED_GLASS;
+            case PURPLE -> Blocks.PURPLE_STAINED_GLASS;
+            case BLUE -> Blocks.BLUE_STAINED_GLASS;
+            case BROWN -> Blocks.BROWN_STAINED_GLASS;
+            case GREEN -> Blocks.GREEN_STAINED_GLASS;
+            case RED -> Blocks.RED_STAINED_GLASS;
+            case BLACK -> Blocks.BLACK_STAINED_GLASS;
+        };
     }
 
     private void buildBookshelfRecipes(Consumer<FinishedRecipe> output) {
@@ -531,6 +581,47 @@ public class ChiselRecipeProvider extends RecipeProvider {
                     .unlockedBy("has_feather", has(Items.FEATHER))
                     .save(output, Chisel.id("holystone/raw"));
         }
+    }
+
+    private void buildCubitsRecipes(Consumer<FinishedRecipe> output) {
+        if (ChiselBlocks.CUBITS.getBlock("15") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.CUBITS.getBlock("15").get(), 8)
+                    .pattern("QQQ")
+                    .pattern("QCQ")
+                    .pattern("QQQ")
+                    .define('Q', Items.QUARTZ)
+                    .define('C', Items.COAL)
+                    .unlockedBy("has_quartz", has(Items.QUARTZ))
+                    .save(output, Chisel.id("cubits/15"));
+        }
+    }
+
+    /**
+     * Generates stonecutter recipes for all chisel carving groups.
+     * Each chisel block variant can be crafted from any block in its carving group tag.
+     */
+    private void buildStonecutterRecipes(Consumer<FinishedRecipe> output) {
+        for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
+            TagKey<Item> itemTag = ItemTags.create(blockType.getCarvingGroupTag().location());
+
+            for (RegistryObject<? extends Block> block : blockType.getAllBlocks()) {
+                String variantName = getVariantName(block);
+
+                SingleItemRecipeBuilder.stonecutting(
+                                Ingredient.of(itemTag),
+                                RecipeCategory.BUILDING_BLOCKS,
+                                block.get()
+                        )
+                        .unlockedBy("has_block", has(itemTag))
+                        .save(output, Chisel.id(blockType.getName().replace("/", "_") + "/" + variantName + "_from_stonecutting"));
+            }
+        }
+    }
+
+    private String getVariantName(RegistryObject<? extends Block> block) {
+        String fullName = block.getId().getPath();
+        int lastSlash = fullName.lastIndexOf('/');
+        return lastSlash >= 0 ? fullName.substring(lastSlash + 1) : fullName;
     }
 
 }

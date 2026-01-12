@@ -74,6 +74,8 @@ public class ChiselItemModelProvider implements DataProvider {
         futures.add(saveToolItemModel(cache, "diamond_chisel"));
         futures.add(saveToolItemModel(cache, "hitech_chisel"));
         futures.add(saveToolItemModel(cache, "offset_tool"));
+        futures.add(saveToolItemModel(cache, "ball_o_moss"));
+        futures.add(saveToolItemModel(cache, "cloud_in_a_bottle"));
 
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }

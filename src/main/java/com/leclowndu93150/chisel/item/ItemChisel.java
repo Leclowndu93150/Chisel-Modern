@@ -136,6 +136,13 @@ public class ItemChisel extends Item implements IChiselItem {
             IChiselMode mode = getMode(stack);
             tooltip.add(Component.translatable("chisel.tooltip.selectedmode",
                     mode.getLocalizedName().copy().withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
+
+            boolean fuzzy = isFuzzyMode(stack);
+            Component fuzzyStatus = fuzzy
+                    ? Component.translatable("chisel.tooltip.fuzzy.enabled").withStyle(ChatFormatting.GREEN)
+                    : Component.translatable("chisel.tooltip.fuzzy.disabled").withStyle(ChatFormatting.RED);
+            tooltip.add(Component.translatable("chisel.tooltip.fuzzy", fuzzyStatus).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("chisel.tooltip.fuzzy.hint").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
@@ -296,6 +303,21 @@ public class ItemChisel extends Item implements IChiselItem {
     public void setTarget(ItemStack stack, ItemStack target) {
         ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
         ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withTarget(target));
+    }
+
+    @Override
+    public boolean isFuzzyMode(ItemStack stack) {
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        return data != null && data.fuzzy();
+    }
+
+    @Override
+    public void setFuzzyMode(ItemStack stack, boolean fuzzy) {
+        ChiselData data = ChiselDataComponents.CHISEL_DATA.get().get(stack);
+        if (data == null) {
+            data = ChiselData.DEFAULT;
+        }
+        ChiselDataComponents.CHISEL_DATA.get().set(stack, data.withFuzzy(fuzzy));
     }
 
     public void cycleMode(ItemStack stack, Player player, boolean forward) {

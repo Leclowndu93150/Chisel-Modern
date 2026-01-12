@@ -77,7 +77,7 @@ public class ItemOffsetTool extends Item {
                 LevelChunk trackingChunk = serverLevel.getChunk(chunkPos.x, chunkPos.z);
                 ChiselNetwork.sendToAllTrackingChunk(
                         trackingChunk,
-                        new ChunkDataPacket(chunkPos.x, chunkPos.z, tag)
+                        new ChunkDataPacket(serverLevel.dimension(), chunkPos.x, chunkPos.z, tag)
                 );
             }
         }
