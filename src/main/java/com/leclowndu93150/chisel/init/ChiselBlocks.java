@@ -606,8 +606,8 @@ public class ChiselBlocks {
                     .variation("weathered_block", "Weathered Big Tile")
                     .variation("weathered_doubleslab", "Weathered Bisected", cubeColumn("weathered_doubleslab-side", "weathered_block"))
                     .variation("weathered_blocks", "Weathered Tiles")
-                    .variation("weathered_half", "Half-Weathered", cubeBottomTop("weathered_half-side", "default", "weathered"))
-                    .variation("weathered_block_half", "Half-Weathered Big Tile", cubeBottomTop("weathered_block_half-side", "block", "weathered_block"))
+                    .variation("weathered_half", "Half-Weathered", cubeBottomTop("weathered_half-side", "weathered", "default"))
+                    .variation("weathered_block_half", "Half-Weathered Big Tile", cubeBottomTop("weathered_block_half-side", "weathered_block", "block"))
                     .build()
     );
 
