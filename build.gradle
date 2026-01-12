@@ -118,7 +118,7 @@ dependencies {
     modImplementation "curse.maven:ftb-library-forge-404465:6807424"
     modImplementation "curse.maven:kubejs-238086:5853326"
     modImplementation "curse.maven:rhino-416294:6186971"
-    modRuntimeOnly "curse.maven:advanced-xray-256256:4840340"
+    //modRuntimeOnly "curse.maven:advanced-xray-256256:4840340"
 }
 
 mixin {
