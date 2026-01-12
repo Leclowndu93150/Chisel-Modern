@@ -11,9 +11,12 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SupportType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+
+import net.minecraft.tags.TagKey;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -166,6 +169,83 @@ public enum ChiselMode implements IChiselMode {
     @Nullable
     private final String displayName;
 
+    /**
+     * Gets candidates for chiseling with optional fuzzy matching.
+     * When fuzzy is enabled, blocks are matched based on being in the same carving group
+     * rather than requiring exact state equality.
+     *
+     * @param player The player
+     * @param pos    The position of the targeted block
+     * @param side   The side of the block being targeted
+     * @param fuzzy  If true, match any block in the same carving group; if false, exact state match
+     * @return All valid positions to be chiseled
+     */
+    public Iterable<? extends BlockPos> getCandidates(Player player, BlockPos pos, Direction side, boolean fuzzy) {
+        if (!fuzzy) {
+            return getCandidates(player, pos, side);
+        }
+
+        Level level = player.level();
+        BlockState state = level.getBlockState(pos);
+
+        return switch (this) {
+            case SINGLE -> Collections.singleton(pos);
+            case PANEL -> {
+                Direction effectiveSide = side.getAxisDirection() == AxisDirection.NEGATIVE ? side.getOpposite() : side;
+                Vec3i offset = effectiveSide.getNormal();
+                BlockPos one = new BlockPos(1, 1, 1);
+                BlockPos negOne = new BlockPos(-1, -1, -1);
+                yield filteredIterable(
+                        BlockPos.betweenClosedStream(negOne.offset(offset).offset(pos), one.subtract(offset).offset(pos)),
+                        level, state, true
+                );
+            }
+            case COLUMN -> {
+                int facing = Mth.floor(player.getYRot() * 4.0F / 360.0F + 0.5D) & 3;
+                Set<BlockPos> ret = new LinkedHashSet<>();
+                for (int i = -1; i <= 1; i++) {
+                    if (side != Direction.DOWN && side != Direction.UP) {
+                        ret.add(pos.above(i));
+                    } else {
+                        if (facing == 0 || facing == 2) {
+                            ret.add(pos.south(i));
+                        } else {
+                            ret.add(pos.east(i));
+                        }
+                    }
+                }
+                yield filteredIterable(ret.stream(), level, state, true);
+            }
+            case ROW -> {
+                int facing = Mth.floor(player.getYRot() * 4.0F / 360.0F + 0.5D) & 3;
+                Set<BlockPos> ret = new LinkedHashSet<>();
+                for (int i = -1; i <= 1; i++) {
+                    if (side != Direction.DOWN && side != Direction.UP) {
+                        if (side == Direction.EAST || side == Direction.WEST) {
+                            ret.add(pos.south(i));
+                        } else {
+                            ret.add(pos.east(i));
+                        }
+                    } else {
+                        if (facing == 0 || facing == 2) {
+                            ret.add(pos.east(i));
+                        } else {
+                            ret.add(pos.south(i));
+                        }
+                    }
+                }
+                yield filteredIterable(ret.stream(), level, state, true);
+            }
+            case CONTIGUOUS -> () -> getContiguousIterator(pos, level, Direction.values(), true);
+            case CONTIGUOUS_2D -> {
+                Direction[] directions = Arrays.stream(Direction.values())
+                        .filter(d -> d != side && d != side.getOpposite())
+                        .toArray(Direction[]::new);
+                yield () -> getContiguousIterator(pos, level, directions, true);
+            }
+        };
+    }
+
     ChiselMode(String description) {
         this(null, description);
     }
@@ -185,6 +265,28 @@ public enum ChiselMode implements IChiselMode {
     }
 
     private static Iterable<BlockPos> filteredIterable(Stream<BlockPos> source, Level world, BlockState state) {
+        return filteredIterable(source, world, state, false);
+    }
+
+    /**
+     * Filters block positions based on state matching.
+     *
+     * @param source The source stream of positions
+     * @param world  The level
+     * @param state  The original block state to match against
+     * @param fuzzy  If true, matches any block in the same carving group; if false, exact state match only
+     */
+    private static Iterable<BlockPos> filteredIterable(Stream<BlockPos> source, Level world, BlockState state, boolean fuzzy) {
+        if (fuzzy) {
+            TagKey<Block> group = CarvingHelper.getCarvingGroup(state);
+            if (group == null) {
+                return source.filter(p -> world.getBlockState(p) == state)::iterator;
+            }
+            return source.filter(p -> {
+                BlockState otherState = world.getBlockState(p);
+                return CarvingHelper.areInSameGroup(state, otherState);
+            })::iterator;
+        }
         return source.filter(p -> world.getBlockState(p) == state)::iterator;
     }
 
@@ -195,10 +297,24 @@ public enum ChiselMode implements IChiselMode {
         return 0;
     }
 
-    private record Node(BlockPos pos, int distance) {}
+    private record Node(BlockPos pos, int distance) {
+    }
 
     private static Iterator<BlockPos> getContiguousIterator(BlockPos origin, Level world, Direction[] directionsToSearch) {
+        return getContiguousIterator(origin, world, directionsToSearch, false);
+    }
+
+    /**
+     * Gets an iterator for contiguous block positions.
+     *
+     * @param origin             The starting position
+     * @param world              The level
+     * @param directionsToSearch Directions to search in
+     * @param fuzzy              If true, matches any block in the same carving group; if false, exact state match only
+     */
+    private static Iterator<BlockPos> getContiguousIterator(BlockPos origin, Level world, Direction[] directionsToSearch, boolean fuzzy) {
         final BlockState state = world.getBlockState(origin);
+        final TagKey<Block> group = fuzzy ? CarvingHelper.getCarvingGroup(state) : null;
         return new Iterator<>() {
             private final Set<BlockPos> seen = Sets.newHashSet(origin);
             private final Queue<Node> search = new ArrayDeque<>();
@@ -212,6 +328,13 @@ public enum ChiselMode implements IChiselMode {
                 return !search.isEmpty();
             }
 
+            private boolean matchesTarget(BlockState newState) {
+                if (fuzzy && group != null) {
+                    return CarvingHelper.areInSameGroup(state, newState);
+                }
+                return newState == state;
+            }
+
             @Override
             public BlockPos next() {
                 Node ret = search.poll();
@@ -219,7 +342,7 @@ public enum ChiselMode implements IChiselMode {
                     for (Direction face : directionsToSearch) {
                         BlockPos bp = ret.pos().relative(face);
                         BlockState newState = world.getBlockState(bp);
-                        if (!seen.contains(bp) && newState == state) {
+                        if (!seen.contains(bp) && matchesTarget(newState)) {
                             for (Direction obscureCheck : Direction.values()) {
                                 if (!newState.isFaceSturdy(world, bp, obscureCheck.getOpposite(), SupportType.FULL)) {
                                     search.offer(new Node(bp, ret.distance() + 1));

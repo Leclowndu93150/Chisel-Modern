@@ -52,6 +52,10 @@ public class ChiselLanguageProvider extends LanguageProvider {
         add("chisel.tooltip.target", "Set a target in the GUI to chisel to a specific variant");
         add("chisel.tooltip.modes", "Shift + Right-click to change mode");
         add("chisel.tooltip.selectedmode", "Selected mode: %s");
+        add("chisel.tooltip.fuzzy", "Fuzzy mode: %s");
+        add("chisel.tooltip.fuzzy.enabled", "Enabled");
+        add("chisel.tooltip.fuzzy.disabled", "Disabled");
+        add("chisel.tooltip.fuzzy.hint", "Ctrl + Shift + Right-click to toggle fuzzy mode");
 
         add("chisel.tooltip.offset_tool.1", "Right-click a block to cycle texture offset");
         add("chisel.tooltip.offset_tool.2", "Sneak + Right-click to reset offset");
@@ -71,6 +75,8 @@ public class ChiselLanguageProvider extends LanguageProvider {
 
         add("chisel.message.mode_changed", "Mode changed to: %s");
         add("chisel.message.cooldown", "Chisel on cooldown: %ss");
+        add("chisel.message.fuzzy_enabled", "Fuzzy mode enabled - chisels all variants in the carving group");
+        add("chisel.message.fuzzy_disabled", "Fuzzy mode disabled - chisels exact block matches only");
 
         add("chisel.mode.single", "Single");
         add("chisel.mode.single.desc", "Chisel a single block.");

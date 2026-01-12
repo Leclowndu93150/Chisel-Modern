@@ -72,6 +72,31 @@ public interface IChiselItem {
     ItemStack getTarget(ItemStack chisel);
 
     /**
+     * Checks if fuzzy mode is enabled for this chisel.
+     * When fuzzy mode is enabled, in-world chiseling will affect all blocks
+     * in the same carving group, not just blocks with the exact same state.
+     */
+    boolean isFuzzyMode(ItemStack chisel);
+
+    /**
+     * Sets the fuzzy mode for this chisel.
+     * @param chisel The chisel ItemStack
+     * @param fuzzy Whether fuzzy mode should be enabled
+     */
+    void setFuzzyMode(ItemStack chisel, boolean fuzzy);
+
+    /**
+     * Toggles fuzzy mode for this chisel and returns the new state.
+     * @param chisel The chisel ItemStack
+     * @return The new fuzzy mode state (true = enabled)
+     */
+    default boolean toggleFuzzyMode(ItemStack chisel) {
+        boolean newState = !isFuzzyMode(chisel);
+        setFuzzyMode(chisel, newState);
+        return newState;
+    }
+
+    /**
      * Opens the chisel GUI for the player.
      */
     void openGui(Player player, InteractionHand hand, ItemStack chisel);

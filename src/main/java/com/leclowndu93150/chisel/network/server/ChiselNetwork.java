@@ -39,6 +39,12 @@ public class ChiselNetwork {
                 HitechSettingsPayload::handle
         );
 
+        registrar.playToServer(
+                ChiselFuzzyPayload.TYPE,
+                ChiselFuzzyPayload.STREAM_CODEC,
+                ChiselFuzzyPayload::handle
+        );
+
         registrar.playToClient(
                 AutoChiselFXPayload.TYPE,
                 AutoChiselFXPayload.STREAM_CODEC,
