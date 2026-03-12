@@ -11,17 +11,13 @@ group = mod_group_id
 repositories {
     mavenLocal()
     maven {
-        name = "CTM Maven"
-        url = "https://maven.tterrag.com/"
-    }
-    maven {
         name = "Curse Maven"
         url = "https://cursemaven.com"
     }
 }
 
 base {
-    archivesName = mod_id+"-1.21.1-NeoForge"
+    archivesName = mod_id + "-1.21.1-NeoForge"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -36,7 +32,7 @@ neoForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    // accessTransformers.add('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformers.from('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -104,7 +100,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
-    implementation "curse.maven:ctm-267602:5587515"
     implementation "curse.maven:jei-238222:7229074"
     implementation "curse.maven:jade-324717:6853386"
     runtimeOnly "curse.maven:mekanism-268560:7132168"
@@ -115,6 +110,7 @@ dependencies {
     implementation "curse.maven:rhino-416294:7104526"
     implementation "curse.maven:baguettelib-1264423:7282690"
     implementation "curse.maven:framedblocks-441647:7135071"
+    implementation "curse.maven:fusion-connected-textures-854949:7471474"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

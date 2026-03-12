@@ -4,12 +4,15 @@
   "package": "com.leclowndu93150.chisel.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "MappedRegistryMixin",
-    "ModelBakedCTMMixin",
-    "TextureMetadataHandlerMixin"
+    "MappedRegistryMixin"
   ],
   "client": [
-    "RenderChunkRegionAccessor"
+    "FusionBaseBakedModelMixin",
+    "FusionModelDataMixin",
+    "MutableQuadAccessor",
+    "RenderChunkRegionAccessor",
+    "SpriteContentsAccessor",
+    "SpriteContentsCTMMixin"
   ],
   "injectors": {
     "defaultRequire": 1

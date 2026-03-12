@@ -2,7 +2,6 @@ package com.leclowndu93150.chisel.client;
 
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
-import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.client.util.CTMDetection;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
@@ -16,7 +15,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import team.chisel.ctm.client.texture.ctx.OffsetProviderRegistry;
 
 import java.util.Map;
 
@@ -27,12 +25,7 @@ public class ChiselClientEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> {
-            OffsetProviderRegistry.INSTANCE.registerProvider((world, pos) ->
-                    ChunkData.getOffsetData(world, pos).getOffset(pos));
-
-            CTMDetection.init();
-        });
+        event.enqueueWork(CTMDetection::init);
     }
 
     @SubscribeEvent

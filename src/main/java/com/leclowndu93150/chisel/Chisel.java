@@ -38,6 +38,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import com.leclowndu93150.chisel.client.ctm.ChiselCTMTypes;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
@@ -56,6 +58,10 @@ public class Chisel {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public Chisel(IEventBus modEventBus, ModContainer modContainer) {
+        if (FMLEnvironment.dist.isClient()) {
+            ChiselCTMTypes.init();
+        }
+
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerCapabilities);
 
