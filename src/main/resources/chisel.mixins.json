@@ -7,8 +7,6 @@
     "MappedRegistryMixin"
   ],
   "client": [
-    "FusionBaseBakedModelMixin",
-    "FusionModelDataMixin",
     "MutableQuadAccessor",
     "RenderChunkRegionAccessor",
     "SpriteContentsAccessor",

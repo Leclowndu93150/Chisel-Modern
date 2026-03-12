@@ -34,6 +34,7 @@ public class PatternTextureType implements TextureType<CTMTextureData>, ChiselQu
 
     @Override
     public TextureAtlasSprite createSprite(SpriteCreationContext context, CTMTextureData data) {
+        com.leclowndu93150.chisel.Chisel.LOGGER.info("[Chisel/CTM] PatternTextureType.createSprite() called!");
         TextureAtlasSprite original = context.createOriginalSprite();
         int size = data.getSize();
         return new GridSprite(original, size, size);

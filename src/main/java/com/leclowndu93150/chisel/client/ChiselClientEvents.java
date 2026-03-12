@@ -3,9 +3,16 @@ package com.leclowndu93150.chisel.client;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockCarvable;
+import com.leclowndu93150.chisel.client.ctm.ChiselBakedModelWrapper;
+import com.leclowndu93150.chisel.client.ctm.ChiselQuadProcessor;
 import com.leclowndu93150.chisel.client.util.CTMDetection;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
+import com.supermartijn642.fusion.extensions.TextureAtlasSpriteExtension;
 import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -13,9 +20,12 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
+import java.util.List;
 import java.util.Map;
 
 @EventBusSubscriber(modid = Chisel.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -26,6 +36,40 @@ public class ChiselClientEvents {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(CTMDetection::init);
+    }
+
+    @SubscribeEvent
+    public static void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        int wrapped = 0;
+        for (Map.Entry<ModelResourceLocation, BakedModel> entry : event.getModels().entrySet()) {
+            if (!entry.getKey().id().getNamespace().equals(Chisel.MODID)) continue;
+            BakedModel model = entry.getValue();
+            if (model instanceof ChiselBakedModelWrapper) continue;
+            if (hasChiselQuads(model)) {
+                entry.setValue(new ChiselBakedModelWrapper(model));
+                wrapped++;
+            }
+        }
+        Chisel.LOGGER.info("[Chisel/CTM] Wrapped {} models with ChiselBakedModelWrapper", wrapped);
+    }
+
+    private static boolean hasChiselQuads(BakedModel model) {
+        try {
+            for (Direction dir : Direction.values()) {
+                List<BakedQuad> quads = model.getQuads(null, dir, null, ModelData.EMPTY, null);
+                for (BakedQuad quad : quads) {
+                    var type = ((TextureAtlasSpriteExtension) quad.getSprite()).getFusionTextureType();
+                    if (type instanceof ChiselQuadProcessor) return true;
+                }
+            }
+            List<BakedQuad> quads = model.getQuads(null, null, null, ModelData.EMPTY, null);
+            for (BakedQuad quad : quads) {
+                var type = ((TextureAtlasSpriteExtension) quad.getSprite()).getFusionTextureType();
+                if (type instanceof ChiselQuadProcessor) return true;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
     }
 
     @SubscribeEvent

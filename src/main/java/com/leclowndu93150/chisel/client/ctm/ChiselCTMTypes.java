@@ -7,15 +7,12 @@ import com.supermartijn642.fusion.api.util.Pair;
 import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import com.leclowndu93150.chisel.Chisel;
 
 import java.util.EnumMap;
 import java.util.Map;
 
 public class ChiselCTMTypes {
-
-    public static final ModelProperty<BlockAndTintGetter> CHISEL_LEVEL_PROPERTY = new ModelProperty<>();
 
     private static final Map<CTMTextureData.CTMType, TextureType<CTMTextureData>> TYPES = new EnumMap<>(CTMTextureData.CTMType.class);
 
@@ -49,6 +46,7 @@ public class ChiselCTMTypes {
     }
 
     public static void init() {
+        Chisel.LOGGER.info("[Chisel/CTM] ChiselCTMTypes.init() called");
         FusionTextureTypeRegistry.registerTextureType(ResourceLocation.fromNamespaceAndPath("chisel", "ctm"), CTM);
         FusionTextureTypeRegistry.registerTextureType(ResourceLocation.fromNamespaceAndPath("chisel", "ctmh"), CTMH);
         FusionTextureTypeRegistry.registerTextureType(ResourceLocation.fromNamespaceAndPath("chisel", "pillar"), PILLAR);
@@ -58,9 +56,11 @@ public class ChiselCTMTypes {
         FusionTextureTypeRegistry.registerTextureType(ResourceLocation.fromNamespaceAndPath("chisel", "ar"), AR);
         FusionTextureTypeRegistry.registerTextureType(ResourceLocation.fromNamespaceAndPath("chisel", "eldritch"), ELDRITCH);
 
+        Chisel.LOGGER.info("[Chisel/CTM] Registering CTMMetadataSection into DEFAULT_METADATA_SECTIONS (current size: {})", SpriteLoader.DEFAULT_METADATA_SECTIONS.size());
         SpriteLoader.DEFAULT_METADATA_SECTIONS = ImmutableSet.<MetadataSectionSerializer<?>>builder()
             .addAll(SpriteLoader.DEFAULT_METADATA_SECTIONS)
             .add(CTMMetadataSection.INSTANCE)
             .build();
+        Chisel.LOGGER.info("[Chisel/CTM] DEFAULT_METADATA_SECTIONS now has {} entries", SpriteLoader.DEFAULT_METADATA_SECTIONS.size());
     }
 }

@@ -143,11 +143,13 @@ public class CTMFullTextureType implements TextureType<CTMTextureData>, ChiselQu
 
     @Override
     public Pair<Integer, Integer> getFrameSize(SpritePreparationContext context, CTMTextureData data) {
+        com.leclowndu93150.chisel.Chisel.LOGGER.info("[Chisel/CTM] CTMFullTextureType.getFrameSize() called!");
         return context.getOriginalFrameSize();
     }
 
     @Override
     public TextureAtlasSprite createSprite(SpriteCreationContext context, CTMTextureData data) {
+        com.leclowndu93150.chisel.Chisel.LOGGER.info("[Chisel/CTM] CTMFullTextureType.createSprite() called!");
         TextureAtlasSprite original = context.createOriginalSprite();
         String[] textures = data.getTextures();
         if (textures.length > 0) {
