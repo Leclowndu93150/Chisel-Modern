@@ -7,10 +7,7 @@
     "MappedRegistryMixin"
   ],
   "client": [
-    "MutableQuadAccessor",
-    "RenderChunkRegionAccessor",
-    "SpriteContentsAccessor",
-    "SpriteContentsCTMMixin"
+    "RenderChunkRegionAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

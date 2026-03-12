@@ -3,16 +3,19 @@ package com.leclowndu93150.chisel.client;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.block.BlockCarvable;
-import com.leclowndu93150.chisel.client.ctm.ChiselBakedModelWrapper;
-import com.leclowndu93150.chisel.client.ctm.ChiselQuadProcessor;
+import com.leclowndu93150.chisel.client.ctm.*;
 import com.leclowndu93150.chisel.client.util.CTMDetection;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
-import com.supermartijn642.fusion.extensions.TextureAtlasSpriteExtension;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -25,8 +28,11 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @EventBusSubscriber(modid = Chisel.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ChiselClientEvents {
@@ -40,36 +46,86 @@ public class ChiselClientEvents {
 
     @SubscribeEvent
     public static void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        CTMMetadataReader.clearCache();
         int wrapped = 0;
+        int chiselTotal = 0;
+
         for (Map.Entry<ModelResourceLocation, BakedModel> entry : event.getModels().entrySet()) {
             if (!entry.getKey().id().getNamespace().equals(Chisel.MODID)) continue;
+            chiselTotal++;
             BakedModel model = entry.getValue();
             if (model instanceof ChiselBakedModelWrapper) continue;
-            if (hasChiselQuads(model)) {
-                entry.setValue(new ChiselBakedModelWrapper(model));
+
+            Map<ResourceLocation, ChiselQuadProcessor> processors = buildProcessors(model);
+            if (!processors.isEmpty()) {
+                entry.setValue(new ChiselBakedModelWrapper(model, processors));
                 wrapped++;
             }
         }
-        Chisel.LOGGER.info("[Chisel/CTM] Wrapped {} models with ChiselBakedModelWrapper", wrapped);
+        Chisel.LOGGER.info("[Chisel/CTM] Wrapped {} / {} chisel models with ChiselBakedModelWrapper", wrapped, chiselTotal);
     }
 
-    private static boolean hasChiselQuads(BakedModel model) {
-        try {
-            for (Direction dir : Direction.values()) {
-                List<BakedQuad> quads = model.getQuads(null, dir, null, ModelData.EMPTY, null);
-                for (BakedQuad quad : quads) {
-                    var type = ((TextureAtlasSpriteExtension) quad.getSprite()).getFusionTextureType();
-                    if (type instanceof ChiselQuadProcessor) return true;
-                }
-            }
-            List<BakedQuad> quads = model.getQuads(null, null, null, ModelData.EMPTY, null);
-            for (BakedQuad quad : quads) {
-                var type = ((TextureAtlasSpriteExtension) quad.getSprite()).getFusionTextureType();
-                if (type instanceof ChiselQuadProcessor) return true;
-            }
-        } catch (Exception ignored) {
+    private static Map<ResourceLocation, ChiselQuadProcessor> buildProcessors(BakedModel model) {
+        Set<ResourceLocation> checked = new HashSet<>();
+        Map<ResourceLocation, ChiselQuadProcessor> processors = new HashMap<>();
+
+        RandomSource random = RandomSource.create(42);
+        for (Direction dir : Direction.values()) {
+            collectFromQuads(model.getQuads(null, dir, random, ModelData.EMPTY, null), checked, processors);
         }
-        return false;
+        collectFromQuads(model.getQuads(null, null, random, ModelData.EMPTY, null), checked, processors);
+
+        return processors;
+    }
+
+    private static void collectFromQuads(List<BakedQuad> quads, Set<ResourceLocation> checked,
+                                          Map<ResourceLocation, ChiselQuadProcessor> processors) {
+        for (BakedQuad quad : quads) {
+            ResourceLocation spriteName = quad.getSprite().contents().name();
+            if (!checked.add(spriteName)) continue;
+
+            CTMTextureData data = CTMMetadataReader.getMetadata(spriteName);
+            if (data == null) continue;
+
+            ChiselQuadProcessor processor = createProcessor(data);
+            if (processor != null) {
+                processors.put(spriteName, processor);
+            }
+        }
+    }
+
+    private static ChiselQuadProcessor createProcessor(CTMTextureData data) {
+        return switch (data.getType()) {
+            case CTM -> {
+                TextureAtlasSprite ctmSheet = resolveCtmSheet(data);
+                yield new CTMFullProcessor(ctmSheet);
+            }
+            case CTMH -> new CTMHProcessor();
+            case CTMV, PILLAR -> new PillarProcessor();
+            case SCTM -> new SCTMProcessor();
+            case PATTERN -> new PatternProcessor(data.getSize());
+            case RANDOM -> new RandomProcessor(data.getSize());
+            case AR -> new AlterRProcessor();
+            case ELDRITCH -> new EldritchProcessor();
+            case NORMAL -> null;
+        };
+    }
+
+    private static TextureAtlasSprite resolveCtmSheet(CTMTextureData data) {
+        String[] textures = data.getTextures();
+        if (textures.length == 0) return null;
+        try {
+            ResourceLocation ctmLoc = ResourceLocation.parse(textures[0]);
+            TextureAtlasSprite sprite = Minecraft.getInstance()
+                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(ctmLoc);
+            if (sprite.contents().name().equals(ResourceLocation.withDefaultNamespace("missingno"))) {
+                return null;
+            }
+            return sprite;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @SubscribeEvent
