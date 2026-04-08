@@ -3,6 +3,7 @@ package com.leclowndu93150.chisel.client.ctm;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -12,9 +13,15 @@ import java.util.List;
 public class PatternProcessor implements ChiselQuadProcessor {
 
     private final int size;
+    private final ResourceLocation targetSprite;
 
     public PatternProcessor(int size) {
+        this(size, null);
+    }
+
+    public PatternProcessor(int size, ResourceLocation targetSprite) {
         this.size = size;
+        this.targetSprite = targetSprite;
     }
 
     @Override
@@ -22,42 +29,32 @@ public class PatternProcessor implements ChiselQuadProcessor {
         int tileX = Math.floorMod(pos.getX(), size);
         int tileY = Math.floorMod(pos.getY() + pos.getZ(), size);
 
-        return remapToTile(quad, tileX, tileY, size, size);
+        return remapToTile(quad, tileX, tileY, size, size, false, targetSprite);
     }
 
     static List<BakedQuad> remapToTile(BakedQuad quad, int tileX, int tileY, int cols, int rows) {
-        TextureAtlasSprite sprite = quad.getSprite();
+        return remapToTile(quad, tileX, tileY, cols, rows, false, null);
+    }
 
+    static List<BakedQuad> remapToTile(BakedQuad quad, int tileX, int tileY, int cols, int rows, boolean derotate) {
+        return remapToTile(quad, tileX, tileY, cols, rows, derotate, null);
+    }
+
+    static List<BakedQuad> remapToTile(BakedQuad quad, int tileX, int tileY, int cols, int rows, boolean derotate, ResourceLocation targetSprite) {
+        TextureAtlasSprite sprite = targetSprite != null ? ChiselSpriteResolver.resolve(targetSprite) : quad.getSprite();
+        if (sprite == null) {
+            sprite = quad.getSprite();
+        }
         float intervalU = 1f / cols;
         float intervalV = 1f / rows;
-        float subMinU = intervalU * tileX;
-        float subMinV = intervalV * tileY;
 
         ChiselMutableQuad mutable = new ChiselMutableQuad();
         mutable.fillFromBakedQuad(quad);
-
-        for (int i = 0; i < 4; i++) {
-            float normU = inverseLerp(sprite.getU0(), sprite.getU1(), mutable.u(i));
-            float normV = inverseLerp(sprite.getV0(), sprite.getV1(), mutable.v(i));
-
-            float mappedU = subMinU + normU * intervalU;
-            float mappedV = subMinV + normV * intervalV;
-
-            float atlasU = lerp(sprite.getU0(), sprite.getU1(), mappedU);
-            float atlasV = lerp(sprite.getV0(), sprite.getV1(), mappedV);
-
-            mutable.uv(i, atlasU, atlasV);
+        if (derotate) {
+            mutable.derotate();
         }
+        mutable.transformUVs(sprite, intervalU * tileX, intervalV * tileY, intervalU, intervalV);
 
         return Collections.singletonList(mutable.toBakedQuad());
-    }
-
-    static float lerp(float a, float b, float t) {
-        return a + (b - a) * t;
-    }
-
-    static float inverseLerp(float a, float b, float x) {
-        if (a == b) return 0.5f;
-        return (x - a) / (b - a);
     }
 }

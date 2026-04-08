@@ -6,16 +6,13 @@ import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.client.ctm.*;
 import com.leclowndu93150.chisel.client.util.CTMDetection;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -84,45 +81,40 @@ public class ChiselClientEvents {
             ResourceLocation spriteName = quad.getSprite().contents().name();
             if (!checked.add(spriteName)) continue;
 
-            CTMTextureData data = CTMMetadataReader.getMetadata(spriteName);
-            if (data == null) continue;
+            CTMMetadataReader.ResolvedMetadata metadata = CTMMetadataReader.getResolvedMetadata(spriteName);
+            if (metadata == null) continue;
 
-            ChiselQuadProcessor processor = createProcessor(data);
+            ChiselQuadProcessor processor = createProcessor(metadata);
             if (processor != null) {
                 processors.put(spriteName, processor);
             }
         }
     }
 
-    private static ChiselQuadProcessor createProcessor(CTMTextureData data) {
+    private static ChiselQuadProcessor createProcessor(CTMMetadataReader.ResolvedMetadata metadata) {
+        CTMTextureData data = metadata.getData();
+        ResourceLocation targetSprite = metadata.getSpriteLocation();
         return switch (data.getType()) {
             case CTM -> {
-                TextureAtlasSprite ctmSheet = resolveCtmSheet(data);
-                yield new CTMFullProcessor(ctmSheet);
+                ResourceLocation ctmSheet = resolveCtmSheet(data);
+                yield new CTMFullProcessor(targetSprite, ctmSheet);
             }
-            case CTMH -> new CTMHProcessor();
-            case CTMV, PILLAR -> new PillarProcessor();
-            case SCTM -> new SCTMProcessor();
-            case PATTERN -> new PatternProcessor(data.getSize());
-            case RANDOM -> new RandomProcessor(data.getSize());
-            case AR -> new AlterRProcessor();
+            case CTMH -> new CTMHProcessor(targetSprite);
+            case CTMV, PILLAR -> new PillarProcessor(targetSprite);
+            case SCTM -> new SCTMProcessor(targetSprite);
+            case PATTERN -> new PatternProcessor(data.getSize(), targetSprite);
+            case RANDOM -> new RandomProcessor(data.getSize(), targetSprite);
+            case AR -> new AlterRProcessor(targetSprite);
             case ELDRITCH -> new EldritchProcessor();
             case NORMAL -> null;
         };
     }
 
-    private static TextureAtlasSprite resolveCtmSheet(CTMTextureData data) {
+    private static ResourceLocation resolveCtmSheet(CTMTextureData data) {
         String[] textures = data.getTextures();
         if (textures.length == 0) return null;
         try {
-            ResourceLocation ctmLoc = ResourceLocation.parse(textures[0]);
-            TextureAtlasSprite sprite = Minecraft.getInstance()
-                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-                .apply(ctmLoc);
-            if (sprite.contents().name().equals(ResourceLocation.withDefaultNamespace("missingno"))) {
-                return null;
-            }
-            return sprite;
+            return ResourceLocation.parse(textures[0]);
         } catch (Exception e) {
             return null;
         }

@@ -3,6 +3,7 @@ package com.leclowndu93150.chisel.client.ctm;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -10,10 +11,20 @@ import java.util.List;
 
 public class SCTMProcessor implements ChiselQuadProcessor {
 
+    private final ResourceLocation targetSprite;
+
+    public SCTMProcessor() {
+        this(null);
+    }
+
+    public SCTMProcessor(ResourceLocation targetSprite) {
+        this.targetSprite = targetSprite;
+    }
+
     @Override
     public List<BakedQuad> processQuad(BakedQuad quad, BlockPos pos, BlockAndTintGetter level, BlockState state) {
         Direction face = quad.getDirection();
-        if (face == null) return PatternProcessor.remapToTile(quad, 0, 0, 2, 2);
+        if (face == null) return PatternProcessor.remapToTile(quad, 0, 0, 2, 2, true, targetSprite);
 
         BlockPos topOffset = getTopOffset(face);
         BlockPos bottomOffset = getBottomOffset(face);
@@ -48,7 +59,7 @@ public class SCTMProcessor implements ChiselQuadProcessor {
             }
         }
 
-        return PatternProcessor.remapToTile(quad, tileU, tileV, 2, 2);
+        return PatternProcessor.remapToTile(quad, tileU, tileV, 2, 2, true, targetSprite);
     }
 
     private static BlockPos getTopOffset(Direction face) {

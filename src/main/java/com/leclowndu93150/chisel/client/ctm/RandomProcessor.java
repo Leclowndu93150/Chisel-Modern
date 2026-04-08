@@ -2,6 +2,7 @@ package com.leclowndu93150.chisel.client.ctm;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,9 +14,15 @@ public class RandomProcessor implements ChiselQuadProcessor {
 
     private static final ThreadLocal<Random> THREAD_RANDOM = ThreadLocal.withInitial(Random::new);
     private final int size;
+    private final ResourceLocation targetSprite;
 
     public RandomProcessor(int size) {
+        this(size, null);
+    }
+
+    public RandomProcessor(int size, ResourceLocation targetSprite) {
         this.size = size;
+        this.targetSprite = targetSprite;
     }
 
     @Override
@@ -25,6 +32,6 @@ public class RandomProcessor implements ChiselQuadProcessor {
         int tileX = rand.nextInt(size);
         int tileY = rand.nextInt(size);
 
-        return PatternProcessor.remapToTile(quad, tileX, tileY, size, size);
+        return PatternProcessor.remapToTile(quad, tileX, tileY, size, size, false, targetSprite);
     }
 }
