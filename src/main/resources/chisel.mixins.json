@@ -3,8 +3,7 @@
   "minVersion": "0.8",
   "package": "com.leclowndu93150.chisel.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-  ],
+  "mixins": [],
   "client": [
     "BlockModelGeneratorsAccessor",
     "FaceBakeryMixin",

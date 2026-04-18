@@ -5,7 +5,6 @@ import com.leclowndu93150.chisel.command.ChiselDebugCommands;
 import com.leclowndu93150.chisel.client.gui.AutoChiselScreen;
 import com.leclowndu93150.chisel.client.gui.ChiselScreen;
 import com.leclowndu93150.chisel.client.gui.HitechChiselScreen;
-import com.leclowndu93150.chisel.compat.ChiselRebornCompat;
 import com.leclowndu93150.chisel.compat.ftbultimine.FTBUltimineCompat;
 import com.leclowndu93150.chisel.client.particle.HolystoneStarParticle;
 import com.leclowndu93150.chisel.init.ChiselBlockEntities;
@@ -56,8 +55,6 @@ public class Chisel {
         modEventBus.addListener(this::registerCapabilities);
 
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
-
-        ChiselRebornCompat.registerAliases();
 
         ChiselRegistries.BLOCKS.register(modEventBus);
         ChiselRegistries.ITEMS.register(modEventBus);
