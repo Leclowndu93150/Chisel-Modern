@@ -10,6 +10,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -31,7 +32,7 @@ public class ChiselDebugCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("chisel")
-                .requires(source -> source.hasPermission(2))
+                .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
                 .then(Commands.literal("debug")
                         .then(Commands.literal("placectm")
                                 .executes(ChiselDebugCommands::placeCTMBlocks))

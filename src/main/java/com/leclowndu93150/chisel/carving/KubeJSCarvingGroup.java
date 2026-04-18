@@ -2,7 +2,7 @@ package com.leclowndu93150.chisel.carving;
 
 import com.leclowndu93150.chisel.api.carving.ICarvingGroup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
@@ -17,16 +17,16 @@ import java.util.Set;
  */
 public class KubeJSCarvingGroup implements ICarvingGroup {
 
-    private final ResourceLocation groupId;
-    private final Set<ResourceLocation> blocks;
+    private final Identifier groupId;
+    private final Set<Identifier> blocks;
 
-    public KubeJSCarvingGroup(ResourceLocation groupId, Set<ResourceLocation> blocks) {
+    public KubeJSCarvingGroup(Identifier groupId, Set<Identifier> blocks) {
         this.groupId = groupId;
         this.blocks = blocks;
     }
 
     @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return groupId;
     }
 
@@ -57,7 +57,7 @@ public class KubeJSCarvingGroup implements ICarvingGroup {
     /**
      * Gets the blocks defined in this virtual group.
      */
-    public Set<ResourceLocation> getBlocks() {
+    public Set<Identifier> getBlocks() {
         return blocks;
     }
 }

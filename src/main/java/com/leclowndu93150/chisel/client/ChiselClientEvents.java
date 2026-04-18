@@ -6,9 +6,13 @@ import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.client.util.CTMDetection;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
+import net.minecraft.client.color.block.BlockTintSource;
+import net.minecraft.client.color.block.BlockTintSources;
 import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,12 +22,14 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import team.chisel.ctm.client.texture.ctx.OffsetProviderRegistry;
 
+import java.util.List;
 import java.util.Map;
 
-@EventBusSubscriber(modid = Chisel.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Chisel.MODID, value = Dist.CLIENT)
 public class ChiselClientEvents {
 
     private static final int DEFAULT_WATER_COLOR = 0x3F76E4;
+    private static final BlockTintSource BLANK = BlockTintSources.constant(-1);
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
@@ -36,7 +42,7 @@ public class ChiselClientEvents {
     }
 
     @SubscribeEvent
-    public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
+    public static void registerBlockColors(RegisterColorHandlersEvent.BlockTintSources event) {
         for (Map.Entry<DyeColor, ChiselBlockType<BlockCarvable>> entry : ChiselBlocks.HEX_PLATING.entrySet()) {
             DyeColor color = entry.getKey();
             ChiselBlockType<?> blockType = entry.getValue();
@@ -45,41 +51,42 @@ public class ChiselClientEvents {
                     .map(DeferredBlock::get)
                     .toArray(Block[]::new);
 
-            event.register((state, level, pos, tintIndex) ->
-                    tintIndex == 1 ? color.getTextColor() : -1, blocks);
+            int tintColor = color.getTextColor();
+            BlockTintSource particleOnlyTint = new BlockTintSource() {
+                @Override
+                public int color(BlockState state) {
+                    return -1;
+                }
+
+                @Override
+                public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                    return -1;
+                }
+
+                @Override
+                public int colorAsTerrainParticle(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                    return tintColor;
+                }
+            };
+            event.register(List.of(particleOnlyTint, BlockTintSources.constant(tintColor)), blocks);
         }
 
         Block[] waterstoneBlocks = ChiselBlocks.WATERSTONE.getAllBlocks().stream()
                 .map(DeferredBlock::get)
                 .toArray(Block[]::new);
 
-        event.register((state, level, pos, tintIndex) -> {
-            if (tintIndex == 1) {
-                return (level != null && pos != null) ? BiomeColors.getAverageWaterColor(level, pos) : DEFAULT_WATER_COLOR;
+        BlockTintSource waterTint = new BlockTintSource() {
+            @Override
+            public int color(BlockState state) {
+                return DEFAULT_WATER_COLOR;
             }
-            return -1;
-        }, waterstoneBlocks);
-    }
 
-    @SubscribeEvent
-    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        for (Map.Entry<DyeColor, ChiselBlockType<BlockCarvable>> entry : ChiselBlocks.HEX_PLATING.entrySet()) {
-            DyeColor color = entry.getKey();
-            ChiselBlockType<?> blockType = entry.getValue();
+            @Override
+            public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                return BiomeColors.getAverageWaterColor(level, pos);
+            }
+        };
 
-            var items = blockType.getAllBlocks().stream()
-                    .map(block -> block.get().asItem())
-                    .toArray(Item[]::new);
-
-            event.register((stack, tintIndex) ->
-                    tintIndex == 1 ? color.getTextColor() : -1, items);
-        }
-
-        var waterstoneItems = ChiselBlocks.WATERSTONE.getAllBlocks().stream()
-                .map(block -> block.get().asItem())
-                .toArray(Item[]::new);
-
-        event.register((stack, tintIndex) ->
-                tintIndex == 1 ? DEFAULT_WATER_COLOR : -1, waterstoneItems);
+        event.register(List.of(BLANK, waterTint), waterstoneBlocks);
     }
 }

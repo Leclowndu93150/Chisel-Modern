@@ -5,11 +5,11 @@ import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
 import java.util.concurrent.CompletableFuture;
@@ -19,8 +19,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ChiselBlockTagsProvider extends BlockTagsProvider {
 
-    public ChiselBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, Chisel.MODID, existingFileHelper);
+    public ChiselBlockTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, Chisel.MODID);
     }
 
     @Override
@@ -28,14 +28,14 @@ public class ChiselBlockTagsProvider extends BlockTagsProvider {
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             TagKey<Block> carvingTag = blockType.getCarvingGroupTag();
 
-            IntrinsicTagAppender<Block> tagBuilder = tag(carvingTag);
+            TagAppender<Block, Block> tagBuilder = tag(carvingTag);
 
             for (DeferredBlock<?> block : blockType.getAllBlocks()) {
                 tagBuilder.add(block.get());
             }
 
-            for (ResourceLocation vanillaId : blockType.getVanillaBlocks()) {
-                tagBuilder.addOptional(vanillaId);
+            for (Identifier vanillaId : blockType.getVanillaBlocks()) {
+                getOrCreateRawBuilder(carvingTag).addOptionalElement(vanillaId);
             }
 
             // Add blocks from source tags (e.g., c:storage_blocks/iron)
@@ -45,7 +45,7 @@ public class ChiselBlockTagsProvider extends BlockTagsProvider {
             }
 
             for (TagKey<Block> blockTag : blockType.getBlockTags()) {
-                IntrinsicTagAppender<Block> miningTagBuilder = tag(blockTag);
+                TagAppender<Block, Block> miningTagBuilder = tag(blockTag);
                 for (DeferredBlock<?> block : blockType.getAllBlocks()) {
                     miningTagBuilder.add(block.get());
                 }

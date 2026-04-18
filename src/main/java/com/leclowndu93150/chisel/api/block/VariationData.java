@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 public record VariationData(
         String name,
         String localizedName,
-        @Nullable ChiselModelTemplates.ModelTemplate modelTemplate,
+        @Nullable ChiselModelTemplates.ChiselModelTemplate modelTemplate,
         @Nullable String[] tooltip,
         @Nullable String textureOverride
 ) {
@@ -22,15 +22,15 @@ public record VariationData(
         this(name, localizedName, null, null, null);
     }
 
-    public VariationData(String name, ChiselModelTemplates.ModelTemplate modelTemplate) {
+    public VariationData(String name, ChiselModelTemplates.ChiselModelTemplate modelTemplate) {
         this(name, toTitleCase(name), modelTemplate, null, null);
     }
 
-    public VariationData(String name, String localizedName, ChiselModelTemplates.ModelTemplate modelTemplate) {
+    public VariationData(String name, String localizedName, ChiselModelTemplates.ChiselModelTemplate modelTemplate) {
         this(name, localizedName, modelTemplate, null, null);
     }
 
-    public VariationData(String name, String localizedName, ChiselModelTemplates.ModelTemplate modelTemplate, @Nullable String[] tooltip) {
+    public VariationData(String name, String localizedName, ChiselModelTemplates.ChiselModelTemplate modelTemplate, @Nullable String[] tooltip) {
         this(name, localizedName, modelTemplate, tooltip, null);
     }
 
@@ -38,7 +38,7 @@ public record VariationData(
         return new VariationData(name, localizedName, modelTemplate, tooltip, textureOverride);
     }
 
-    public VariationData withModelTemplate(ChiselModelTemplates.ModelTemplate template) {
+    public VariationData withModelTemplate(ChiselModelTemplates.ChiselModelTemplate template) {
         return new VariationData(name, localizedName, template, tooltip, textureOverride);
     }
 

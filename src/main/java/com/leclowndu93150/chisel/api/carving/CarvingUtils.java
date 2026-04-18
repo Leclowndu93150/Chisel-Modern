@@ -3,7 +3,7 @@ package com.leclowndu93150.chisel.api.carving;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.carving.ChiselModeRegistry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
@@ -51,20 +51,20 @@ public class CarvingUtils {
     /**
      * Creates a carving group from a block tag.
      */
-    public static ICarvingGroup createGroup(ResourceLocation id, String displayName) {
+    public static ICarvingGroup createGroup(Identifier id, String displayName) {
         return createGroup(id, displayName, SoundEvents.UI_STONECUTTER_TAKE_RESULT);
     }
 
     /**
      * Creates a carving group from a block tag with a custom sound.
      */
-    public static ICarvingGroup createGroup(ResourceLocation id, String displayName, SoundEvent sound) {
+    public static ICarvingGroup createGroup(Identifier id, String displayName, SoundEvent sound) {
         TagKey<Block> blockTag = BlockTags.create(id);
         TagKey<Item> itemTag = ItemTags.create(id);
 
         return new ICarvingGroup() {
             @Override
-            public ResourceLocation getId() {
+            public Identifier getId() {
                 return id;
             }
 

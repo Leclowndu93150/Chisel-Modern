@@ -2,7 +2,7 @@ package com.leclowndu93150.chisel.api.carving;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -16,7 +16,7 @@ public interface ICarvingGroup {
     /**
      * Gets the unique identifier for this carving group.
      */
-    ResourceLocation getId();
+    Identifier getId();
 
     /**
      * Gets the translation key for this group's display name.

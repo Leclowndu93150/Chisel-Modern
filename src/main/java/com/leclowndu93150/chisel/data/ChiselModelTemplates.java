@@ -2,27 +2,53 @@ package com.leclowndu93150.chisel.data;
 
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ICarvable;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CrossCollisionBlock;
+import com.leclowndu93150.chisel.mixin.BlockModelGeneratorsAccessor;
+import com.leclowndu93150.chisel.mixin.TextureSlotAccessor;
+import com.mojang.datafixers.functions.PointFreeRule;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.data.models.blockstates.ConditionBuilder;
+import net.minecraft.client.data.models.blockstates.MultiPartGenerator;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.client.color.item.Constant;
+import net.minecraft.client.color.item.ItemTintSource;
+import net.minecraft.client.data.models.model.ItemModelUtils;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
-import java.util.function.Function;
+import java.util.Optional;
 
 /**
  * Model templates for generating block models.
- * Ported from Chisel 1.18.2's ModelTemplates.java
+ * Ported from Chisel 1.18.2's ModelTemplates.java, updated for NeoForge 26.1 datagen.
+ * <p>
+ * Uses BlockModelGenerators with blockStateOutput/modelOutput consumers
+ * instead of the removed BlockStateProvider.
  */
 public class ChiselModelTemplates {
 
+    /**
+     * Functional interface for applying a model template to a block.
+     * Renamed from ModelTemplate to ChiselModelTemplate to avoid conflict with
+     * {@link net.minecraft.client.data.models.model.ModelTemplate}.
+     */
     @FunctionalInterface
-    public interface ModelTemplate {
-        void apply(BlockStateProvider prov, Block block);
+    public interface ChiselModelTemplate {
+        void apply(Block block, BlockModelGenerators blockModels);
     }
+
+    // =====================================================================
+    // Utility methods
+    // =====================================================================
 
     /**
      * Gets the registry name path (used for model file names).
@@ -45,48 +71,6 @@ public class ChiselModelTemplates {
         return name(block);
     }
 
-    public static ModelTemplate simpleBlock() {
-        return ChiselModelTemplates::simpleBlock;
-    }
-
-    private static void simpleBlock(BlockStateProvider prov, Block block) {
-        prov.simpleBlock(block, prov.models().cubeAll("block/" + name(block), Chisel.id("block/" + texturePath(block))));
-    }
-
-    /**
-     * Simple cube_all block with cutout render type (for glass blocks - like vanilla glass).
-     */
-    public static ModelTemplate simpleBlockCutout() {
-        return (prov, block) -> {
-            prov.simpleBlock(block, prov.models()
-                    .cubeAll("block/" + name(block), Chisel.id("block/" + texturePath(block)))
-                    .renderType("cutout"));
-        };
-    }
-
-    /**
-     * Simple cube_all block with translucent render type (for stained glass blocks).
-     */
-    public static ModelTemplate simpleBlockTranslucent() {
-        return (prov, block) -> {
-            prov.simpleBlock(block, prov.models()
-                    .cubeAll("block/" + name(block), Chisel.id("block/" + texturePath(block)))
-                    .renderType("translucent"));
-        };
-    }
-
-    /**
-     * Cloud block template - translucent with no culling between same blocks.
-     */
-    public static ModelTemplate cloudBlock() {
-        return (prov, block) -> {
-            prov.simpleBlock(block, prov.models()
-                    .withExistingParent("block/" + name(block), Chisel.id("block/cube_all_translucent"))
-                    .texture("all", Chisel.id("block/" + texturePath(block)))
-                    .renderType("translucent"));
-        };
-    }
-
     /**
      * Replaces the variant (last path component) in a texture path.
      */
@@ -105,268 +89,6 @@ public class ChiselModelTemplates {
         return texPath.replaceAll("^block/[^/]+", "block/" + newBlock);
     }
 
-    public static ModelTemplate cubeBottomTop() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().cubeBottomTop(modelName,
-                    Chisel.id(texPath + "-side"),
-                    Chisel.id(texPath + "-bottom"),
-                    Chisel.id(texPath + "-top")));
-        };
-    }
-
-    public static ModelTemplate cubeBottomTop(String side, String bottom, String top) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().cubeBottomTop(modelName,
-                    Chisel.id(replaceVariant(texPath, side)),
-                    Chisel.id(replaceVariant(texPath, bottom)),
-                    Chisel.id(replaceVariant(texPath, top))));
-        };
-    }
-
-    public static ModelTemplate cubeAll(String postfix) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().cubeAll(modelName, Chisel.id(texPath + postfix)));
-        };
-    }
-
-    public static ModelTemplate cubeColumn() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().cubeColumn(modelName,
-                    Chisel.id(texPath + "-side"),
-                    Chisel.id(texPath + "-top")));
-        };
-    }
-
-    /**
-     * Cube column block with cutout render type (for transparent blocks with top/side textures).
-     */
-    public static ModelTemplate cubeColumnCutout() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().cubeColumn(modelName,
-                    Chisel.id(texPath + "-side"),
-                    Chisel.id(texPath + "-top"))
-                    .renderType("cutout"));
-        };
-    }
-
-    public static ModelTemplate cubeColumn(String side, String top) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().cubeColumn(modelName,
-                    Chisel.id(replaceVariant(texPath, side)),
-                    Chisel.id(replaceVariant(texPath, top))));
-        };
-    }
-
-    /**
-     * Bookshelf model - uses oak planks as base with bookshelf texture overlaid on sides.
-     * Top/bottom are solid oak planks, sides are oak planks + bookshelf overlay.
-     */
-    public static ModelTemplate bookshelf() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models()
-                    .withExistingParent(modelName, Chisel.id("block/bookshelf_base"))
-                    .texture("overlay", Chisel.id(texPath)));
-        };
-    }
-
-    /**
-     * Bookshelf model for a specific wood type - uses that wood's planks as base with bookshelf texture overlaid on sides.
-     * All wood types share the same overlay textures from bookshelf/.
-     */
-    public static ModelTemplate bookshelf(String woodType) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            // Get the variant name (e.g., "rainbow") and use shared bookshelf textures
-            String variantName = getVariantName(block);
-            prov.simpleBlock(block, prov.models()
-                    .withExistingParent(modelName, Chisel.id("block/bookshelf_base_" + woodType))
-                    .texture("overlay", Chisel.id("block/bookshelf/" + variantName)));
-        };
-    }
-
-    public static ModelTemplate ctm(String variant) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            String texName = replaceVariant(texPath, variant);
-            // For CTM variants like "circularct", strip the "ct" suffix for the -ctm texture
-            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
-            String ctmTexName = replaceVariant(texPath, ctmVariant);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("cube_ctm"))
-                    .texture("all", texName)
-                    .texture("connected_tex", ctmTexName + "-ctm"));
-        };
-    }
-
-    public static ModelTemplate twoLayerWithTop(String top, boolean shade) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id(shade ? "cube_2_layer" : "cube_2_layer_no_shade"))
-                    .texture("bot", texPath)
-                    .texture("top", replaceVariant(texPath, top)));
-        };
-    }
-
-    public static ModelTemplate axisFaces() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_axis"))
-                    .texture("x", texPath + "-ew")
-                    .texture("y", texPath + "-tb")
-                    .texture("z", texPath + "-ns"));
-        };
-    }
-
-    /**
-     * Axis faces without separate top/bottom texture - uses -ns for top.
-     */
-    public static ModelTemplate axisFacesNoTop() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_axis"))
-                    .texture("x", texPath + "-ew")
-                    .texture("y", texPath + "-ns")
-                    .texture("z", texPath + "-ns"));
-        };
-    }
-
-    public static ModelTemplate mossy(String base) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            String texName = replaceBlock(texPath, base);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/mossy/mossy"))
-                    .texture("bot", texName));
-        };
-    }
-
-    public static ModelTemplate mossyColumn(String base) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            String texName = replaceBlock(texPath, base);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/mossy/mossy_column"))
-                    .texture("side", texName + "-side")
-                    .texture("end", texName + "-top"));
-        };
-    }
-
-    public static ModelTemplate mossyCtm(String base, String variant) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            String texName = replaceBlock(texPath, base);
-            texName = replaceVariant(texName, variant);
-            // For CTM variants like "circularct", strip the "ct" suffix for the -ctm texture
-            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
-            String ctmTexName = replaceBlock(texPath, base);
-            ctmTexName = replaceVariant(ctmTexName, ctmVariant);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/mossy/mossy_ctm"))
-                    .texture("bot", texName)
-                    .texture("connect_bot", ctmTexName + "-ctm"));
-        };
-    }
-
-    public static ModelTemplate twoLayerTopShaded(String top, String bottom) {
-        return twoLayerTopShaded(top, top, bottom);
-    }
-
-    public static ModelTemplate twoLayerTopShaded(String particle, String top, String bottom) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_2_layer_topshaded"))
-                    .texture("particle", replaceVariant(texPath, particle))
-                    .texture("top", replaceVariant(texPath, top))
-                    .texture("bot", replaceVariant(texPath, bottom)));
-        };
-    }
-
-    public static ModelTemplate threeLayerTopShaded(String particle, String top, String mid, String bottom) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_3_layer_topshaded"))
-                    .texture("particle", replaceVariant(texPath, particle))
-                    .texture("top", replaceVariant(texPath, top))
-                    .texture("mid", replaceVariant(texPath, mid))
-                    .texture("bot", replaceVariant(texPath, bottom)));
-        };
-    }
-
-    public static ModelTemplate cubeCTMTranslucent(String all, String ctm) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_ctm_translucent"))
-                    .texture("all", all)
-                    .texture("connected_tex", ctm));
-        };
-    }
-
-    public static ModelTemplate fluidCube(String fluid) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String variant = getVariantName(block);
-
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/cube_" + fluid))
-                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
-                    .texture("top", Chisel.id("block/fluid/" + variant)));
-        };
-    }
-
-    public static ModelTemplate fluidCubeCTM(String fluid, String variant) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            // For CTM variants like "circularct", strip the "ct" suffix for the -ctm texture
-            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
-
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/cube_ctm_" + fluid))
-                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
-                    .texture("top", Chisel.id("block/fluid/" + variant))
-                    .texture("connect_top", Chisel.id("block/fluid/" + ctmVariant + "-ctm")));
-        };
-    }
-
-    public static ModelTemplate fluidPassCube(String fluid) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String variant = getVariantName(block);
-
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/cube_pass_" + fluid))
-                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
-                    .texture("top", Chisel.id("block/fluid/" + variant)));
-        };
-    }
-
-    public static ModelTemplate fluidPassColumn(String fluid) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            String variant = getVariantName(block);
-
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/column_" + fluid))
-                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
-                    .texture("side", Chisel.id("block/fluid/" + variant + "-side"))
-                    .texture("top", Chisel.id("block/fluid/" + variant + "-top")));
-        };
-    }
-
     /**
      * Gets the variant name from a block (for fluid textures).
      */
@@ -374,403 +96,677 @@ public class ChiselModelTemplates {
         if (block instanceof ICarvable carvable) {
             return carvable.getVariation().getTextureName();
         }
-        String name = name(block);
-        return name.contains("/") ? name.split("/")[1] : name;
+        String n = name(block);
+        return n.contains("/") ? n.split("/")[1] : n;
     }
 
-    public static ModelTemplate cubeEldritch() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
+    // =====================================================================
+    // Internal helper methods
+    // =====================================================================
+
+    /**
+     * Creates a custom TextureSlot with the given name.
+     * Uses a mixin accessor since TextureSlot.create() is private in vanilla.
+     */
+    private static TextureSlot slot(String name) {
+        return TextureSlotAccessor.chisel$create(name);
+    }
+
+    /**
+     * Registers a simple block blockstate (single variant pointing to the model).
+     * Uses mixin accessor since createSimpleBlock/plainVariant are private in vanilla.
+     */
+    private static void simpleBlockState(Block block, Identifier modelLoc, BlockModelGenerators blockModels) {
+        blockModels.blockStateOutput.accept(
+                BlockModelGeneratorsAccessor.chisel$createSimpleBlock(block,
+                        BlockModelGeneratorsAccessor.chisel$plainVariant(modelLoc)));
+    }
+
+    /**
+     * Creates a Material from an existing Identifier.
+     */
+    private static Material mat(Identifier id) {
+        return new Material(id);
+    }
+
+    /**
+     * Creates a Material from a Chisel-namespaced path string.
+     */
+    private static Material mat(String path) {
+        return new Material(Chisel.id(path));
+    }
+
+    private static Identifier cubeAllModel(Block block, Material texture, BlockModelGenerators blockModels) {
+        TextureMapping mapping = new TextureMapping().put(TextureSlot.ALL, texture);
+        return ModelTemplates.CUBE_ALL.create(block, mapping, blockModels.modelOutput);
+    }
+
+    private static Identifier cubeAllTranslucentModel(Block block, Material texture, BlockModelGenerators blockModels) {
+        TextureMapping mapping = new TextureMapping().put(TextureSlot.ALL, texture).forceAllTranslucent();
+        return ModelTemplates.CUBE_ALL.create(block, mapping, blockModels.modelOutput);
+    }
+
+    private static Identifier cubeColumnModel(Block block, Material side, Material end, BlockModelGenerators blockModels) {
+        TextureMapping mapping = new TextureMapping().put(TextureSlot.SIDE, side).put(TextureSlot.END, end);
+        return ModelTemplates.CUBE_COLUMN.create(block, mapping, blockModels.modelOutput);
+    }
+
+    private static Identifier cubeBottomTopModel(Block block, Material side, Material bottom, Material top, BlockModelGenerators blockModels) {
+        TextureMapping mapping = new TextureMapping()
+                .put(TextureSlot.SIDE, side)
+                .put(TextureSlot.BOTTOM, bottom)
+                .put(TextureSlot.TOP, top);
+        return ModelTemplates.CUBE_BOTTOM_TOP.create(block, mapping, blockModels.modelOutput);
+    }
+
+    private static Identifier parentModel(Block block, Identifier parent, TextureMapping mapping, BlockModelGenerators blockModels, TextureSlot... slots) {
+        var template = new net.minecraft.client.data.models.model.ModelTemplate(Optional.of(parent), Optional.empty(), slots);
+        return template.create(block, mapping, blockModels.modelOutput);
+    }
+
+    // =====================================================================
+    // Simple cube_all templates
+    // =====================================================================
+
+    /**
+     * Simple cube_all block with the block's own texture.
+     */
+    public static ChiselModelTemplate simpleBlock() {
+        return (block, blockModels) -> {
+            Material tex = mat("block/" + texturePath(block));
+            Identifier model = cubeAllModel(block, tex, blockModels);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate simpleBlockCutout() {
+        return simpleBlock();
+    }
+
+    public static ChiselModelTemplate simpleBlockTranslucent() {
+        return (block, blockModels) -> {
+            Material tex = mat("block/" + texturePath(block));
+            Identifier model = cubeAllTranslucentModel(block, tex, blockModels);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    /**
+     * Cloud block template - translucent with no culling between same blocks.
+     * Uses a custom parent model for the translucent no-cull behavior.
+     */
+    public static ChiselModelTemplate cloudBlock() {
+        return (block, blockModels) -> {
+            TextureMapping mapping = new TextureMapping()
+                    .put(TextureSlot.ALL, mat("block/" + texturePath(block)));
+            Identifier model = parentModel(block, Chisel.id("block/cube_all_translucent"),
+                    mapping, blockModels, TextureSlot.ALL);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate cubeBottomTop() {
+        return (block, blockModels) -> {
             String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_eldritch"))
-                    .texture("all", texPath));
+            Identifier model = cubeBottomTopModel(block,
+                    mat(texPath + "-side"),
+                    mat(texPath + "-bottom"),
+                    mat(texPath + "-top"),
+                    blockModels);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    public static ModelTemplate columnEldritch(String top) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
+    public static ChiselModelTemplate cubeBottomTop(String side, String bottom, String top) {
+        return (block, blockModels) -> {
             String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/column_eldritch"))
-                    .texture("end", replaceVariant(texPath, top) + "-top")
-                    .texture("side", texPath + "-side"));
+            Identifier model = cubeBottomTopModel(block,
+                    mat(replaceVariant(texPath, side)),
+                    mat(replaceVariant(texPath, bottom)),
+                    mat(replaceVariant(texPath, top)),
+                    blockModels);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    public static ModelTemplate columnPillar() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
+    public static ChiselModelTemplate cubeAll(String postfix) {
+        return (block, blockModels) -> {
             String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/column_pillar"))
-                    .texture("top", texPath + "-top")
-                    .texture("pillar", texPath + "-ctmv"));
+            Identifier model = cubeAllModel(block, mat(texPath + postfix), blockModels);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    public static ModelTemplate hexPlate(String variant) {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_2_layer"))
-                    .texture("top", Chisel.id("block/hexplating/" + variant))
-                    .texture("bot", Chisel.id("block/animations/archetype2")));
+    public static ChiselModelTemplate cubeColumn() {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            Identifier model = cubeColumnModel(block,
+                    mat(texPath + "-side"),
+                    mat(texPath + "-top"),
+                    blockModels);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    public static ModelTemplate cube(String texture) {
-        return (prov, block) -> {
-            prov.simpleBlock(block, prov.models().cubeAll("block/" + name(block), Chisel.id(texture)));
+    public static ChiselModelTemplate cubeColumnCutout() {
+        return cubeColumn();
+    }
+
+    public static ChiselModelTemplate cubeColumn(String side, String top) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            Identifier model = cubeColumnModel(block,
+                    mat(replaceVariant(texPath, side)),
+                    mat(replaceVariant(texPath, top)),
+                    blockModels);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    public static ModelTemplate paneBlock(String edge) {
-        return (prov, block) -> {
-            String name = "block/" + name(block);
+    public static ChiselModelTemplate bookshelf() {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot overlay = slot("overlay");
+            TextureMapping mapping = new TextureMapping().put(overlay, mat(texPath));
+            Identifier model = parentModel(block, Chisel.id("block/bookshelf_base"), mapping, blockModels, overlay);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate bookshelf(String woodType) {
+        return (block, blockModels) -> {
+            String variantName = getVariantName(block);
+            TextureSlot overlay = slot("overlay");
+            TextureMapping mapping = new TextureMapping().put(overlay, mat("block/bookshelf/" + variantName));
+            Identifier model = parentModel(block, Chisel.id("block/bookshelf_base_" + woodType), mapping, blockModels, overlay);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate ctm(String variant) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            String texName = replaceVariant(texPath, variant);
+            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
+            String ctmTexName = replaceVariant(texPath, ctmVariant);
+            TextureSlot allSlot = TextureSlot.ALL;
+            TextureSlot ctmSlot = slot("connected_tex");
+            TextureMapping mapping = new TextureMapping().put(allSlot, mat(texName)).put(ctmSlot, mat(ctmTexName + "-ctm"));
+            Identifier model = parentModel(block, Chisel.id("block/cube_ctm"), mapping, blockModels, allSlot, ctmSlot);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate twoLayerWithTop(String top, boolean shade) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot botSlot = slot("bot");
+            TextureSlot topSlot = slot("top");
+            TextureMapping mapping = new TextureMapping().put(botSlot, mat(texPath)).put(topSlot, mat(replaceVariant(texPath, top)));
+            Identifier parent = Chisel.id(shade ? "block/cube_2_layer" : "block/cube_2_layer_no_shade");
+            Identifier model = parentModel(block, parent, mapping, blockModels, botSlot, topSlot);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate axisFaces() {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot x = slot("x");
+            TextureSlot y = slot("y");
+            TextureSlot z = slot("z");
+            TextureMapping mapping = new TextureMapping()
+                    .put(x, mat(texPath + "-ew"))
+                    .put(y, mat(texPath + "-tb"))
+                    .put(z, mat(texPath + "-ns"));
+            Identifier model = parentModel(block, Chisel.id("block/cube_axis"), mapping, blockModels, x, y, z);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate axisFacesNoTop() {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot x = slot("x");
+            TextureSlot y = slot("y");
+            TextureSlot z = slot("z");
+            TextureMapping mapping = new TextureMapping()
+                    .put(x, mat(texPath + "-ew"))
+                    .put(y, mat(texPath + "-ns"))
+                    .put(z, mat(texPath + "-ns"));
+            Identifier model = parentModel(block, Chisel.id("block/cube_axis"), mapping, blockModels, x, y, z);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate mossy(String base) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            String texName = replaceBlock(texPath, base);
+            TextureSlot bot = slot("bot");
+            TextureMapping mapping = new TextureMapping().put(bot, mat(texName));
+            Identifier model = parentModel(block, Chisel.id("block/mossy/mossy"), mapping, blockModels, bot);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate mossyColumn(String base) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            String texName = replaceBlock(texPath, base);
+            TextureSlot side = slot("side");
+            TextureSlot end = slot("end");
+            TextureMapping mapping = new TextureMapping()
+                    .put(side, mat(texName + "-side"))
+                    .put(end, mat(texName + "-top"));
+            Identifier model = parentModel(block, Chisel.id("block/mossy/mossy_column"), mapping, blockModels, side, end);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate mossyCtm(String base, String variant) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            String texName = replaceVariant(replaceBlock(texPath, base), variant);
+            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
+            String ctmTexName = replaceVariant(replaceBlock(texPath, base), ctmVariant);
+            TextureSlot bot = slot("bot");
+            TextureSlot connectBot = slot("connect_bot");
+            TextureMapping mapping = new TextureMapping()
+                    .put(bot, mat(texName))
+                    .put(connectBot, mat(ctmTexName + "-ctm"));
+            Identifier model = parentModel(block, Chisel.id("block/mossy/mossy_ctm"), mapping, blockModels, bot, connectBot);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate twoLayerTopShaded(String top, String bottom) {
+        return twoLayerTopShaded(top, top, bottom);
+    }
+
+    public static ChiselModelTemplate twoLayerTopShaded(String particle, String top, String bottom) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot pSlot = TextureSlot.PARTICLE;
+            TextureSlot tSlot = slot("top");
+            TextureSlot bSlot = slot("bot");
+            TextureMapping mapping = new TextureMapping()
+                    .put(pSlot, mat(replaceVariant(texPath, particle)))
+                    .put(tSlot, mat(replaceVariant(texPath, top)))
+                    .put(bSlot, mat(replaceVariant(texPath, bottom)));
+            Identifier model = parentModel(block, Chisel.id("block/cube_2_layer_topshaded"), mapping, blockModels, pSlot, tSlot, bSlot);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate threeLayerTopShaded(String particle, String top, String mid, String bottom) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot pSlot = TextureSlot.PARTICLE;
+            TextureSlot tSlot = slot("top");
+            TextureSlot mSlot = slot("mid");
+            TextureSlot bSlot = slot("bot");
+            TextureMapping mapping = new TextureMapping()
+                    .put(pSlot, mat(replaceVariant(texPath, particle)))
+                    .put(tSlot, mat(replaceVariant(texPath, top)))
+                    .put(mSlot, mat(replaceVariant(texPath, mid)))
+                    .put(bSlot, mat(replaceVariant(texPath, bottom)));
+            Identifier model = parentModel(block, Chisel.id("block/cube_3_layer_topshaded"), mapping, blockModels, pSlot, tSlot, mSlot, bSlot);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate cubeCTMTranslucent(String all, String ctm) {
+        return (block, blockModels) -> {
+            TextureSlot allSlot = TextureSlot.ALL;
+            TextureSlot ctmSlot = slot("connected_tex");
+            TextureMapping mapping = new TextureMapping().put(allSlot, mat(Identifier.parse(all))).put(ctmSlot, mat(Identifier.parse(ctm))).forceAllTranslucent();
+            Identifier model = parentModel(block, Chisel.id("block/cube_ctm_translucent"), mapping, blockModels, allSlot, ctmSlot);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate fluidCube(String fluid) {
+        return (block, blockModels) -> {
+            String variant = getVariantName(block);
+            TextureSlot bot = slot("bot");
+            TextureSlot top = slot("top");
+            TextureMapping mapping = new TextureMapping()
+                    .put(bot, mat(Identifier.withDefaultNamespace("block/" + fluid + "_still")))
+                    .put(top, mat("block/fluid/" + variant))
+                    .forceAllTranslucent();
+            Identifier model = parentModel(block, Chisel.id("block/" + fluid + "stone/cube_" + fluid), mapping, blockModels, bot, top);
+            simpleBlockState(block, model, blockModels);
+            registerFluidTintedItem(block, model, blockModels, fluid);
+        };
+    }
+
+    public static ChiselModelTemplate fluidCubeCTM(String fluid, String variant) {
+        return (block, blockModels) -> {
+            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
+            TextureSlot bot = slot("bot");
+            TextureSlot top = slot("top");
+            TextureSlot connectTop = slot("connect_top");
+            TextureMapping mapping = new TextureMapping()
+                    .put(bot, mat(Identifier.withDefaultNamespace("block/" + fluid + "_still")))
+                    .put(top, mat("block/fluid/" + variant))
+                    .put(connectTop, mat("block/fluid/" + ctmVariant + "-ctm"))
+                    .forceAllTranslucent();
+            Identifier model = parentModel(block, Chisel.id("block/" + fluid + "stone/cube_ctm_" + fluid), mapping, blockModels, bot, top, connectTop);
+            simpleBlockState(block, model, blockModels);
+            registerFluidTintedItem(block, model, blockModels, fluid);
+        };
+    }
+
+    public static ChiselModelTemplate fluidPassCube(String fluid) {
+        return (block, blockModels) -> {
+            String variant = getVariantName(block);
+            TextureSlot bot = slot("bot");
+            TextureSlot top = slot("top");
+            TextureMapping mapping = new TextureMapping()
+                    .put(bot, mat(Identifier.withDefaultNamespace("block/" + fluid + "_still")))
+                    .put(top, mat("block/fluid/" + variant))
+                    .forceAllTranslucent();
+            Identifier model = parentModel(block, Chisel.id("block/" + fluid + "stone/cube_pass_" + fluid), mapping, blockModels, bot, top);
+            simpleBlockState(block, model, blockModels);
+            registerFluidTintedItem(block, model, blockModels, fluid);
+        };
+    }
+
+    public static ChiselModelTemplate fluidPassColumn(String fluid) {
+        return (block, blockModels) -> {
+            String variant = getVariantName(block);
+            TextureSlot bot = slot("bot");
+            TextureSlot side = slot("side");
+            TextureSlot top = slot("top");
+            TextureMapping mapping = new TextureMapping()
+                    .put(bot, mat(Identifier.withDefaultNamespace("block/" + fluid + "_still")))
+                    .put(side, mat("block/fluid/" + variant + "-side"))
+                    .put(top, mat("block/fluid/" + variant + "-top"))
+                    .forceAllTranslucent();
+            Identifier model = parentModel(block, Chisel.id("block/" + fluid + "stone/column_" + fluid), mapping, blockModels, bot, side, top);
+            simpleBlockState(block, model, blockModels);
+            registerFluidTintedItem(block, model, blockModels, fluid);
+        };
+    }
+
+    private static void registerFluidTintedItem(Block block, Identifier model, BlockModelGenerators blockModels, String fluid) {
+        if (!"water".equals(fluid)) return;
+        registerTintedBlockItem(block, model, blockModels,
+                new Constant(0xFFFFFF),
+                new Constant(0x3F76E4));
+    }
+
+    public static ChiselModelTemplate cubeEldritch() {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureMapping mapping = new TextureMapping().put(TextureSlot.ALL, mat(texPath));
+            Identifier model = parentModel(block, Chisel.id("block/cube_eldritch"), mapping, blockModels, TextureSlot.ALL);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate columnEldritch(String top) {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot end = slot("end");
+            TextureSlot side = slot("side");
+            TextureMapping mapping = new TextureMapping()
+                    .put(end, mat(replaceVariant(texPath, top) + "-top"))
+                    .put(side, mat(texPath + "-side"));
+            Identifier model = parentModel(block, Chisel.id("block/column_eldritch"), mapping, blockModels, end, side);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate columnPillar() {
+        return (block, blockModels) -> {
+            String texPath = "block/" + texturePath(block);
+            TextureSlot top = slot("top");
+            TextureSlot pillar = slot("pillar");
+            TextureMapping mapping = new TextureMapping()
+                    .put(top, mat(texPath + "-top"))
+                    .put(pillar, mat(texPath + "-ctmv"));
+            Identifier model = parentModel(block, Chisel.id("block/column_pillar"), mapping, blockModels, top, pillar);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate hexPlate(String variant) {
+        return (block, blockModels) -> {
+            TextureSlot top = slot("top");
+            TextureSlot bot = slot("bot");
+            TextureMapping mapping = new TextureMapping()
+                    .put(top, mat("block/hexplating/" + variant))
+                    .put(bot, mat("block/animations/archetype2"));
+            Identifier model = parentModel(block, Chisel.id("block/cube_2_layer"), mapping, blockModels, top, bot);
+            simpleBlockState(block, model, blockModels);
+            int color = dyeColorFromBlockPath(block, "hexplating_");
+            registerTintedBlockItem(block, model, blockModels,
+                    new Constant(0xFFFFFF),
+                    new Constant(color));
+        };
+    }
+
+    public static ChiselModelTemplate cube(String texture) {
+        return (block, blockModels) -> {
+            Identifier model = cubeAllModel(block, mat(texture), blockModels);
+            simpleBlockState(block, model, blockModels);
+        };
+    }
+
+    public static ChiselModelTemplate paneBlock(String edge) {
+        return (block, blockModels) -> {
             String texture = "block/" + name(block).replace("pane", "");
-            paneBlockInternal(prov, block, name, Chisel.id(texture), Chisel.id(edge));
+            Material paneTex = mat(texture);
+            Material edgeTex = mat(edge);
+            createPaneMultipart(block, paneTex, edgeTex, blockModels);
+            registerFlatBlockItemFromTexture(block, paneTex, blockModels);
         };
     }
 
-    public static ModelTemplate paneBlockSideTop() {
-        return (prov, block) -> {
-            String name = "block/" + name(block);
+    public static ChiselModelTemplate paneBlockSideTop() {
+        return (block, blockModels) -> {
             String basePath = "block/" + texturePath(block);
-            ResourceLocation paneTexture = Chisel.id(basePath + "-side");
-            ResourceLocation edgeTexture = Chisel.id(basePath + "-top");
-            paneBlockVanillaStyle(prov, block, name, paneTexture, edgeTexture);
+            Material paneTex = mat(basePath + "-side");
+            Material edgeTex = mat(basePath + "-top");
+            createPaneMultipart(block, paneTex, edgeTex, blockModels);
+            registerFlatBlockItemFromTexture(block, paneTex, blockModels);
         };
     }
 
-    /**
-     * Creates pane blockstate using vanilla-style multipart with post, side, side_alt, noside, noside_alt models.
-     * This matches exactly how vanilla handles glass panes.
-     */
-    private static void paneBlockVanillaStyle(BlockStateProvider prov, Block block, String name,
-                                               ResourceLocation paneTexture, ResourceLocation edgeTexture) {
-        MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
-
-        var postModel = prov.models()
-                .withExistingParent(name + "_post", ResourceLocation.withDefaultNamespace("block/template_glass_pane_post"))
-                .texture("pane", paneTexture)
-                .texture("edge", edgeTexture)
-                .renderType("translucent");
-        builder.part().modelFile(postModel).addModel().end();
-
-        var sideModel = prov.models()
-                .withExistingParent(name + "_side", ResourceLocation.withDefaultNamespace("block/template_glass_pane_side"))
-                .texture("pane", paneTexture)
-                .texture("edge", edgeTexture)
-                .renderType("translucent");
-        var sideAltModel = prov.models()
-                .withExistingParent(name + "_side_alt", ResourceLocation.withDefaultNamespace("block/template_glass_pane_side_alt"))
-                .texture("pane", paneTexture)
-                .texture("edge", edgeTexture)
-                .renderType("translucent");
-
-        var nosideModel = prov.models()
-                .withExistingParent(name + "_noside", ResourceLocation.withDefaultNamespace("block/template_glass_pane_noside"))
-                .texture("pane", paneTexture)
-                .renderType("translucent");
-        var nosideAltModel = prov.models()
-                .withExistingParent(name + "_noside_alt", ResourceLocation.withDefaultNamespace("block/template_glass_pane_noside_alt"))
-                .texture("pane", paneTexture)
-                .renderType("translucent");
-
-        builder.part().modelFile(sideModel).addModel()
-                .condition(CrossCollisionBlock.NORTH, true).end();
-        builder.part().modelFile(nosideModel).addModel()
-                .condition(CrossCollisionBlock.NORTH, false).end();
-
-        builder.part().modelFile(sideModel).rotationY(90).addModel()
-                .condition(CrossCollisionBlock.EAST, true).end();
-        builder.part().modelFile(nosideAltModel).addModel()
-                .condition(CrossCollisionBlock.EAST, false).end();
-
-        builder.part().modelFile(sideAltModel).addModel()
-                .condition(CrossCollisionBlock.SOUTH, true).end();
-        builder.part().modelFile(nosideAltModel).rotationY(90).addModel()
-                .condition(CrossCollisionBlock.SOUTH, false).end();
-
-        builder.part().modelFile(sideAltModel).rotationY(90).addModel()
-                .condition(CrossCollisionBlock.WEST, true).end();
-        builder.part().modelFile(nosideModel).rotationY(270).addModel()
-                .condition(CrossCollisionBlock.WEST, false).end();
+    private static void registerFlatBlockItem(Block block, BlockModelGenerators blockModels) {
+        var accessor = (BlockModelGeneratorsAccessor) blockModels;
+        Item item = block.asItem();
+        if (item != Items.AIR) {
+            Identifier model = accessor.chisel$createFlatItemModel(item);
+            accessor.chisel$getItemModelOutput().accept(item, ItemModelUtils.plainModel(model));
+        }
     }
 
-    private static void paneBlockInternal(BlockStateProvider prov, Block block, String name, ResourceLocation texture, ResourceLocation edge) {
-        MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
-
-        builder.part().modelFile(prov.models().withExistingParent(name + "_post", Chisel.id("block/pane/post"))
-                        .texture("pane", texture)
-                        .texture("edge", edge))
-                .addModel()
-                .condition(CrossCollisionBlock.NORTH, false)
-                .condition(CrossCollisionBlock.EAST, false)
-                .condition(CrossCollisionBlock.SOUTH, false)
-                .condition(CrossCollisionBlock.WEST, false)
-                .end();
-
-        builder.part().modelFile(prov.models().withExistingParent(name + "_n", Chisel.id("block/pane/n"))
-                        .texture("pane", texture)
-                        .texture("edge", edge))
-                .addModel()
-                .condition(CrossCollisionBlock.NORTH, true)
-                .end();
-
-        builder.part().modelFile(prov.models().withExistingParent(name + "_e", Chisel.id("block/pane/e"))
-                        .texture("pane", texture)
-                        .texture("edge", edge))
-                .addModel()
-                .condition(CrossCollisionBlock.EAST, true)
-                .end();
-
-        builder.part().modelFile(prov.models().withExistingParent(name + "_s", Chisel.id("block/pane/s"))
-                        .texture("pane", texture)
-                        .texture("edge", edge))
-                .addModel()
-                .condition(CrossCollisionBlock.SOUTH, true)
-                .end();
-
-        builder.part().modelFile(prov.models().withExistingParent(name + "_w", Chisel.id("block/pane/w"))
-                        .texture("pane", texture)
-                        .texture("edge", edge))
-                .addModel()
-                .condition(CrossCollisionBlock.WEST, true)
-                .end();
+    private static void registerFlatBlockItemFromTexture(Block block, Material texture, BlockModelGenerators blockModels) {
+        Item item = block.asItem();
+        if (item == Items.AIR) return;
+        Identifier model = ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(item),
+                TextureMapping.layer0(texture),
+                blockModels.modelOutput);
+        ((BlockModelGeneratorsAccessor) blockModels).chisel$getItemModelOutput()
+                .accept(item, ItemModelUtils.plainModel(model));
     }
 
-    public static ModelTemplate bars(String texture, String edge, String side) {
-        return (prov, block) -> {
-            String name = "block/" + name(block);
-            ResourceLocation tex = Chisel.id(texture);
-            ResourceLocation edgeTex = Chisel.id(edge);
-            ResourceLocation sideTex = Chisel.id(side);
+    private static void registerTintedBlockItem(Block block, Identifier model, BlockModelGenerators blockModels, ItemTintSource... tints) {
+        Item item = block.asItem();
+        if (item != Items.AIR) {
+            ((BlockModelGeneratorsAccessor) blockModels).chisel$getItemModelOutput()
+                    .accept(item, ItemModelUtils.tintedModel(model, tints));
+        }
+    }
 
-            MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
+    private static int dyeColorFromBlockPath(Block block, String prefix) {
+        String path = BuiltInRegistries.BLOCK.getKey(block).getPath();
+        int slash = path.indexOf('/');
+        String namePart = slash >= 0 ? path.substring(0, slash) : path;
+        String colorName = namePart.startsWith(prefix) ? namePart.substring(prefix.length()) : namePart;
+        return DyeColor.byName(colorName, DyeColor.WHITE).getTextColor();
+    }
 
-            builder.part().modelFile(prov.models().withExistingParent(name + "_post_ends", Chisel.id("block/bars_post_ends"))
-                            .texture("bars", tex)
-                            .texture("particle", tex)
-                            .texture("edge", edgeTex)
-                            .texture("side", sideTex))
-                    .addModel()
-                    .end();
+    private static void createPaneMultipart(Block block, Material pane, Material edge, BlockModelGenerators blockModels) {
+        TextureMapping mapping = new TextureMapping()
+                .put(TextureSlot.PANE, pane)
+                .put(TextureSlot.EDGE, edge);
+        MultiVariant post = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.STAINED_GLASS_PANE_POST.create(block, mapping, blockModels.modelOutput));
+        MultiVariant side = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.STAINED_GLASS_PANE_SIDE.create(block, mapping, blockModels.modelOutput));
+        MultiVariant sideAlt = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.STAINED_GLASS_PANE_SIDE_ALT.create(block, mapping, blockModels.modelOutput));
+        MultiVariant noSide = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.STAINED_GLASS_PANE_NOSIDE.create(block, mapping, blockModels.modelOutput));
+        MultiVariant noSideAlt = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.STAINED_GLASS_PANE_NOSIDE_ALT.create(block, mapping, blockModels.modelOutput));
 
-            builder.part().modelFile(prov.models().withExistingParent(name + "_post", Chisel.id("block/bars_post"))
-                            .texture("bars", tex)
-                            .texture("particle", tex)
-                            .texture("edge", edgeTex)
-                            .texture("side", sideTex))
-                    .addModel()
-                    .condition(CrossCollisionBlock.NORTH, false)
-                    .condition(CrossCollisionBlock.EAST, false)
-                    .condition(CrossCollisionBlock.SOUTH, false)
-                    .condition(CrossCollisionBlock.WEST, false)
-                    .end();
+        blockModels.blockStateOutput.accept(
+                MultiPartGenerator.multiPart(block)
+                        .with(post)
+                        .with(new ConditionBuilder().term(BlockStateProperties.NORTH, true), side)
+                        .with(new ConditionBuilder().term(BlockStateProperties.EAST, true), side.with(BlockModelGenerators.Y_ROT_90))
+                        .with(new ConditionBuilder().term(BlockStateProperties.SOUTH, true), sideAlt)
+                        .with(new ConditionBuilder().term(BlockStateProperties.WEST, true), sideAlt.with(BlockModelGenerators.Y_ROT_90))
+                        .with(new ConditionBuilder().term(BlockStateProperties.NORTH, false), noSide)
+                        .with(new ConditionBuilder().term(BlockStateProperties.EAST, false), noSideAlt)
+                        .with(new ConditionBuilder().term(BlockStateProperties.SOUTH, false), noSideAlt.with(BlockModelGenerators.Y_ROT_90))
+                        .with(new ConditionBuilder().term(BlockStateProperties.WEST, false), noSide.with(BlockModelGenerators.Y_ROT_270))
+        );
+    }
 
-            builder.part().modelFile(prov.models().withExistingParent(name + "_side", Chisel.id("block/bars_side"))
-                            .texture("bars", tex)
-                            .texture("particle", tex)
-                            .texture("edge", edgeTex)
-                            .texture("side", sideTex))
-                    .addModel()
-                    .condition(CrossCollisionBlock.NORTH, true)
-                    .end();
-
-            builder.part().modelFile(prov.models().getExistingFile(Chisel.id(name + "_side")))
-                    .rotationY(90)
-                    .addModel()
-                    .condition(CrossCollisionBlock.EAST, true)
-                    .end();
-
-            builder.part().modelFile(prov.models().withExistingParent(name + "_side_alt", Chisel.id("block/bars_side_alt"))
-                            .texture("bars", tex)
-                            .texture("particle", tex)
-                            .texture("edge", edgeTex)
-                            .texture("side", sideTex))
-                    .addModel()
-                    .condition(CrossCollisionBlock.SOUTH, true)
-                    .end();
-
-            builder.part().modelFile(prov.models().getExistingFile(Chisel.id(name + "_side_alt")))
-                    .rotationY(90)
-                    .addModel()
-                    .condition(CrossCollisionBlock.WEST, true)
-                    .end();
+    public static ChiselModelTemplate bars(String texture, String edge, String side) {
+        return (block, blockModels) -> {
+            Material barsTex = mat(texture);
+            Material edgeTex = mat(edge);
+            Material sideTex = mat(side);
+            TextureMapping mapping = new TextureMapping()
+                    .put(TextureSlot.BARS, barsTex)
+                    .put(TextureSlot.EDGE, edgeTex);
+            createBarsMultipart(block, mapping, blockModels);
+            registerFlatBlockItemFromTexture(block, sideTex, blockModels);
         };
     }
 
-    /**
-     * Iron bars model template - uses vanilla iron bars template models.
-     * Detects if variant has -side/-top textures and uses them, otherwise uses the main texture.
-     */
-    public static ModelTemplate ironBars() {
-        return (prov, block) -> {
-            String name = "block/" + name(block);
+    public static ChiselModelTemplate ironBars() {
+        return (block, blockModels) -> {
             String basePath = "block/" + texturePath(block);
-
-            ResourceLocation barsTexture = Chisel.id(basePath);
-            ResourceLocation edgeTexture = Chisel.id(basePath);
-
-            ironBarsVanillaStyle(prov, block, name, barsTexture, edgeTexture);
+            Material barsTex = mat(basePath);
+            TextureMapping mapping = new TextureMapping()
+                    .put(TextureSlot.BARS, barsTex)
+                    .put(TextureSlot.EDGE, barsTex);
+            createBarsMultipart(block, mapping, blockModels);
+            registerFlatBlockItemFromTexture(block, barsTex, blockModels);
         };
     }
 
-    /**
-     * Creates iron bars blockstate using vanilla-style multipart with post_ends, post, cap, side models.
-     * This matches exactly how vanilla handles iron bars.
-     */
-    private static void ironBarsVanillaStyle(BlockStateProvider prov, Block block, String name,
-                                              ResourceLocation barsTexture, ResourceLocation edgeTexture) {
-        MultiPartBlockStateBuilder builder = prov.getMultipartBuilder(block);
+    private static void createBarsMultipart(Block block, TextureMapping mapping, BlockModelGenerators blockModels) {
+        MultiVariant postEnds = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.BARS_POST_ENDS.create(block, mapping, blockModels.modelOutput));
+        MultiVariant post = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.BARS_POST.create(block, mapping, blockModels.modelOutput));
+        MultiVariant cap = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.BARS_CAP.create(block, mapping, blockModels.modelOutput));
+        MultiVariant capAlt = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.BARS_CAP_ALT.create(block, mapping, blockModels.modelOutput));
+        MultiVariant side = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.BARS_POST_SIDE.create(block, mapping, blockModels.modelOutput));
+        MultiVariant sideAlt = BlockModelGeneratorsAccessor.chisel$plainVariant(
+                ModelTemplates.BARS_POST_SIDE_ALT.create(block, mapping, blockModels.modelOutput));
 
-        var postEndsModel = prov.models()
-                .withExistingParent(name + "_post_ends", ResourceLocation.withDefaultNamespace("block/iron_bars_post_ends"))
-                .texture("particle", barsTexture)
-                .texture("edge", edgeTexture)
-                .renderType("cutout");
-        builder.part().modelFile(postEndsModel).addModel().end();
-
-        var postModel = prov.models()
-                .withExistingParent(name + "_post", ResourceLocation.withDefaultNamespace("block/iron_bars_post"))
-                .texture("particle", barsTexture)
-                .texture("bars", barsTexture)
-                .renderType("cutout");
-        builder.part().modelFile(postModel).addModel()
-                .condition(CrossCollisionBlock.NORTH, false)
-                .condition(CrossCollisionBlock.EAST, false)
-                .condition(CrossCollisionBlock.SOUTH, false)
-                .condition(CrossCollisionBlock.WEST, false)
-                .end();
-
-        var capModel = prov.models()
-                .withExistingParent(name + "_cap", ResourceLocation.withDefaultNamespace("block/iron_bars_cap"))
-                .texture("particle", barsTexture)
-                .texture("bars", barsTexture)
-                .texture("edge", edgeTexture)
-                .renderType("cutout");
-        var capAltModel = prov.models()
-                .withExistingParent(name + "_cap_alt", ResourceLocation.withDefaultNamespace("block/iron_bars_cap_alt"))
-                .texture("particle", barsTexture)
-                .texture("bars", barsTexture)
-                .texture("edge", edgeTexture)
-                .renderType("cutout");
-
-        builder.part().modelFile(capModel).addModel()
-                .condition(CrossCollisionBlock.NORTH, true)
-                .condition(CrossCollisionBlock.EAST, false)
-                .condition(CrossCollisionBlock.SOUTH, false)
-                .condition(CrossCollisionBlock.WEST, false)
-                .end();
-
-        builder.part().modelFile(capModel).rotationY(90).addModel()
-                .condition(CrossCollisionBlock.NORTH, false)
-                .condition(CrossCollisionBlock.EAST, true)
-                .condition(CrossCollisionBlock.SOUTH, false)
-                .condition(CrossCollisionBlock.WEST, false)
-                .end();
-
-        builder.part().modelFile(capAltModel).addModel()
-                .condition(CrossCollisionBlock.NORTH, false)
-                .condition(CrossCollisionBlock.EAST, false)
-                .condition(CrossCollisionBlock.SOUTH, true)
-                .condition(CrossCollisionBlock.WEST, false)
-                .end();
-
-        builder.part().modelFile(capAltModel).rotationY(90).addModel()
-                .condition(CrossCollisionBlock.NORTH, false)
-                .condition(CrossCollisionBlock.EAST, false)
-                .condition(CrossCollisionBlock.SOUTH, false)
-                .condition(CrossCollisionBlock.WEST, true)
-                .end();
-
-        var sideModel = prov.models()
-                .withExistingParent(name + "_side", ResourceLocation.withDefaultNamespace("block/iron_bars_side"))
-                .texture("particle", barsTexture)
-                .texture("bars", barsTexture)
-                .texture("edge", edgeTexture)
-                .renderType("cutout");
-        var sideAltModel = prov.models()
-                .withExistingParent(name + "_side_alt", ResourceLocation.withDefaultNamespace("block/iron_bars_side_alt"))
-                .texture("particle", barsTexture)
-                .texture("bars", barsTexture)
-                .texture("edge", edgeTexture)
-                .renderType("cutout");
-
-        builder.part().modelFile(sideModel).addModel()
-                .condition(CrossCollisionBlock.NORTH, true).end();
-
-        builder.part().modelFile(sideModel).rotationY(90).addModel()
-                .condition(CrossCollisionBlock.EAST, true).end();
-
-        builder.part().modelFile(sideAltModel).addModel()
-                .condition(CrossCollisionBlock.SOUTH, true).end();
-
-        builder.part().modelFile(sideAltModel).rotationY(90).addModel()
-                .condition(CrossCollisionBlock.WEST, true).end();
+        blockModels.blockStateOutput.accept(
+                MultiPartGenerator.multiPart(block)
+                        .with(postEnds)
+                        .with(new ConditionBuilder()
+                                .term(BlockStateProperties.NORTH, false)
+                                .term(BlockStateProperties.EAST, false)
+                                .term(BlockStateProperties.SOUTH, false)
+                                .term(BlockStateProperties.WEST, false), post)
+                        .with(new ConditionBuilder()
+                                .term(BlockStateProperties.NORTH, true)
+                                .term(BlockStateProperties.EAST, false)
+                                .term(BlockStateProperties.SOUTH, false)
+                                .term(BlockStateProperties.WEST, false), cap)
+                        .with(new ConditionBuilder()
+                                .term(BlockStateProperties.NORTH, false)
+                                .term(BlockStateProperties.EAST, true)
+                                .term(BlockStateProperties.SOUTH, false)
+                                .term(BlockStateProperties.WEST, false), cap.with(BlockModelGenerators.Y_ROT_90))
+                        .with(new ConditionBuilder()
+                                .term(BlockStateProperties.NORTH, false)
+                                .term(BlockStateProperties.EAST, false)
+                                .term(BlockStateProperties.SOUTH, true)
+                                .term(BlockStateProperties.WEST, false), capAlt)
+                        .with(new ConditionBuilder()
+                                .term(BlockStateProperties.NORTH, false)
+                                .term(BlockStateProperties.EAST, false)
+                                .term(BlockStateProperties.SOUTH, false)
+                                .term(BlockStateProperties.WEST, true), capAlt.with(BlockModelGenerators.Y_ROT_90))
+                        .with(new ConditionBuilder().term(BlockStateProperties.NORTH, true), side)
+                        .with(new ConditionBuilder().term(BlockStateProperties.EAST, true), side.with(BlockModelGenerators.Y_ROT_90))
+                        .with(new ConditionBuilder().term(BlockStateProperties.SOUTH, true), sideAlt)
+                        .with(new ConditionBuilder().term(BlockStateProperties.WEST, true), sideAlt.with(BlockModelGenerators.Y_ROT_90))
+        );
     }
 
-    /**
-     * Wool CTM model template - full cube with connected textures.
-     * Uses cube_ctm model with all + connected_tex textures.
-     */
-    public static ModelTemplate woolCtm() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
+    public static ChiselModelTemplate woolCtm() {
+        return (block, blockModels) -> {
             String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models()
-                    .withExistingParent(modelName, Chisel.id("cube_ctm"))
-                    .texture("all", Chisel.id(texPath))
-                    .texture("connected_tex", Chisel.id(texPath + "-ctm")));
+            TextureSlot allSlot = TextureSlot.ALL;
+            TextureSlot ctmSlot = slot("connected_tex");
+            TextureMapping mapping = new TextureMapping()
+                    .put(allSlot, mat(texPath))
+                    .put(ctmSlot, mat(texPath + "-ctm"));
+            Identifier model = parentModel(block, Chisel.id("block/cube_ctm"), mapping, blockModels, allSlot, ctmSlot);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    /**
-     * Carpet CTM model template - thin 1-pixel carpet with connected textures.
-     * Uses wool textures based on the carpet color and variant.
-     */
-    public static ModelTemplate carpetCtm() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
-            // Carpet textures reuse wool textures: carpet/{color}/{variant} -> wool/{color}/{variant}
+    public static ChiselModelTemplate carpetCtm() {
+        return (block, blockModels) -> {
             String texPath = "block/" + texturePath(block).replace("carpet/", "wool/");
-            prov.simpleBlock(block, prov.models()
-                    .withExistingParent(modelName, Chisel.id("block/carpet_ctm"))
-                    .texture("all", Chisel.id(texPath))
-                    .texture("all_ctm", Chisel.id(texPath + "-ctm")));
+            TextureSlot allSlot = TextureSlot.ALL;
+            TextureSlot ctmSlot = slot("all_ctm");
+            TextureMapping mapping = new TextureMapping()
+                    .put(allSlot, mat(texPath))
+                    .put(ctmSlot, mat(texPath + "-ctm"));
+            Identifier model = parentModel(block, Chisel.id("block/carpet_ctm"), mapping, blockModels, allSlot, ctmSlot);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    /**
-     * Mysterious Cube model template - two-layer cube with animated core and fullbright frame overlay.
-     * Based on AE2 Mysterious Cube from Chisel Chipped Integration.
-     */
-    public static ModelTemplate mysteriousCube() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
+    public static ChiselModelTemplate mysteriousCube() {
+        return (block, blockModels) -> {
             String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models()
-                    .withExistingParent(modelName, Chisel.id("block/futura/mysterious_cube_base"))
-                    .texture("core", Chisel.id(replaceVariant(texPath, "mysterious_cube_core")))
-                    .texture("side", Chisel.id(replaceVariant(texPath, "mysterious_cube_side")))
-                    .texture("top", Chisel.id(replaceVariant(texPath, "mysterious_cube_top")))
-                    .texture("bottom", Chisel.id(replaceVariant(texPath, "mysterious_cube_bottom")))
-                    .renderType("cutout"));
+            TextureSlot core = slot("core");
+            TextureSlot side = slot("side");
+            TextureSlot top = slot("top");
+            TextureSlot bottom = slot("bottom");
+            TextureMapping mapping = new TextureMapping()
+                    .put(core, mat(replaceVariant(texPath, "mysterious_cube_core")))
+                    .put(side, mat(replaceVariant(texPath, "mysterious_cube_side")))
+                    .put(top, mat(replaceVariant(texPath, "mysterious_cube_top")))
+                    .put(bottom, mat(replaceVariant(texPath, "mysterious_cube_bottom")));
+            Identifier model = parentModel(block, Chisel.id("block/futura/mysterious_cube_base"), mapping, blockModels, core, side, top, bottom);
+            simpleBlockState(block, model, blockModels);
         };
     }
 
-    /**
-     * AE2 Controller model template - two-layer cube with animated lights overlay.
-     * Based on AE2 ME Controller block.
-     */
-    public static ModelTemplate ae2Controller() {
-        return (prov, block) -> {
-            String modelName = "block/" + name(block);
+    public static ChiselModelTemplate ae2Controller() {
+        return (block, blockModels) -> {
             String texPath = "block/" + texturePath(block);
-            prov.simpleBlock(block, prov.models()
-                    .withExistingParent(modelName, Chisel.id("block/futura/ae2_controller_base"))
-                    .texture("block", Chisel.id(replaceVariant(texPath, "ae2_controller")))
-                    .texture("lights", Chisel.id(replaceVariant(texPath, "ae2_controller_lights")))
-                    .renderType("cutout"));
+            TextureSlot blockTex = slot("block");
+            TextureSlot lights = slot("lights");
+            TextureMapping mapping = new TextureMapping()
+                    .put(blockTex, mat(replaceVariant(texPath, "ae2_controller")))
+                    .put(lights, mat(replaceVariant(texPath, "ae2_controller_lights")));
+            Identifier model = parentModel(block, Chisel.id("block/futura/ae2_controller_base"), mapping, blockModels, blockTex, lights);
+            simpleBlockState(block, model, blockModels);
         };
     }
 }

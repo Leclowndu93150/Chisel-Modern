@@ -1,27 +1,19 @@
 package com.leclowndu93150.chisel.api.chunkdata;
 
+import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.leclowndu93150.chisel.mixin.RenderChunkRegionAccessor;
-import net.minecraft.client.renderer.chunk.RenderChunkRegion;
+import net.minecraft.client.renderer.chunk.RenderSectionRegion;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 public class ChunkData {
 
     public static final String NBT_KEY = "chisel:offset_data";
 
     private static final IOffsetData DUMMY = pos -> BlockPos.ZERO;
-    private static final Map<LevelChunkKey, OffsetData> serverDataCache = new ConcurrentHashMap<>();
-    private static final Map<LevelChunkKey, OffsetData> clientDataCache = new ConcurrentHashMap<>();
-
-    private static Map<LevelChunkKey, OffsetData> getCache(Level level) {
-        return level.isClientSide() ? clientDataCache : serverDataCache;
-    }
 
     public static IOffsetData getOffsetData(BlockAndTintGetter world, BlockPos pos) {
         if (world == null || pos == null) {
@@ -32,7 +24,7 @@ public class ChunkData {
 
         if (world instanceof Level lvl) {
             level = lvl;
-        } else if (world instanceof RenderChunkRegion region) {
+        } else if (world instanceof RenderSectionRegion region) {
             level = ((RenderChunkRegionAccessor) region).chisel$getLevel();
         }
 
@@ -40,52 +32,42 @@ public class ChunkData {
             return DUMMY;
         }
 
-        ChunkPos chunkPos = new ChunkPos(pos);
-        LevelChunkKey key = getKey(level, chunkPos);
+        ChunkAccess chunk = level.getChunk(pos);
+        if (chunk == null) {
+            return DUMMY;
+        }
 
-        OffsetData data = getCache(level).get(key);
-        return data != null ? data : DUMMY;
+        if (chunk.hasData(ChiselRegistries.OFFSET_DATA.get())) {
+            return chunk.getData(ChiselRegistries.OFFSET_DATA.get());
+        }
+
+        return DUMMY;
     }
 
     public static OffsetData getOrCreateData(Level level, ChunkPos chunkPos) {
-        LevelChunkKey key = getKey(level, chunkPos);
-        return getCache(level).computeIfAbsent(key, k -> new OffsetData());
+        ChunkAccess chunk = level.getChunk(chunkPos.x(), chunkPos.z());
+        return chunk.getData(ChiselRegistries.OFFSET_DATA.get());
     }
 
     public static OffsetData getData(Level level, ChunkPos chunkPos) {
-        LevelChunkKey key = getKey(level, chunkPos);
-        return getCache(level).get(key);
+        ChunkAccess chunk = level.getChunk(chunkPos.x(), chunkPos.z());
+        if (chunk.hasData(ChiselRegistries.OFFSET_DATA.get())) {
+            return chunk.getData(ChiselRegistries.OFFSET_DATA.get());
+        }
+        return null;
     }
 
     public static void setData(Level level, ChunkPos chunkPos, OffsetData data) {
-        LevelChunkKey key = getKey(level, chunkPos);
+        ChunkAccess chunk = level.getChunk(chunkPos.x(), chunkPos.z());
         if (data == null || data.isEmpty()) {
-            getCache(level).remove(key);
+            chunk.removeData(ChiselRegistries.OFFSET_DATA.get());
         } else {
-            getCache(level).put(key, data);
+            chunk.setData(ChiselRegistries.OFFSET_DATA.get(), data);
         }
     }
 
     public static void removeData(Level level, ChunkPos chunkPos) {
-        LevelChunkKey key = getKey(level, chunkPos);
-        getCache(level).remove(key);
-    }
-
-    public static void clearDataForLevel(Level level) {
-        Map<LevelChunkKey, OffsetData> cache = getCache(level);
-        ResourceKey<Level> dimension = level.dimension();
-        cache.keySet().removeIf(key -> key.dimension().equals(dimension));
-    }
-
-    public static void clearAll() {
-        serverDataCache.clear();
-        clientDataCache.clear();
-    }
-
-    private static LevelChunkKey getKey(Level level, ChunkPos pos) {
-        return new LevelChunkKey(level.dimension(), pos.toLong());
-    }
-
-    private record LevelChunkKey(ResourceKey<Level> dimension, long chunkPos) {
+        ChunkAccess chunk = level.getChunk(chunkPos.x(), chunkPos.z());
+        chunk.removeData(ChiselRegistries.OFFSET_DATA.get());
     }
 }

@@ -4,28 +4,24 @@ import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.data.ItemTagsProvider;
 import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Data provider for generating item tag JSON files.
- */
 public class ChiselItemTagsProvider extends ItemTagsProvider {
 
-    public ChiselItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider,
-                                  CompletableFuture<TagLookup<Block>> blockTags, ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, blockTags, Chisel.MODID, existingFileHelper);
+    public ChiselItemTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, Chisel.MODID);
     }
 
     @Override
@@ -33,14 +29,14 @@ public class ChiselItemTagsProvider extends ItemTagsProvider {
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             TagKey<Item> carvingItemTag = ItemTags.create(Chisel.id("carving/" + blockType.getName().replace("/", "_")));
 
-            IntrinsicTagAppender<Item> tagBuilder = tag(carvingItemTag);
+            TagAppender<Item, Item> tagBuilder = tag(carvingItemTag);
 
             for (DeferredItem<BlockItem> item : blockType.getAllItems()) {
                 tagBuilder.add(item.get());
             }
 
-            for (ResourceLocation vanillaId : blockType.getVanillaBlocks()) {
-                tagBuilder.addOptional(vanillaId);
+            for (Identifier vanillaId : blockType.getVanillaBlocks()) {
+                getOrCreateRawBuilder(carvingItemTag).addOptionalElement(vanillaId);
             }
 
             for (TagKey<Block> sourceBlockTag : blockType.getSourceBlockTags()) {
@@ -49,7 +45,7 @@ public class ChiselItemTagsProvider extends ItemTagsProvider {
             }
 
             for (TagKey<Item> itemTag : blockType.getItemTags()) {
-                IntrinsicTagAppender<Item> itemTagBuilder = tag(itemTag);
+                TagAppender<Item, Item> itemTagBuilder = tag(itemTag);
                 for (DeferredItem<BlockItem> item : blockType.getAllItems()) {
                     itemTagBuilder.add(item.get());
                 }

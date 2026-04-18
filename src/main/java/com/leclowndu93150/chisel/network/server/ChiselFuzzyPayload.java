@@ -36,9 +36,9 @@ public record ChiselFuzzyPayload(int slot) implements CustomPacketPayload {
                 if (stack.getItem() instanceof IChiselItem chiselItem) {
                     boolean newState = chiselItem.toggleFuzzyMode(stack);
                     if (newState) {
-                        player.displayClientMessage(Component.translatable("chisel.message.fuzzy_enabled"), true);
+                        player.sendOverlayMessage(Component.translatable("chisel.message.fuzzy_enabled"));
                     } else {
-                        player.displayClientMessage(Component.translatable("chisel.message.fuzzy_disabled"), true);
+                        player.sendOverlayMessage(Component.translatable("chisel.message.fuzzy_disabled"));
                     }
                 }
             }

@@ -49,6 +49,10 @@ public class ChiselController {
 
     @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        if (event.getAction() != PlayerInteractEvent.LeftClickBlock.Action.START) {
+            return;
+        }
+
         Player player = event.getEntity();
         ItemStack held = event.getItemStack();
 
@@ -77,12 +81,24 @@ public class ChiselController {
 
         if (!target.isEmpty()) {
             TagKey<Item> targetGroup = CarvingHelper.getCarvingGroupForItem(target);
-            if (blockGroup.equals(targetGroup)) {
-                Block targetBlock = Block.byItem(target.getItem());
-                if (targetBlock != null) {
-                    setAll(candidates, player, state, targetBlock, held, event.getHand(), fuzzy);
-                    event.setCanceled(true);
+            if (!blockGroup.equals(targetGroup)) {
+                if (level.isClientSide()) {
+                    player.sendOverlayMessage(Component.translatable("chisel.message.wrong_group", target.getHoverName()));
                 }
+                event.setCanceled(true);
+                return;
+            }
+            Block targetBlock = Block.byItem(target.getItem());
+            if (targetBlock != null) {
+                if (state.getBlock() == targetBlock) {
+                    if (level.isClientSide()) {
+                        player.sendOverlayMessage(Component.translatable("chisel.message.already_target"));
+                    }
+                    event.setCanceled(true);
+                    return;
+                }
+                setAll(candidates, player, state, targetBlock, held, event.getHand(), fuzzy);
+                event.setCanceled(true);
             }
         } else {
             List<Item> variations = CarvingHelper.getItemsInGroup(blockGroup);
@@ -125,10 +141,10 @@ public class ChiselController {
         int cooldown = ChiselConfig.carvingCooldownTicks;
         long lastClick = CLICK_CACHE.getUnchecked(player);
         if (lastClick > time - cooldown) {
-            if (player.level().isClientSide) {
+            if (player.level().isClientSide()) {
                 long ticksRemaining = cooldown - (time - lastClick);
                 double secondsRemaining = ticksRemaining / 20.0;
-                player.displayClientMessage(Component.translatable("chisel.message.cooldown", String.format("%.1f", secondsRemaining)), true);
+                player.sendOverlayMessage(Component.translatable("chisel.message.cooldown", String.format("%.1f", secondsRemaining)));
             }
             return false;
         }
@@ -163,11 +179,11 @@ public class ChiselController {
 
             if (chiselStack.isEmpty() || chiselStack.getCount() <= 0) {
                 ItemStack targetItem = chisel.getTarget(chiselStack);
-                player.getInventory().setItem(player.getInventory().selected, targetItem.isEmpty() ? ItemStack.EMPTY : targetItem);
+                player.getInventory().setItem(player.getInventory().getSelectedSlot(), targetItem.isEmpty() ? ItemStack.EMPTY : targetItem);
                 return;
             }
 
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 CarvingHelper.playChiselSound(level, player, targetBlock);
                 level.levelEvent(player, LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(curState));
             }

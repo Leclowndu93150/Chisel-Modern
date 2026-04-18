@@ -13,7 +13,9 @@ import com.leclowndu93150.chisel.block.BlockHolystone;
 import com.leclowndu93150.chisel.client.sound.ChiselSoundTypes;
 import com.leclowndu93150.chisel.data.ChiselModelTemplates;
 import com.leclowndu93150.chisel.data.VariantTemplates;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
@@ -38,7 +40,7 @@ public class ChiselBlocks {
      * This allows modded metal blocks to be automatically included in chisel groups.
      */
     private static TagKey<Block> storageBlockTag(String metalName) {
-        return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/" + metalName));
+        return BlockTags.create(Identifier.fromNamespaceAndPath("c", "storage_blocks/" + metalName));
     }
 
     public static final ChiselBlockType<BlockCarvable> ALUMINUM = registerType(
@@ -752,7 +754,7 @@ public class ChiselBlocks {
                     .sound(ChiselSoundTypes.METAL_SUPPLIER)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_STONE_TOOL)
-                    .carvingGroup(BlockTags.create(ResourceLocation.fromNamespaceAndPath("chisel", "carving/technical")))
+                    .carvingGroup(BlockTags.create(Identifier.fromNamespaceAndPath("chisel", "carving/technical")))
                     .variation("scaffoldtransparent", "Rusty Scaffold", simpleBlockCutout())
                     .variation("fanfasttransparent", "Fan (Fast)", cubeColumnCutout())
                     .variation("fanstilltransparent", "Fan (Still)", cubeColumnCutout())
@@ -1531,7 +1533,8 @@ public class ChiselBlocks {
     }
 
     public static final DeferredBlock<BlockAutoChisel> AUTO_CHISEL = ChiselRegistries.BLOCKS.register("auto_chisel",
-            () -> new BlockAutoChisel(BlockBehaviour.Properties.of()
+            key -> new BlockAutoChisel(BlockBehaviour.Properties.of()
+                    .setId(ResourceKey.create(Registries.BLOCK, key))
                     .mapColor(MapColor.METAL)
                     .strength(2.5F)
                     .sound(SoundType.METAL)

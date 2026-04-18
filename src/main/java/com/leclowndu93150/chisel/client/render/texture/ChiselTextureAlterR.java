@@ -2,7 +2,7 @@ package com.leclowndu93150.chisel.client.render.texture;
 
 import com.leclowndu93150.chisel.client.render.ctx.BlockRenderContextAlterR;
 import com.leclowndu93150.chisel.client.render.type.BlockRenderTypeAlterR;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import team.chisel.ctm.api.texture.ISubmap;
 import team.chisel.ctm.api.texture.ITextureContext;
 import team.chisel.ctm.api.util.TextureInfo;

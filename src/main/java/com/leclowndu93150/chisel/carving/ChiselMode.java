@@ -48,7 +48,7 @@ public enum ChiselMode implements IChiselMode {
             if (side.getAxisDirection() == AxisDirection.NEGATIVE) {
                 side = side.getOpposite();
             }
-            Vec3i offset = side.getNormal();
+            Vec3i offset = side.getUnitVec3i();
             return filteredIterable(
                     BlockPos.betweenClosedStream(NEG_ONE.offset(offset).offset(pos), ONE.subtract(offset).offset(pos)),
                     player.level(),
@@ -192,7 +192,7 @@ public enum ChiselMode implements IChiselMode {
             case SINGLE -> Collections.singleton(pos);
             case PANEL -> {
                 Direction effectiveSide = side.getAxisDirection() == AxisDirection.NEGATIVE ? side.getOpposite() : side;
-                Vec3i offset = effectiveSide.getNormal();
+                Vec3i offset = effectiveSide.getUnitVec3i();
                 BlockPos one = new BlockPos(1, 1, 1);
                 BlockPos negOne = new BlockPos(-1, -1, -1);
                 yield filteredIterable(

@@ -7,27 +7,27 @@ import com.leclowndu93150.chisel.inventory.ChiselMenu;
 import com.leclowndu93150.chisel.item.ItemChisel;
 import com.leclowndu93150.chisel.network.server.ChiselModePayload;
 import com.leclowndu93150.chisel.network.server.ChiselScrollPayload;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.List;
 
 public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
 
-    private static final ResourceLocation TEXTURE = Chisel.id("textures/gui/chisel2gui.png");
+    private static final Identifier TEXTURE = Chisel.id("textures/gui/chisel2gui.png");
     public static final int GUI_WIDTH = 252;
     public static final int GUI_HEIGHT = 202;
 
@@ -41,9 +41,7 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
     private double scrollbarDragOffset = 0;
 
     public ChiselScreen(ChiselMenu menu, Inventory playerInv, Component title) {
-        super(menu, playerInv, title);
-        this.imageWidth = GUI_WIDTH;
-        this.imageHeight = GUI_HEIGHT;
+        super(menu, playerInv, title, GUI_WIDTH, GUI_HEIGHT);
     }
 
     @Override
@@ -110,20 +108,19 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
         if (chisel.getItem() instanceof ItemChisel itemChisel) {
             itemChisel.setMode(chisel, mode);
             int slot = menu.getHand() == InteractionHand.MAIN_HAND
-                    ? minecraft.player.getInventory().selected
+                    ? minecraft.player.getInventory().getSelectedSlot()
                     : 40; // Offhand slot
-            PacketDistributor.sendToServer(new ChiselModePayload(slot, mode));
+            ClientPacketDistributor.sendToServer(new ChiselModePayload(slot, mode));
         }
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight);
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
 
         Slot inputSlot = menu.getInputSlot();
         if (inputSlot.getItem().isEmpty()) {
-            graphics.blit(TEXTURE, leftPos + inputSlot.x - 16, topPos + inputSlot.y - 16, 0, imageHeight, 48, 48);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, leftPos + inputSlot.x - 16, topPos + inputSlot.y - 16, 0, imageHeight, 48, 48, 256, 256);
         }
 
         if (menu.canScroll()) {
@@ -131,7 +128,7 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
         }
     }
 
-    private void renderScrollbar(GuiGraphics graphics, int mouseX, int mouseY) {
+    private void renderScrollbar(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int x = leftPos + SCROLLBAR_X;
         int y = topPos + SCROLLBAR_Y;
 
@@ -153,27 +150,24 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTick);
-        super.render(graphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(graphics, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+        this.extractTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         List<FormattedCharSequence> lines = font.split(title, 40);
         int y = 60;
         for (FormattedCharSequence s : lines) {
-            graphics.drawString(font, s, 32 - font.width(s) / 2, y, 0x404040, false);
+            graphics.text(font, s, 32 - font.width(s) / 2, y, 0x404040, false);
             y += 10;
         }
 
         drawButtonTooltips(graphics, mouseX, mouseY);
     }
 
-    protected void drawButtonTooltips(GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void drawButtonTooltips(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         for (Renderable widget : renderables) {
             if (widget instanceof ButtonChiselMode button && button.isHovered()) {
                 IChiselMode mode = button.getMode();
@@ -181,7 +175,7 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
                         mode.getLocalizedName(),
                         mode.getLocalizedDescription().copy().withStyle(ChatFormatting.GRAY)
                 );
-                graphics.renderComponentTooltip(font, ttLines, mouseX - leftPos, mouseY - topPos);
+                graphics.setComponentTooltipForNextFrame(font, ttLines, mouseX - leftPos, mouseY - topPos);
             }
         }
     }
@@ -196,34 +190,34 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
     }
 
     @Override
-    protected void renderSlot(GuiGraphics graphics, Slot slot) {
+    protected void extractSlot(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY) {
         if (slot == menu.getInputSlot()) {
-            PoseStack poseStack = graphics.pose();
-            poseStack.pushPose();
+            var pose = graphics.pose();
+            pose.pushMatrix();
 
             float centerX = slot.x + 8;
             float centerY = slot.y + 8;
 
-            poseStack.translate(centerX, centerY, 0);
-            poseStack.scale(2.0f, 2.0f, 1.0f);
-            poseStack.translate(-centerX, -centerY, 0);
+            pose.translate(centerX, centerY);
+            pose.scale(2.0f, 2.0f);
+            pose.translate(-centerX, -centerY);
 
-            super.renderSlot(graphics, slot);
+            super.extractSlot(graphics, slot, mouseX, mouseY);
 
-            poseStack.popPose();
+            pose.popMatrix();
         } else {
-            super.renderSlot(graphics, slot);
+            super.extractSlot(graphics, slot, mouseX, mouseY);
         }
     }
 
     @Override
-    protected void renderTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
-        super.renderTooltip(graphics, mouseX, mouseY);
+    protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        super.extractTooltip(graphics, mouseX, mouseY);
     }
 
     private void scrollTo(int row) {
         menu.setScrollRow(row);
-        PacketDistributor.sendToServer(new ChiselScrollPayload(menu.getScrollRow()));
+        ClientPacketDistributor.sendToServer(new ChiselScrollPayload(menu.getScrollRow()));
     }
 
     @Override
@@ -236,7 +230,10 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x();
+        double mouseY = event.y();
+        int button = event.button();
         if (menu.canScroll() && button == 0) {
             int x = leftPos + SCROLLBAR_X;
             int y = topPos + SCROLLBAR_Y;
@@ -258,25 +255,25 @@ public class ChiselScreen extends AbstractContainerScreen<ChiselMenu> {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(MouseButtonEvent event) {
         if (scrollbarDragging) {
             scrollbarDragging = false;
             return true;
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
         if (scrollbarDragging) {
-            updateScrollFromMouse(mouseY);
+            updateScrollFromMouse(event.y());
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(event, dragX, dragY);
     }
 
     private void updateScrollFromMouse(double mouseY) {

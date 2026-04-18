@@ -3,11 +3,11 @@ package com.leclowndu93150.chisel.carving;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.ChiselSound;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
-import com.leclowndu93150.chisel.compat.kubejs.KubeJSCompat;
+// import com.leclowndu93150.chisel.compat.kubejs.KubeJSCompat;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -38,25 +38,24 @@ public class CarvingHelper {
     @Nullable
     public static TagKey<Block> getCarvingGroup(BlockState state) {
         Block block = state.getBlock();
-        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
+        Identifier blockId = BuiltInRegistries.BLOCK.getKey(block);
 
-        for (ResourceLocation tagId : BuiltInRegistries.BLOCK.getTagNames()
-                .filter(tag -> tag.location().getNamespace().equals(Chisel.MODID) && tag.location().getPath().startsWith("carving/"))
-                .map(TagKey::location)
+        for (TagKey<Block> tag : BuiltInRegistries.BLOCK.getTags()
+                .filter(named -> named.key().location().getNamespace().equals(Chisel.MODID) && named.key().location().getPath().startsWith("carving/"))
+                .map(named -> named.key())
                 .toList()) {
-            TagKey<Block> tag = BlockTags.create(tagId);
             if (state.is(tag)) {
-                Boolean include = KubeJSCompat.shouldIncludeBlock(tag, block);
-                if (include == null || include) {
+                // Boolean include = KubeJSCompat.shouldIncludeBlock(tag, block);
+                // if (include == null || include) {
                     return tag;
-                }
+                // }
             }
         }
 
-        TagKey<Block> kubeGroup = KubeJSCompat.getGroupForBlock(block);
-        if (kubeGroup != null) {
-            return kubeGroup;
-        }
+        // TagKey<Block> kubeGroup = KubeJSCompat.getGroupForBlock(block);
+        // if (kubeGroup != null) {
+        //     return kubeGroup;
+        // }
 
         return null;
     }
@@ -68,28 +67,27 @@ public class CarvingHelper {
     public static TagKey<Item> getCarvingGroupForItem(ItemStack stack) {
         Item item = stack.getItem();
 
-        for (ResourceLocation tagId : BuiltInRegistries.ITEM.getTagNames()
-                .filter(tag -> tag.location().getNamespace().equals(Chisel.MODID) && tag.location().getPath().startsWith("carving/"))
-                .map(TagKey::location)
+        for (TagKey<Item> tag : BuiltInRegistries.ITEM.getTags()
+                .filter(named -> named.key().location().getNamespace().equals(Chisel.MODID) && named.key().location().getPath().startsWith("carving/"))
+                .map(named -> named.key())
                 .toList()) {
-            TagKey<Item> tag = ItemTags.create(tagId);
             if (stack.is(tag)) {
-                Block block = Block.byItem(item);
-                TagKey<Block> blockTag = BlockTags.create(tagId);
-                Boolean include = KubeJSCompat.shouldIncludeBlock(blockTag, block);
-                if (include == null || include) {
+                // Block block = Block.byItem(item);
+                // TagKey<Block> blockTag = BlockTags.create(tagId);
+                // Boolean include = KubeJSCompat.shouldIncludeBlock(blockTag, block);
+                // if (include == null || include) {
                     return tag;
-                }
+                // }
             }
         }
 
-        Block block = Block.byItem(item);
-        if (block != null) {
-            TagKey<Block> kubeGroup = KubeJSCompat.getGroupForBlock(block);
-            if (kubeGroup != null) {
-                return TagKey.create(Registries.ITEM, kubeGroup.location());
-            }
-        }
+        // Block block = Block.byItem(item);
+        // if (block != null) {
+        //     TagKey<Block> kubeGroup = KubeJSCompat.getGroupForBlock(block);
+        //     if (kubeGroup != null) {
+        //         return TagKey.create(Registries.ITEM, kubeGroup.location());
+        //     }
+        // }
 
         return null;
     }
@@ -101,22 +99,22 @@ public class CarvingHelper {
     public static List<Block> getBlocksInGroup(TagKey<Block> groupTag) {
         List<Block> blocks = new ArrayList<>();
 
-        BuiltInRegistries.BLOCK.getTag(groupTag).ifPresent(tag -> {
+        BuiltInRegistries.BLOCK.get(groupTag).ifPresent(tag -> {
             tag.forEach(holder -> {
                 Block block = holder.value();
-                Boolean include = KubeJSCompat.shouldIncludeBlock(groupTag, block);
-                if (include == null || include) {
+                // Boolean include = KubeJSCompat.shouldIncludeBlock(groupTag, block);
+                // if (include == null || include) {
                     blocks.add(block);
-                }
+                // }
             });
         });
 
-        for (ResourceLocation blockId : KubeJSCompat.getAdditionalBlocks(groupTag)) {
-            Block block = BuiltInRegistries.BLOCK.get(blockId);
-            if (block != null && !blocks.contains(block)) {
-                blocks.add(block);
-            }
-        }
+        // for (Identifier blockId : KubeJSCompat.getAdditionalBlocks(groupTag)) {
+        //     Block block = BuiltInRegistries.BLOCK.get(blockId);
+        //     if (block != null && !blocks.contains(block)) {
+        //         blocks.add(block);
+        //     }
+        // }
 
         return blocks;
     }
@@ -129,26 +127,26 @@ public class CarvingHelper {
         TagKey<Block> blockTag = TagKey.create(Registries.BLOCK, groupTag.location());
 
         List<Item> items = new ArrayList<>();
-        BuiltInRegistries.ITEM.getTag(groupTag).ifPresent(tag -> {
+        BuiltInRegistries.ITEM.get(groupTag).ifPresent(tag -> {
             tag.forEach(holder -> {
                 Item item = holder.value();
-                Block block = Block.byItem(item);
-                Boolean include = KubeJSCompat.shouldIncludeBlock(blockTag, block);
-                if (include == null || include) {
+                // Block block = Block.byItem(item);
+                // Boolean include = KubeJSCompat.shouldIncludeBlock(blockTag, block);
+                // if (include == null || include) {
                     items.add(item);
-                }
+                // }
             });
         });
 
-        for (ResourceLocation blockId : KubeJSCompat.getAdditionalBlocks(blockTag)) {
-            Block block = BuiltInRegistries.BLOCK.get(blockId);
-            if (block != null) {
-                Item item = block.asItem();
-                if (item != Items.AIR && !items.contains(item)) {
-                    items.add(item);
-                }
-            }
-        }
+        // for (Identifier blockId : KubeJSCompat.getAdditionalBlocks(blockTag)) {
+        //     Block block = BuiltInRegistries.BLOCK.get(blockId);
+        //     if (block != null) {
+        //         Item item = block.asItem();
+        //         if (item != Items.AIR && !items.contains(item)) {
+        //             items.add(item);
+        //         }
+        //     }
+        // }
 
         return items;
     }
@@ -243,7 +241,7 @@ public class CarvingHelper {
         if (chiselSound == null) {
             chiselSound = ChiselSound.FALLBACK;
         }
-        float randomValue = level.random.nextFloat();
+        float randomValue = level.getRandom().nextFloat();
         level.playSound(null, player.blockPosition(), chiselSound.getSound(),
                 SoundSource.PLAYERS, chiselSound.getVolume(randomValue), chiselSound.getPitch(randomValue));
     }

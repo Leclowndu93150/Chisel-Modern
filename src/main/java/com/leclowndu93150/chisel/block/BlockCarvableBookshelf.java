@@ -4,7 +4,7 @@ import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ICarvable;
 import com.leclowndu93150.chisel.api.block.VariationData;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,7 +37,7 @@ public class BlockCarvableBookshelf extends Block implements ICarvable {
     }
 
     @Override
-    public ResourceLocation getCarvingGroup() {
+    public Identifier getCarvingGroup() {
         return Chisel.id("carving/" + blockType);
     }
 
@@ -46,7 +46,6 @@ public class BlockCarvableBookshelf extends Block implements ICarvable {
         return blockType;
     }
 
-    @Override
     public float getEnchantPowerBonus(BlockState state, LevelReader level, BlockPos pos) {
         return 1.0F;
     }

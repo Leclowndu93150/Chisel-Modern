@@ -3,7 +3,7 @@ package com.leclowndu93150.chisel.block;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ICarvable;
 import com.leclowndu93150.chisel.api.block.VariationData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.IronBarsBlock;
 
 import javax.annotation.Nullable;
@@ -34,7 +34,7 @@ public class BlockCarvablePane extends IronBarsBlock implements ICarvable {
     }
 
     @Override
-    public ResourceLocation getCarvingGroup() {
+    public Identifier getCarvingGroup() {
         return Chisel.id("carving/" + blockType);
     }
 

@@ -10,8 +10,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,12 +26,8 @@ public class CloudInABottleEntity extends ThrowableItemProjectile {
         super(entityType, level);
     }
 
-    public CloudInABottleEntity(Level level, LivingEntity shooter) {
-        super(ChiselEntities.CLOUD_IN_A_BOTTLE.get(), shooter, level);
-    }
-
-    public CloudInABottleEntity(Level level, double x, double y, double z) {
-        super(ChiselEntities.CLOUD_IN_A_BOTTLE.get(), x, y, z, level);
+    public CloudInABottleEntity(Level level, LivingEntity shooter, ItemStack stack) {
+        super(ChiselEntities.CLOUD_IN_A_BOTTLE.get(), shooter, level, stack);
     }
 
     @Override
@@ -45,8 +42,8 @@ public class CloudInABottleEntity extends ThrowableItemProjectile {
         Level level = level();
         BlockPos hitPos = result.getBlockPos().relative(result.getDirection());
 
-        if (!level.isClientSide) {
-            generateCloud(level, level.random, hitPos.getX(), hitPos.getY(), hitPos.getZ(), 40);
+        if (!level.isClientSide()) {
+            generateCloud(level, level.getRandom(), hitPos.getX(), hitPos.getY(), hitPos.getZ(), 40);
 
             level.playSound(null, hitPos, SoundEvents.SPLASH_POTION_BREAK, SoundSource.NEUTRAL, 1.0F, 1.0F);
         }

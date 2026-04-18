@@ -10,7 +10,7 @@ import com.leclowndu93150.chisel.init.ChiselItems;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -44,27 +44,11 @@ public class ChiselItemModelProvider implements DataProvider {
                 DeferredItem<BlockItem> item = blockType.getItem(variantName);
 
                 if (item != null) {
-                    String registryPath = item.getId().getPath();
                     Block block = deferredBlock.get();
-                    JsonObject json;
+                    if (block instanceof BlockCarvablePane) continue;
 
-                    String texturePath = blockType.getName() + "/" + variantName;
-                    if (block instanceof ICarvable carvable) {
-                        texturePath = carvable.getBlockType() + "/" + carvable.getVariation().getTextureName();
-                    }
-
-                    if (block instanceof BlockCarvablePane paneBlock) {
-                        if (blockType == ChiselBlocks.IRONPANE) {
-                            String mainTexture = "chisel:block/" + texturePath;
-                            json = createGeneratedItemModel(mainTexture);
-                        } else {
-                            String sideTexture = "chisel:block/" + texturePath + "-side";
-                            json = createGeneratedItemModel(sideTexture);
-                        }
-                    } else {
-                        json = createBlockItemModel("chisel:block/" + registryPath);
-                    }
-
+                    String registryPath = item.getId().getPath();
+                    JsonObject json = createBlockItemModel("chisel:block/" + registryPath);
                     Path path = output.getOutputFolder().resolve("assets/chisel/models/item/" + registryPath + ".json");
                     futures.add(DataProvider.saveStable(cache, json, path));
                 }

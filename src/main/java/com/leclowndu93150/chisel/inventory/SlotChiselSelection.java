@@ -5,7 +5,7 @@ import com.leclowndu93150.chisel.carving.CarvingHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -107,7 +107,7 @@ public class SlotChiselSelection extends Slot {
             }
             CarvingHelper.playChiselSound(player.level(), player, targetBlock);
 
-            ClickType clickType = container.getCurrentClickType();
+            ContainerInput clickType = container.getCurrentClickType();
             if (clickType != null) {
                 switch (clickType) {
                     case PICKUP, PICKUP_ALL, QUICK_CRAFT, QUICK_MOVE -> container.setCarried(result);

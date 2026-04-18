@@ -9,7 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
@@ -46,7 +46,7 @@ public class ChiselMenu extends AbstractContainerMenu {
     protected final ItemStack chisel;
     protected SlotChiselInput inputSlot;
 
-    private ClickType currentClickType;
+    private ContainerInput currentClickType;
     private int scrollRow = 0;
 
     public static Supplier<MenuType<ChiselMenu>> MENU_TYPE_SUPPLIER;
@@ -66,7 +66,7 @@ public class ChiselMenu extends AbstractContainerMenu {
         super(type, containerId);
         this.inventoryPlayer = playerInv;
         this.hand = hand;
-        this.chiselSlot = hand == InteractionHand.MAIN_HAND ? playerInv.selected : playerInv.getContainerSize() - 1;
+        this.chiselSlot = hand == InteractionHand.MAIN_HAND ? playerInv.getSelectedSlot() : playerInv.getContainerSize() - 1;
         this.chisel = playerInv.getItem(chiselSlot);
         this.inventoryChisel = new InventoryChiselSelection(this, selectionSize);
 
@@ -113,11 +113,11 @@ public class ChiselMenu extends AbstractContainerMenu {
     protected int getHotbarTop() { return HOTBAR_TOP; }
 
     @Override
-    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-        if (clickTypeIn != ClickType.QUICK_CRAFT && slotId >= 0) {
+    public void clicked(int slotId, int dragType, ContainerInput clickTypeIn, Player player) {
+        if (clickTypeIn != ContainerInput.QUICK_CRAFT && slotId >= 0) {
             int clickedPlayerSlot = slotId - inventoryChisel.getContainerSize() - 27;
 
-            if (clickedPlayerSlot == chiselSlot || (clickTypeIn == ClickType.SWAP && dragType == chiselSlot)) {
+            if (clickedPlayerSlot == chiselSlot || (clickTypeIn == ContainerInput.SWAP && dragType == chiselSlot)) {
                 return;
             }
         }
@@ -126,7 +126,7 @@ public class ChiselMenu extends AbstractContainerMenu {
         super.clicked(slotId, dragType, clickTypeIn, player);
     }
 
-    public ClickType getCurrentClickType() {
+    public ContainerInput getCurrentClickType() {
         return currentClickType;
     }
 
@@ -265,7 +265,7 @@ public class ChiselMenu extends AbstractContainerMenu {
     }
 
     public void onChiselBroken() {
-        if (!inventoryPlayer.player.level().isClientSide) {
+        if (!inventoryPlayer.player.level().isClientSide()) {
             inventoryPlayer.player.drop(inventoryChisel.getStackInSpecialSlot(), false);
             inventoryChisel.setStackInSpecialSlot(ItemStack.EMPTY);
         }

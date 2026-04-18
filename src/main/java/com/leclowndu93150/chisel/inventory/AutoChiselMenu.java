@@ -14,9 +14,9 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 
 public class AutoChiselMenu extends AbstractContainerMenu {
 
@@ -43,10 +43,10 @@ public class AutoChiselMenu extends AbstractContainerMenu {
 
     public AutoChiselMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
         this(containerId, playerInv,
-                new ItemStackHandler(1),
-                new ItemStackHandler(1),
-                new ItemStackHandler(AutoChiselBlockEntity.INPUT_SLOTS),
-                new ItemStackHandler(AutoChiselBlockEntity.OUTPUT_SLOTS),
+                new ItemStacksResourceHandler(1),
+                new ItemStacksResourceHandler(1),
+                new ItemStacksResourceHandler(AutoChiselBlockEntity.INPUT_SLOTS),
+                new ItemStacksResourceHandler(AutoChiselBlockEntity.OUTPUT_SLOTS),
                 new SimpleContainerData(6),
                 ContainerLevelAccess.NULL);
     }
@@ -62,8 +62,8 @@ public class AutoChiselMenu extends AbstractContainerMenu {
     }
 
     public AutoChiselMenu(int containerId, Inventory playerInv,
-                          IItemHandler chisel, IItemHandler target,
-                          IItemHandler input, IItemHandler output,
+                          ItemStacksResourceHandler chisel, ItemStacksResourceHandler target,
+                          ItemStacksResourceHandler input, ItemStacksResourceHandler output,
                           ContainerData data, ContainerLevelAccess access) {
         super(ChiselMenus.AUTO_CHISEL_MENU.get(), containerId);
         this.playerInventory = playerInv;
@@ -73,7 +73,7 @@ public class AutoChiselMenu extends AbstractContainerMenu {
         int yStart = 19;
 
         chiselSlot = 0;
-        addSlot(new SlotItemHandler(chisel, 0, 80, yStart + 9) {
+        addSlot(new ResourceHandlerSlot(chisel, chisel::set, 0, 80, yStart + 9) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.getItem() instanceof IChiselItem;
@@ -81,7 +81,7 @@ public class AutoChiselMenu extends AbstractContainerMenu {
         });
 
         targetSlot = 1;
-        addSlot(new SlotItemHandler(target, 0, 80, 54 + yStart - 9) {
+        addSlot(new ResourceHandlerSlot(target, target::set, 0, 80, 54 + yStart - 9) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return CarvingHelper.canChisel(stack);
@@ -89,10 +89,10 @@ public class AutoChiselMenu extends AbstractContainerMenu {
         });
 
         beginInputSlots = slots.size();
-        for (int i = 0; i < input.getSlots(); i++) {
+        for (int i = 0; i < input.size(); i++) {
             int x = 8 + 18 * (i % 3);
             int y = yStart + 18 * (i / 3);
-            addSlot(new SlotItemHandler(input, i, x, y) {
+            addSlot(new ResourceHandlerSlot(input, input::set, i, x, y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return CarvingHelper.canChisel(stack);
@@ -101,10 +101,10 @@ public class AutoChiselMenu extends AbstractContainerMenu {
         }
         endInputSlots = beginOutputSlots = slots.size();
 
-        for (int i = 0; i < output.getSlots(); i++) {
+        for (int i = 0; i < output.size(); i++) {
             int x = 8 + 108 + 18 * (i % 3);
             int y = yStart + 18 * (i / 3);
-            addSlot(new SlotItemHandler(output, i, x, y) {
+            addSlot(new ResourceHandlerSlot(output, output::set, i, x, y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false;

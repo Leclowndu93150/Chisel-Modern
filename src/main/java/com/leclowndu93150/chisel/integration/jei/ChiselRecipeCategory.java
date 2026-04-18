@@ -14,9 +14,9 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -32,7 +32,7 @@ public class ChiselRecipeCategory implements IRecipeCategory<ICarvingGroup> {
             ICarvingGroup.class
     );
 
-    private static final ResourceLocation TEXTURE_LOC = Chisel.id("textures/chiseljei.png");
+    private static final Identifier TEXTURE_LOC = Chisel.id("textures/chiseljei.png");
 
     private final IDrawable icon;
     private final IDrawable background;
@@ -61,8 +61,18 @@ public class ChiselRecipeCategory implements IRecipeCategory<ICarvingGroup> {
         return Component.translatable("jei.chisel.chiseling");
     }
 
-    @Nonnull
     @Override
+    public int getWidth() {
+        return 165;
+    }
+
+    @Override
+    public int getHeight() {
+        return 126;
+    }
+
+    @Nonnull
+    @Deprecated
     public IDrawable getBackground() {
         return background;
     }
@@ -73,7 +83,9 @@ public class ChiselRecipeCategory implements IRecipeCategory<ICarvingGroup> {
     }
 
     @Override
-    public void draw(ICarvingGroup recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(ICarvingGroup recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+        background.draw(guiGraphics);
+
         if (layout == null) return;
 
         if (focus == null || focus.getFocuses(VanillaTypes.ITEM_STACK, RecipeIngredientRole.OUTPUT).count() == 0) {

@@ -8,7 +8,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import java.util.HashMap;
 import java.util.Map;
 
-@EventBusSubscriber(modid = Chisel.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Chisel.MODID)
 public class ChiselConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 

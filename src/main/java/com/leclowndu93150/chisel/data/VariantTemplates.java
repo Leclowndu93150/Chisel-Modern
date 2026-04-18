@@ -13,7 +13,7 @@ import static com.leclowndu93150.chisel.data.ChiselModelTemplates.*;
 /**
  * Predefined variant template lists for common block types.
  * Ported from Chisel 1.18.2's VariantTemplates.java
- *
+ * <p>
  * Each variant now stores the actual ModelTemplate function for datagen.
  */
 public class VariantTemplates {
@@ -113,6 +113,7 @@ public class VariantTemplates {
     );
 
     public static final List<VariationData> COBBLESTONE;
+
     static {
         List<VariationData> cobble = new ArrayList<>(ROCK);
         cobble.add(new VariationData("extra/emboss", "Embossed", simpleBlock()));
@@ -121,7 +122,7 @@ public class VariantTemplates {
         COBBLESTONE = List.copyOf(cobble);
     }
 
-    private static ModelTemplate mossyModel(String base, VariationData variant) {
+    private static ChiselModelTemplate mossyModel(String base, VariationData variant) {
         if (variant.name().equals("circularct")) {
             return mossyCtm(base, "circularct");
         } else if (variant.name().equals("pillar") || variant.name().equals("twisted")) {
@@ -132,6 +133,7 @@ public class VariantTemplates {
     }
 
     public static final List<VariationData> COBBLESTONE_MOSSY;
+
     static {
         List<VariationData> mossy = new ArrayList<>();
         for (VariationData v : COBBLESTONE) {
@@ -194,7 +196,7 @@ public class VariantTemplates {
     /**
      * Generate color variants with a specific model template.
      */
-    public static List<VariationData> colors(ModelTemplate template) {
+    public static List<VariationData> colors(ChiselModelTemplate template) {
         return COLORS.stream()
                 .map(v -> v.withModelTemplate(template))
                 .collect(Collectors.toUnmodifiableList());

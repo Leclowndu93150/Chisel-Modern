@@ -3,7 +3,7 @@ package com.leclowndu93150.chisel.block;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ICarvable;
 import com.leclowndu93150.chisel.api.block.VariationData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 public class BlockCarvable extends Block implements ICarvable {
     private final VariationData variation;
     private final String blockType;
-    private final ResourceLocation carvingGroup;
+    private final Identifier carvingGroup;
 
     public BlockCarvable(Properties properties, VariationData variation, String blockType) {
         super(properties);
@@ -27,7 +27,7 @@ public class BlockCarvable extends Block implements ICarvable {
     }
 
     @Override
-    public ResourceLocation getCarvingGroup() {
+    public Identifier getCarvingGroup() {
         return carvingGroup;
     }
 

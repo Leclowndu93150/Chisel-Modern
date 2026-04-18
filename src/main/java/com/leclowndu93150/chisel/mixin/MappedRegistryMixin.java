@@ -4,7 +4,7 @@ import com.leclowndu93150.chisel.Chisel;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -30,9 +30,9 @@ public class MappedRegistryMixin<T> {
     @Unique
     private static final Set<String> chisel$loggedMissingBlocks = new HashSet<>();
 
-    @Inject(method = "getHolder(Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;",
+    @Inject(method = "getHolder(Lnet/minecraft/resources/Identifier;)Ljava/util/Optional;",
             at = @At("RETURN"))
-    private void chisel$logMissingChiselBlocks(ResourceLocation location, CallbackInfoReturnable<Optional<Holder.Reference<T>>> cir) {
+    private void chisel$logMissingChiselBlocks(Identifier location, CallbackInfoReturnable<Optional<Holder.Reference<T>>> cir) {
         if (location != null && location.getNamespace().equals(Chisel.MODID)) {
             Optional<Holder.Reference<T>> result = cir.getReturnValue();
             if (result.isEmpty()) {

@@ -15,6 +15,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -26,6 +27,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.awt.geom.Line2D;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static net.minecraft.core.Direction.*;
 
@@ -42,7 +44,7 @@ public class ItemOffsetTool extends Item {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
 
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 
@@ -56,7 +58,7 @@ public class ItemOffsetTool extends Item {
 
         Map<ChunkPos, Set<BlockPos>> blocksByChunk = new HashMap<>();
         for (BlockPos blockPos : connectedBlocks) {
-            ChunkPos chunkPos = new ChunkPos(blockPos);
+            ChunkPos chunkPos = ChunkPos.containing(blockPos);
             blocksByChunk.computeIfAbsent(chunkPos, k -> new HashSet<>()).add(blockPos);
         }
 
@@ -67,8 +69,8 @@ public class ItemOffsetTool extends Item {
             OffsetData data = ChunkData.getOrCreateData(world, chunkPos);
             data.moveAll(blocksInChunk, moveDir);
 
-            LevelChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
-            chunk.setUnsaved(true);
+            LevelChunk chunk = world.getChunk(chunkPos.x(), chunkPos.z());
+            chunk.markUnsaved();
 
             if (world instanceof ServerLevel serverLevel) {
                 CompoundTag tag = new CompoundTag();
@@ -77,7 +79,7 @@ public class ItemOffsetTool extends Item {
                 PacketDistributor.sendToPlayersTrackingChunk(
                         serverLevel,
                         chunkPos,
-                        new ChunkDataPayload(serverLevel.dimension(), chunkPos.x, chunkPos.z, tag)
+                        new ChunkDataPayload(serverLevel.dimension(), chunkPos.x(), chunkPos.z(), tag)
                 );
             }
         }
@@ -136,10 +138,10 @@ public class ItemOffsetTool extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("chisel.tooltip.offset_tool.1")
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+        tooltip.accept(Component.translatable("chisel.tooltip.offset_tool.1")
                 .withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("chisel.tooltip.offset_tool.2")
+        tooltip.accept(Component.translatable("chisel.tooltip.offset_tool.2")
                 .withStyle(ChatFormatting.GRAY));
     }
 }

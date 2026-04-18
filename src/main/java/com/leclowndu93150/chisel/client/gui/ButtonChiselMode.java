@@ -1,11 +1,11 @@
 package com.leclowndu93150.chisel.client.gui;
 
 import com.leclowndu93150.chisel.api.carving.IChiselMode;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ButtonChiselMode extends Button {
 
@@ -25,22 +25,21 @@ public class ButtonChiselMode extends Button {
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SPRITES.get(this.active, this.isHovered()), this.getX(), this.getY(), this.width, this.height);
 
-        graphics.blitSprite(SPRITES.get(this.active, this.isHovered()), this.getX(), this.getY(), this.width, this.height);
-
-        ResourceLocation spriteSheet = mode.getSpriteSheet();
+        Identifier spriteSheet = mode.getSpriteSheet();
         int[] spritePos = mode.getSpritePos();
 
         graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
                 spriteSheet,
                 getX() + ICON_OFFSET,
                 getY() + ICON_OFFSET,
-                RENDER_SIZE,
-                RENDER_SIZE,
                 spritePos[0],
                 spritePos[1],
+                RENDER_SIZE,
+                RENDER_SIZE,
                 SPRITE_SIZE,
                 SPRITE_SIZE,
                 256,

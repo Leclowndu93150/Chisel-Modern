@@ -15,7 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -30,11 +30,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ItemChisel extends Item implements IChiselItem {
 
@@ -100,36 +102,31 @@ public class ItemChisel extends Item implements IChiselItem {
         return ChiselConfig.allowChiselDamage;
     }
 
-    @Override
-    public boolean isValidRepairItem(ItemStack damagedItem, ItemStack repairMaterial) {
-        return switch (type) {
-            case DIAMOND, HITECH -> repairMaterial.is(Items.DIAMOND);
-            case IRON -> repairMaterial.is(Items.IRON_INGOT);
-        };
-    }
+    // isValidRepairItem moved to Repairable component in 26.1
+    // Repair materials should be set via Item.Properties instead
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("chisel.tooltip.gui").withStyle(ChatFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+        tooltip.accept(Component.translatable("chisel.tooltip.gui").withStyle(ChatFormatting.GRAY));
 
         if (type.canLeftClick()) {
-            tooltip.add(Component.translatable("chisel.tooltip.leftclick.1").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("chisel.tooltip.leftclick.2").withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.translatable("chisel.tooltip.leftclick.1").withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.translatable("chisel.tooltip.leftclick.2").withStyle(ChatFormatting.GRAY));
         }
 
         if (type.hasModes()) {
-            tooltip.add(Component.empty());
-            tooltip.add(Component.translatable("chisel.tooltip.modes").withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.empty());
+            tooltip.accept(Component.translatable("chisel.tooltip.modes").withStyle(ChatFormatting.GRAY));
             IChiselMode mode = getMode(stack);
-            tooltip.add(Component.translatable("chisel.tooltip.selectedmode",
+            tooltip.accept(Component.translatable("chisel.tooltip.selectedmode",
                     mode.getLocalizedName().copy().withStyle(ChatFormatting.GREEN)).withStyle(ChatFormatting.GRAY));
 
             boolean fuzzy = isFuzzyMode(stack);
             Component fuzzyStatus = fuzzy
                     ? Component.translatable("chisel.tooltip.fuzzy.enabled").withStyle(ChatFormatting.GREEN)
                     : Component.translatable("chisel.tooltip.fuzzy.disabled").withStyle(ChatFormatting.RED);
-            tooltip.add(Component.translatable("chisel.tooltip.fuzzy", fuzzyStatus).withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("chisel.tooltip.fuzzy.hint").withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.accept(Component.translatable("chisel.tooltip.fuzzy", fuzzyStatus).withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.translatable("chisel.tooltip.fuzzy.hint").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 
@@ -143,23 +140,22 @@ public class ItemChisel extends Item implements IChiselItem {
     }
 
     @Override
-    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+    public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
-        return true;
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (player.isCrouching() && type.hasModes()) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 cycleMode(stack, player, true);
             }
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
 
-        if (!level.isClientSide && canOpenGui(level, player, hand)) {
+        if (!level.isClientSide() && canOpenGui(level, player, hand)) {
             if (player instanceof ServerPlayer serverPlayer) {
                 ChiselGuiType guiType = getGuiType(level, player, hand);
                 if (guiType == ChiselGuiType.HITECH) {
@@ -187,11 +183,11 @@ public class ItemChisel extends Item implements IChiselItem {
                         }
                     }, buf -> buf.writeBoolean(hand == InteractionHand.MAIN_HAND));
                 }
-                return InteractionResultHolder.consume(stack);
+                return InteractionResult.CONSUME;
             }
         }
 
-        return InteractionResultHolder.pass(stack);
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -328,8 +324,8 @@ public class ItemChisel extends Item implements IChiselItem {
 
         if (next != current) {
             setMode(stack, next);
-            player.displayClientMessage(Component.translatable("chisel.message.mode_changed",
-                    next.getLocalizedName()), true);
+            player.sendOverlayMessage(Component.translatable("chisel.message.mode_changed",
+                    next.getLocalizedName()));
         }
     }
 

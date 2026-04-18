@@ -9,8 +9,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -25,12 +26,8 @@ public class BallOMossEntity extends ThrowableItemProjectile {
         super(entityType, level);
     }
 
-    public BallOMossEntity(Level level, LivingEntity shooter) {
-        super(ChiselEntities.BALL_O_MOSS.get(), shooter, level);
-    }
-
-    public BallOMossEntity(Level level, double x, double y, double z) {
-        super(ChiselEntities.BALL_O_MOSS.get(), x, y, z, level);
+    public BallOMossEntity(Level level, LivingEntity shooter, ItemStack stack) {
+        super(ChiselEntities.BALL_O_MOSS.get(), shooter, level, stack);
     }
 
     @Override
@@ -45,13 +42,13 @@ public class BallOMossEntity extends ThrowableItemProjectile {
         Level level = level();
         BlockPos hitPos = result.getBlockPos().relative(result.getDirection());
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             level.playLocalSound(hitPos.getX(), hitPos.getY(), hitPos.getZ(),
                     SoundEvents.SLIME_SQUISH, SoundSource.NEUTRAL, 1.0F, 1.0F, false);
         } else {
             int radius = 5;
             int falloff = 3;
-            RandomSource rand = level.random;
+            RandomSource rand = level.getRandom();
 
             for (int xx = -radius; xx < radius; xx++) {
                 for (int yy = -radius; yy < radius; yy++) {

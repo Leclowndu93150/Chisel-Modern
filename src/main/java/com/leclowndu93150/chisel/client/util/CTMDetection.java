@@ -5,7 +5,7 @@ import com.leclowndu93150.chisel.api.block.ChiselBlockType;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -34,7 +34,7 @@ public class CTMDetection {
         for (ChiselBlockType<?> blockType : ChiselBlocks.ALL_BLOCK_TYPES) {
             for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
                 Block block = deferredBlock.get();
-                ResourceLocation blockId = deferredBlock.getId();
+                Identifier blockId = deferredBlock.getId();
 
                 String variantName = getVariantName(blockId);
                 if (hasCTMMetadata(blockType.getName(), variantName)) {
@@ -54,7 +54,7 @@ public class CTMDetection {
         return CTM_ITEMS.contains(item);
     }
 
-    private static String getVariantName(ResourceLocation blockId) {
+    private static String getVariantName(Identifier blockId) {
         String path = blockId.getPath();
         // Block IDs are in format: {blockTypeName}/{variantName}
         // e.g., "metals_aluminum/badgreggy" -> "badgreggy"
@@ -67,7 +67,7 @@ public class CTMDetection {
     }
 
     private static boolean hasCTMMetadata(String blockTypeName, String variantName) {
-        ResourceLocation textureLocation = ResourceLocation.fromNamespaceAndPath(
+        Identifier textureLocation = Identifier.fromNamespaceAndPath(
                 Chisel.MODID,
                 "textures/block/" + blockTypeName + "/" + variantName + ".png.mcmeta"
         );

@@ -55,13 +55,13 @@ public class BlockAutoChisel extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof AutoChiselBlockEntity autoChisel) {
                 player.openMenu(autoChisel);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -76,15 +76,8 @@ public class BlockAutoChisel extends BaseEntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof AutoChiselBlockEntity autoChisel) {
-                autoChisel.dropContents(level, pos);
-                level.updateNeighbourForOutputSignal(pos, this);
-            }
-        }
-        super.onRemove(state, level, pos, newState, movedByPiston);
+    protected void affectNeighborsAfterRemoval(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        net.minecraft.world.Containers.updateNeighboursAfterDestroy(state, level, pos);
     }
 
     @Override

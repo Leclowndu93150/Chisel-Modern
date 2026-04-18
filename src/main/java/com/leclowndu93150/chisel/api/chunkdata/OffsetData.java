@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -149,15 +148,15 @@ public class OffsetData implements IOffsetData {
     public void readFromNBT(CompoundTag tag) {
         offsets.clear();
 
-        if (!tag.contains("offsets", Tag.TAG_LIST)) {
+        if (!tag.contains("offsets")) {
             return;
         }
 
-        ListTag list = tag.getList("offsets", Tag.TAG_COMPOUND);
+        ListTag list = tag.getListOrEmpty("offsets");
         for (int i = 0; i < list.size(); i++) {
-            CompoundTag entryTag = list.getCompound(i);
+            CompoundTag entryTag = list.getCompoundOrEmpty(i);
 
-            int packedPos = entryTag.getInt("pos");
+            int packedPos = entryTag.getIntOr("pos", 0);
             int x = (packedPos >> 28) & 0xF;
             int y = (packedPos >> 4) & 0xFFFFFF;
             int z = packedPos & 0xF;
@@ -167,7 +166,7 @@ public class OffsetData implements IOffsetData {
             }
             BlockPos pos = new BlockPos(x, y, z);
 
-            short packedOffset = entryTag.getShort("off");
+            short packedOffset = entryTag.getShortOr("off", (short) 0);
             BlockPos offset = new BlockPos(
                     (packedOffset >> 8) & 0xF,
                     (packedOffset >> 4) & 0xF,

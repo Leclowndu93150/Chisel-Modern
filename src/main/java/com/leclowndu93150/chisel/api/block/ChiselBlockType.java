@@ -6,7 +6,9 @@ import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.data.ChiselModelTemplates;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -29,7 +31,7 @@ import java.util.function.Supplier;
 public class ChiselBlockType<T extends Block & ICarvable> {
     private final String name;
     private final List<VariationData> variations = new ArrayList<>();
-    private final List<ResourceLocation> vanillaBlocks = new ArrayList<>();
+    private final List<Identifier> vanillaBlocks = new ArrayList<>();
     private final List<TagKey<Block>> sourceBlockTags = new ArrayList<>();
     private final List<TagKey<Block>> blockTags = new ArrayList<>();
     private final List<TagKey<Item>> itemTags = new ArrayList<>();
@@ -49,7 +51,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     @Nullable
     private ChiselSound chiselSound;
     @Nullable
-    private ChiselModelTemplates.ModelTemplate defaultModelTemplate;
+    private ChiselModelTemplates.ChiselModelTemplate defaultModelTemplate;
 
     private BiFunction<BlockBehaviour.Properties, VariationData, T> blockFactory;
 
@@ -71,7 +73,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
      * Add a vanilla block to be included in this carving group.
      */
     public ChiselBlockType<T> addVanillaBlock(Block block) {
-        ResourceLocation key = BuiltInRegistries.BLOCK.getKey(block);
+        Identifier key = BuiltInRegistries.BLOCK.getKey(block);
         if (key != null) {
             vanillaBlocks.add(key);
         }
@@ -81,7 +83,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     /**
      * Add a vanilla block by resource location.
      */
-    public ChiselBlockType<T> addVanillaBlock(ResourceLocation blockId) {
+    public ChiselBlockType<T> addVanillaBlock(Identifier blockId) {
         vanillaBlocks.add(blockId);
         return this;
     }
@@ -197,7 +199,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     /**
      * Add a single variation with custom localized name and model template.
      */
-    public ChiselBlockType<T> variation(String name, String localizedName, ChiselModelTemplates.ModelTemplate modelTemplate) {
+    public ChiselBlockType<T> variation(String name, String localizedName, ChiselModelTemplates.ChiselModelTemplate modelTemplate) {
         this.variations.add(new VariationData(name, localizedName, modelTemplate, null));
         return this;
     }
@@ -213,7 +215,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
     /**
      * Set a default model template for all variations that don't specify one.
      */
-    public ChiselBlockType<T> defaultModelTemplate(ChiselModelTemplates.ModelTemplate template) {
+    public ChiselBlockType<T> defaultModelTemplate(ChiselModelTemplates.ChiselModelTemplate template) {
         this.defaultModelTemplate = template;
         return this;
     }
@@ -222,7 +224,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
      * Get the default model template for this block type.
      */
     @Nullable
-    public ChiselModelTemplates.ModelTemplate getDefaultModelTemplate() {
+    public ChiselModelTemplates.ChiselModelTemplate getDefaultModelTemplate() {
         return defaultModelTemplate;
     }
 
@@ -254,7 +256,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
             final BlockBehaviour.Properties finalProps = props;
 
             DeferredBlock<T> block = ChiselRegistries.BLOCKS.register(registryName,
-                    () -> blockFactory.apply(finalProps, finalVariation));
+                    key -> blockFactory.apply(finalProps.setId(ResourceKey.create(Registries.BLOCK, key)), finalVariation));
             registeredBlocks.put(variation.name(), block);
 
             DeferredItem<BlockItem> item = ChiselRegistries.ITEMS.registerSimpleBlockItem(registryName, block);
@@ -276,7 +278,7 @@ public class ChiselBlockType<T extends Block & ICarvable> {
         return Collections.unmodifiableList(variations);
     }
 
-    public List<ResourceLocation> getVanillaBlocks() {
+    public List<Identifier> getVanillaBlocks() {
         return Collections.unmodifiableList(vanillaBlocks);
     }
 

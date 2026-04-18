@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -30,9 +31,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.transfer.CombinedResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
 public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, Nameable {
@@ -46,50 +54,55 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
     private static final int POWER_PER_TICK = 20;
     private static final int MAX_ENERGY = 10000;
 
-    private final ItemStackHandler chiselSlot = new ItemStackHandler(1) {
+    private final ItemStacksResourceHandler chiselSlot = new ItemStacksResourceHandler(1) {
         @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return stack.getItem() instanceof IChiselItem;
+        public boolean isValid(int index, ItemResource resource) {
+            return resource.toStack().getItem() instanceof IChiselItem;
         }
 
         @Override
-        protected void onContentsChanged(int slot) {
+        protected void onContentsChanged(int index, ItemStack oldContents) {
             setChanged();
         }
     };
 
-    private final ItemStackHandler targetSlot = new ItemStackHandler(1) {
+    private final ItemStacksResourceHandler targetSlot = new ItemStacksResourceHandler(1) {
         @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return CarvingHelper.canChisel(stack);
+        public boolean isValid(int index, ItemResource resource) {
+            return CarvingHelper.canChisel(resource.toStack());
         }
 
         @Override
-        protected void onContentsChanged(int slot) {
+        protected void onContentsChanged(int index, ItemStack oldContents) {
             setChanged();
         }
     };
 
-    private final ItemStackHandler inputInv = new ItemStackHandler(INPUT_SLOTS) {
+    private final ItemStacksResourceHandler inputInv = new ItemStacksResourceHandler(INPUT_SLOTS) {
         @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return CarvingHelper.canChisel(stack);
+        public boolean isValid(int index, ItemResource resource) {
+            return CarvingHelper.canChisel(resource.toStack());
         }
 
         @Override
-        protected void onContentsChanged(int slot) {
+        protected void onContentsChanged(int index, ItemStack oldContents) {
             setChanged();
         }
     };
 
-    private final ItemStackHandler outputInv = new ItemStackHandler(OUTPUT_SLOTS) {
+    private final ItemStacksResourceHandler outputInv = new ItemStacksResourceHandler(OUTPUT_SLOTS) {
         @Override
-        protected void onContentsChanged(int slot) {
+        protected void onContentsChanged(int index, ItemStack oldContents) {
             setChanged();
         }
     };
 
-    private final EnergyStorage energyStorage = new EnergyStorage(MAX_ENERGY, POWER_PER_TICK * 2, POWER_PER_TICK);
+    private final SimpleEnergyHandler energyStorage = new SimpleEnergyHandler(MAX_ENERGY, POWER_PER_TICK * 2, POWER_PER_TICK) {
+        @Override
+        protected void onEnergyChanged(int previousAmount) {
+            setChanged();
+        }
+    };
 
     private int progress = 0;
     private int sourceSlot = -1;
@@ -102,8 +115,8 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
                 case AutoChiselMenu.ACTIVE -> sourceSlot >= 0 ? 1 : 0;
                 case AutoChiselMenu.PROGRESS -> progress;
                 case AutoChiselMenu.MAX_PROGRESS -> MAX_PROGRESS;
-                case AutoChiselMenu.ENERGY -> energyStorage.getEnergyStored();
-                case AutoChiselMenu.MAX_ENERGY -> energyStorage.getMaxEnergyStored();
+                case AutoChiselMenu.ENERGY -> energyStorage.getAmountAsInt();
+                case AutoChiselMenu.MAX_ENERGY -> energyStorage.getCapacityAsInt();
                 case AutoChiselMenu.ENERGY_USE -> getUsagePerTick();
                 default -> 0;
             };
@@ -123,18 +136,28 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
         super(ChiselBlockEntities.AUTO_CHISEL.get(), pos, state);
     }
 
+    private ItemStack getStack(ItemStacksResourceHandler handler, int index) {
+        ItemResource resource = handler.getResource(index);
+        int amount = handler.getAmountAsInt(index);
+        return resource.isEmpty() ? ItemStack.EMPTY : resource.toStack(amount);
+    }
+
+    private void setStack(ItemStacksResourceHandler handler, int index, ItemStack stack) {
+        handler.set(index, ItemResource.of(stack), stack.getCount());
+    }
+
     public void tick() {
-        if (level == null || level.isClientSide) {
+        if (level == null || level.isClientSide()) {
             return;
         }
 
-        if (energyStorage.getEnergyStored() == 0 && ChiselConfig.autoChiselNeedsPower) {
+        if (energyStorage.getAmountAsInt() == 0 && ChiselConfig.autoChiselNeedsPower) {
             return;
         }
 
-        ItemStack target = targetSlot.getStackInSlot(0);
-        ItemStack chisel = chiselSlot.getStackInSlot(0);
-        ItemStack source = sourceSlot >= 0 ? inputInv.getStackInSlot(sourceSlot) : ItemStack.EMPTY;
+        ItemStack target = getStack(targetSlot, 0);
+        ItemStack chisel = getStack(chiselSlot, 0);
+        ItemStack source = sourceSlot >= 0 ? getStack(inputInv, sourceSlot) : ItemStack.EMPTY;
 
         TagKey<Item> targetGroup = target.isEmpty() || chisel.isEmpty() ? null : CarvingHelper.getCarvingGroupForItem(target);
 
@@ -162,8 +185,8 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
             }
 
             if (source.isEmpty() || canOutput(result)) {
-                for (int i = 0; sourceSlot < 0 && i < inputInv.getSlots(); i++) {
-                    ItemStack stack = inputInv.getStackInSlot(i);
+                for (int i = 0; sourceSlot < 0 && i < inputInv.size(); i++) {
+                    ItemStack stack = getStack(inputInv, i);
                     if (!stack.isEmpty()) {
                         TagKey<Item> stackGroup = CarvingHelper.getCarvingGroupForItem(stack);
                         if (stackGroup != null && stackGroup.equals(targetGroup)) {
@@ -181,7 +204,7 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
         }
 
         if (sourceSlot >= 0) {
-            source = inputInv.getStackInSlot(sourceSlot);
+            source = getStack(inputInv, sourceSlot);
 
             if (!ItemStack.isSameItem(source, target)) {
                 if (progress < MAX_PROGRESS) {
@@ -194,8 +217,11 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
 
                     if (toUse > 0 && powerToUse > 0) {
                         if (ChiselConfig.autoChiselPowered) {
-                            int used = energyStorage.extractEnergy(powerToUse, false);
-                            progress += (int) (toUse * ((float) used / powerToUse));
+                            try (var tx = Transaction.openRoot()) {
+                                int used = energyStorage.extract(powerToUse, tx);
+                                progress += (int) (toUse * ((float) used / powerToUse));
+                                tx.commit();
+                            }
                         } else {
                             progress += toUse;
                         }
@@ -203,12 +229,12 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
                 } else {
                     ItemStack result = new ItemStack(target.getItem(), source.getCount());
 
-                    inputInv.setStackInSlot(sourceSlot, ItemStack.EMPTY);
+                    setStack(inputInv, sourceSlot, ItemStack.EMPTY);
 
                     if (ChiselConfig.allowChiselDamage && chisel.isDamageableItem()) {
                         chisel.setDamageValue(chisel.getDamageValue() + 1);
                         if (chisel.getDamageValue() >= chisel.getMaxDamage()) {
-                            chiselSlot.setStackInSlot(0, ItemStack.EMPTY);
+                            setStack(chiselSlot, 0, ItemStack.EMPTY);
                         }
                     }
 
@@ -222,11 +248,11 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
                                 new AutoChiselFXPayload(worldPosition, chisel.copy(), resultState));
                     }
 
-                    sourceSlot = (sourceSlot + 1) % inputInv.getSlots();
+                    sourceSlot = (sourceSlot + 1) % inputInv.size();
                     progress = 0;
                 }
             } else {
-                inputInv.setStackInSlot(sourceSlot, ItemStack.EMPTY);
+                setStack(inputInv, sourceSlot, ItemStack.EMPTY);
                 mergeOutput(source);
             }
         } else {
@@ -235,7 +261,7 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     private float getSpeedFactor() {
-        return ChiselConfig.autoChiselPowered ? (float) energyStorage.getEnergyStored() / energyStorage.getMaxEnergyStored() : 1;
+        return ChiselConfig.autoChiselPowered ? (float) energyStorage.getAmountAsInt() / energyStorage.getCapacityAsInt() : 1;
     }
 
     private int getPowerProgressPerTick() {
@@ -248,81 +274,79 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     private boolean canOutput(ItemStack stack) {
-        ItemStack remaining = stack.copy();
-        for (int i = 0; i < outputInv.getSlots(); i++) {
-            remaining = outputInv.insertItem(i, remaining, true);
-            if (remaining.isEmpty()) {
-                return true;
-            }
+        try (var tx = Transaction.openRoot()) {
+            int remaining = stack.getCount();
+            ItemResource resource = ItemResource.of(stack);
+            remaining -= outputInv.insert(resource, remaining, tx);
+            return remaining <= 0;
         }
-        return false;
     }
 
     private void mergeOutput(ItemStack stack) {
-        for (int i = 0; i < outputInv.getSlots() && !stack.isEmpty(); i++) {
-            stack = outputInv.insertItem(i, stack, false);
+        if (stack.isEmpty()) return;
+        try (var tx = Transaction.openRoot()) {
+            outputInv.insert(ItemResource.of(stack), stack.getCount(), tx);
+            tx.commit();
         }
     }
 
     public void dropContents(Level level, BlockPos pos) {
-        for (int i = 0; i < inputInv.getSlots(); i++) {
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), inputInv.getStackInSlot(i));
+        for (int i = 0; i < inputInv.size(); i++) {
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), getStack(inputInv, i));
         }
-        for (int i = 0; i < outputInv.getSlots(); i++) {
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), outputInv.getStackInSlot(i));
+        for (int i = 0; i < outputInv.size(); i++) {
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), getStack(outputInv, i));
         }
-        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), chiselSlot.getStackInSlot(0));
-        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), targetSlot.getStackInSlot(0));
+        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), getStack(chiselSlot, 0));
+        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), getStack(targetSlot, 0));
     }
 
-    public ItemStackHandler getChiselSlot() {
+    public ItemStacksResourceHandler getChiselSlot() {
         return chiselSlot;
     }
 
-    public ItemStackHandler getTargetSlot() {
+    public ItemStacksResourceHandler getTargetSlot() {
         return targetSlot;
     }
 
-    public ItemStackHandler getInputInv() {
+    public ItemStacksResourceHandler getInputInv() {
         return inputInv;
     }
 
-    public ItemStackHandler getOutputInv() {
+    public ItemStacksResourceHandler getOutputInv() {
         return outputInv;
     }
 
-    public EnergyStorage getEnergyStorage() {
+    public SimpleEnergyHandler getEnergyStorage() {
         return energyStorage;
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("chisel", chiselSlot.serializeNBT(registries));
-        tag.put("target", targetSlot.serializeNBT(registries));
-        tag.put("input", inputInv.serializeNBT(registries));
-        tag.put("output", outputInv.serializeNBT(registries));
-        tag.putInt("energy", energyStorage.getEnergyStored());
-        tag.putInt("progress", progress);
-        tag.putInt("source", sourceSlot);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        chiselSlot.serialize(output.child("chisel"));
+        targetSlot.serialize(output.child("target"));
+        inputInv.serialize(output.child("input"));
+        outputInv.serialize(output.child("output"));
+        energyStorage.serialize(output.child("energy_data"));
+        output.putInt("progress", progress);
+        output.putInt("source", sourceSlot);
         if (customName != null) {
-            tag.putString("customName", Component.Serializer.toJson(customName, registries));
+            output.store("customName", ComponentSerialization.CODEC, customName);
         }
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        chiselSlot.deserializeNBT(registries, tag.getCompound("chisel"));
-        targetSlot.deserializeNBT(registries, tag.getCompound("target"));
-        inputInv.deserializeNBT(registries, tag.getCompound("input"));
-        outputInv.deserializeNBT(registries, tag.getCompound("output"));
-        energyStorage.receiveEnergy(tag.getInt("energy") - energyStorage.getEnergyStored(), false);
-        progress = tag.getInt("progress");
-        sourceSlot = tag.getInt("source");
-        if (tag.contains("customName")) {
-            customName = Component.Serializer.fromJson(tag.getString("customName"), registries);
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.child("chisel").ifPresent(chiselSlot::deserialize);
+        input.child("target").ifPresent(targetSlot::deserialize);
+        input.child("input").ifPresent(inputInv::deserialize);
+        input.child("output").ifPresent(outputInv::deserialize);
+        input.child("energy_data").ifPresent(energyStorage::deserialize);
+        progress = input.getIntOr("progress", 0);
+        sourceSlot = input.getIntOr("source", -1);
+        input.read("customName", ComponentSerialization.CODEC).ifPresent(name -> customName = name);
     }
 
     @Nullable
@@ -333,9 +357,7 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        saveAdditional(tag, registries);
-        return tag;
+        return saveWithoutMetadata(registries);
     }
 
     @Override
@@ -367,5 +389,17 @@ public class AutoChiselBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInv, Player player) {
         return new AutoChiselMenu(containerId, playerInv, this, dataAccess, ContainerLevelAccess.create(level, worldPosition));
+    }
+
+    public ResourceHandler<ItemResource> getCombinedItemHandler(@Nullable Direction side) {
+        if (side == Direction.DOWN) {
+            return outputInv;
+        } else if (side == Direction.UP) {
+            return inputInv;
+        } else if (side == null) {
+            return new CombinedResourceHandler<>(inputInv, outputInv, chiselSlot, targetSlot);
+        } else {
+            return new CombinedResourceHandler<>(inputInv, outputInv);
+        }
     }
 }

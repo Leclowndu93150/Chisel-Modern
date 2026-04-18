@@ -1,6 +1,6 @@
 package com.leclowndu93150.chisel.api.block;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Interface for blocks that can be chiseled between variants.
@@ -14,7 +14,7 @@ public interface ICarvable {
     /**
      * Gets the carving group ID this block belongs to.
      */
-    ResourceLocation getCarvingGroup();
+    Identifier getCarvingGroup();
 
     /**
      * Gets the block type name (e.g., "marble", "andesite").

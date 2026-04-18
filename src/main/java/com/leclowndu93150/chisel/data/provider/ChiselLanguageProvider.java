@@ -75,6 +75,8 @@ public class ChiselLanguageProvider extends LanguageProvider {
 
         add("chisel.message.mode_changed", "Mode changed to: %s");
         add("chisel.message.cooldown", "Chisel on cooldown: %ss");
+        add("chisel.message.already_target", "Block is already the selected variant");
+        add("chisel.message.wrong_group", "Block is not in the same group as: %s");
         add("chisel.message.fuzzy_enabled", "Fuzzy mode enabled - chisels all variants in the carving group");
         add("chisel.message.fuzzy_disabled", "Fuzzy mode disabled - chisels exact block matches only");
 

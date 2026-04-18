@@ -10,11 +10,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Brownstone block that gives a speed boost when walked on.
@@ -37,9 +39,4 @@ public class BlockBrownstone extends BlockCarvable {
         super.stepOn(level, pos, state, entity);
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("chisel.tooltip.brownstone.speed").withStyle(ChatFormatting.GRAY));
-        super.appendHoverText(stack, context, tooltip, flag);
-    }
 }

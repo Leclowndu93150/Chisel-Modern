@@ -1,7 +1,7 @@
 package com.leclowndu93150.chisel.init;
 
 import com.leclowndu93150.chisel.Chisel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
@@ -31,7 +31,7 @@ public class ChiselSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> CHISEL_DIRT = registerSound("chisel.dirt");
 
     private static DeferredHolder<SoundEvent, SoundEvent> registerSound(String name) {
-        ResourceLocation id = Chisel.id(name);
+        Identifier id = Chisel.id(name);
         return ChiselRegistries.SOUND_EVENTS.register(name.replace(".", "_"),
             () -> SoundEvent.createVariableRangeEvent(id));
     }

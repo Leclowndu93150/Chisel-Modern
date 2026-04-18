@@ -3,6 +3,8 @@ package com.leclowndu93150.chisel.init;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.entity.BallOMossEntity;
 import com.leclowndu93150.chisel.entity.CloudInABottleEntity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -15,7 +17,7 @@ public class ChiselEntities {
                             .sized(0.25F, 0.25F)
                             .clientTrackingRange(4)
                             .updateInterval(10)
-                            .build(Chisel.MODID + ":ball_o_moss"));
+                            .build(ResourceKey.create(Registries.ENTITY_TYPE, Chisel.id("ball_o_moss"))));
 
     public static final DeferredHolder<EntityType<?>, EntityType<CloudInABottleEntity>> CLOUD_IN_A_BOTTLE =
             ChiselRegistries.ENTITY_TYPES.register("cloud_in_a_bottle",
@@ -23,7 +25,7 @@ public class ChiselEntities {
                             .sized(0.25F, 0.25F)
                             .clientTrackingRange(4)
                             .updateInterval(10)
-                            .build(Chisel.MODID + ":cloud_in_a_bottle"));
+                            .build(ResourceKey.create(Registries.ENTITY_TYPE, Chisel.id("cloud_in_a_bottle"))));
 
     public static void init() {
     }

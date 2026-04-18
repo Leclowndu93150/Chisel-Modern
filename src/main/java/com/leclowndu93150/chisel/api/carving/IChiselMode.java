@@ -4,7 +4,7 @@ import com.leclowndu93150.chisel.Chisel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 
@@ -61,9 +61,9 @@ public interface IChiselMode {
         return new long[]{origin.asLong(), side.ordinal()};
     }
 
-    ResourceLocation SPRITES = Chisel.id("textures/gui/mode_icons.png");
+    Identifier SPRITES = Chisel.id("textures/gui/mode_icons.png");
 
-    default ResourceLocation getSpriteSheet() {
+    default Identifier getSpriteSheet() {
         return SPRITES;
     }
 

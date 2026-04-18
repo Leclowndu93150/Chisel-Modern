@@ -14,10 +14,14 @@ repositories {
         name = "Curse Maven"
         url = "https://cursemaven.com"
     }
+    maven {
+        name = "FTB Releases"
+        url = "https://maven.ftb.dev/releases"
+    }
 }
 
 base {
-    archivesName = mod_id+"-26.1-NeoForge"
+    archivesName = mod_id + "-26.1-NeoForge"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
@@ -72,20 +76,27 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+sourceSets.main.java {
+    exclude 'com/leclowndu93150/chisel/compat/kubejs/**'
+}
+
 dependencies {
     // CTM - local jar
     implementation files('libs/CTM.jar')
 
     // JEI
-    implementation "curse.maven:jei-238222:7884734"
+    implementation "curse.maven:jei-238222:7920926"
 
     // BaguetteLib
     implementation "curse.maven:baguettelib-1264423:7813553"
 
+    // FTB Ultimine + Library
+    implementation "dev.ftb.mods:ftb-library-neoforge:26.1.2.1"
+    implementation "dev.ftb.mods:ftb-ultimine-neoforge:26.1.2.2"
+
     // Commented out - not yet ported to 26.1
     // implementation "curse.maven:jade-324717:6853386"
     // runtimeOnly "curse.maven:mekanism-268560:7132168"
-    // implementation "curse.maven:ftb-ultimine-forge-386134:7188395"
     // implementation "curse.maven:architectury-api-419699:5786327"
     // implementation "curse.maven:ftb-library-forge-404465:7260617"
     // implementation "curse.maven:kubejs-238086:7255073"

@@ -3,7 +3,7 @@ package com.leclowndu93150.chisel.compat;
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.init.ChiselRegistries;
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
@@ -507,8 +507,8 @@ public class ChiselRebornCompat {
 
         registeredAliases.add(fromPath);
 
-        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, fromPath);
-        ResourceLocation to = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, toPath);
+        Identifier from = Identifier.fromNamespaceAndPath(Chisel.MODID, fromPath);
+        Identifier to = Identifier.fromNamespaceAndPath(Chisel.MODID, toPath);
 
         ChiselRegistries.BLOCKS.addAlias(from, to);
         ChiselRegistries.ITEMS.addAlias(from, to);
@@ -523,8 +523,8 @@ public class ChiselRebornCompat {
 
         registeredAliases.add(fromPath);
 
-        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, fromPath);
-        ResourceLocation to = ResourceLocation.withDefaultNamespace(vanillaBlock);
+        Identifier from = Identifier.fromNamespaceAndPath(Chisel.MODID, fromPath);
+        Identifier to = Identifier.withDefaultNamespace(vanillaBlock);
 
         ChiselRegistries.BLOCKS.addAlias(from, to);
         ChiselRegistries.ITEMS.addAlias(from, to);
@@ -538,8 +538,8 @@ public class ChiselRebornCompat {
         }
         registeredAliases.add(key);
 
-        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(fromMod, fromPath);
-        ResourceLocation to = ResourceLocation.fromNamespaceAndPath(Chisel.MODID, toPath);
+        Identifier from = Identifier.fromNamespaceAndPath(fromMod, fromPath);
+        Identifier to = Identifier.fromNamespaceAndPath(Chisel.MODID, toPath);
 
         ChiselRegistries.BLOCKS.addAlias(from, to);
         ChiselRegistries.ITEMS.addAlias(from, to);
@@ -553,8 +553,8 @@ public class ChiselRebornCompat {
         }
         registeredAliases.add(key);
 
-        ResourceLocation from = ResourceLocation.fromNamespaceAndPath(fromMod, fromPath);
-        ResourceLocation to = ResourceLocation.withDefaultNamespace(vanillaBlock);
+        Identifier from = Identifier.fromNamespaceAndPath(fromMod, fromPath);
+        Identifier to = Identifier.withDefaultNamespace(vanillaBlock);
 
         ChiselRegistries.BLOCKS.addAlias(from, to);
         ChiselRegistries.ITEMS.addAlias(from, to);

@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 /**
  * Handles registration of all network payloads.
  */
-@EventBusSubscriber(modid = Chisel.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Chisel.MODID)
 public class ChiselNetwork {
 
     @SubscribeEvent
@@ -54,13 +54,13 @@ public class ChiselNetwork {
         registrar.playToClient(
                 AutoChiselFXPayload.TYPE,
                 AutoChiselFXPayload.STREAM_CODEC,
-                FMLEnvironment.dist.isClient() ? ClientHandlers.autoChiselFX() : (p, c) -> {}
+                FMLEnvironment.getDist().isClient() ? ClientHandlers.autoChiselFX() : (p, c) -> {}
         );
 
         registrar.playToClient(
                 ChunkDataPayload.TYPE,
                 ChunkDataPayload.STREAM_CODEC,
-                FMLEnvironment.dist.isClient() ? ClientHandlers.chunkData() : (p, c) -> {}
+                FMLEnvironment.getDist().isClient() ? ClientHandlers.chunkData() : (p, c) -> {}
         );
     }
 

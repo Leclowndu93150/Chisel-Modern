@@ -3,7 +3,7 @@ package com.leclowndu93150.chisel.client.render.type;
 import com.leclowndu93150.chisel.client.render.ctx.BlockRenderContextAlterR;
 import com.leclowndu93150.chisel.client.render.texture.ChiselTextureAlterR;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import team.chisel.ctm.api.texture.ICTMTexture;

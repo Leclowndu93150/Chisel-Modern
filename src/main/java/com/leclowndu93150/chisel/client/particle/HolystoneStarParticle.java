@@ -2,24 +2,24 @@ package com.leclowndu93150.chisel.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * Custom star particle for Holystone blocks.
  * Features sinusoidal scale animation, random rotation, and fade in/out effects.
  */
-@OnlyIn(Dist.CLIENT)
-public class HolystoneStarParticle extends TextureSheetParticle {
+public class HolystoneStarParticle extends SingleQuadParticle {
 
     private final float initialScale;
     private final float rotationOffset;
 
     protected HolystoneStarParticle(ClientLevel level, double x, double y, double z,
-                                     double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
-        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+                                    double xSpeed, double ySpeed, double zSpeed, TextureAtlasSprite sprite) {
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
 
         this.lifetime = 80 + this.random.nextInt(10); // 80-90 ticks
         this.initialScale = 0.15f + this.random.nextFloat() * 0.1f; // 0.15 to 0.25
@@ -41,13 +41,11 @@ public class HolystoneStarParticle extends TextureSheetParticle {
 
         // Particles pass through blocks
         this.hasPhysics = false;
-
-        this.pickSprite(sprites);
     }
 
     @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    protected SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     @Override
@@ -86,12 +84,11 @@ public class HolystoneStarParticle extends TextureSheetParticle {
     }
 
     @Override
-    public int getLightColor(float partialTick) {
+    public int getLightCoords(float partialTick) {
         // Full brightness - makes the particle glow
         return 0xF000F0;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
 
@@ -101,9 +98,10 @@ public class HolystoneStarParticle extends TextureSheetParticle {
 
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level,
-                                        double x, double y, double z,
-                                        double xSpeed, double ySpeed, double zSpeed) {
-            return new HolystoneStarParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites);
+                                       double x, double y, double z,
+                                       double xSpeed, double ySpeed, double zSpeed,
+                                       RandomSource random) {
+            return new HolystoneStarParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites.get(random));
         }
     }
 }

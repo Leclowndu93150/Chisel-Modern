@@ -26,9 +26,9 @@ public class ClientPayloadHandler {
                 double z = payload.pos().getZ() + 0.5;
 
                 for (int i = 0; i < 5; i++) {
-                    double dx = (level.random.nextDouble() - 0.5) * 0.3;
-                    double dy = level.random.nextDouble() * 0.2;
-                    double dz = (level.random.nextDouble() - 0.5) * 0.3;
+                    double dx = (level.getRandom().nextDouble() - 0.5) * 0.3;
+                    double dy = level.getRandom().nextDouble() * 0.2;
+                    double dz = (level.getRandom().nextDouble() - 0.5) * 0.3;
                     level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, payload.state()), x, y, z, dx, dy, dz);
                 }
 
@@ -51,8 +51,8 @@ public class ClientPayloadHandler {
                     ChunkData.setData(mc.level, chunkPos, offsetData);
                 }
 
-                int minSection = mc.level.getMinSection();
-                int maxSection = mc.level.getMaxSection();
+                int minSection = mc.level.getMinSectionY();
+                int maxSection = mc.level.getMaxSectionY();
 
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dz = -1; dz <= 1; dz++) {
