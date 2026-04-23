@@ -556,9 +556,10 @@ public class ChiselBlocks {
     );
 
     public static final ChiselBlockType<BlockCarvableGlass> ICE = registerType(
-            new ChiselBlockType<BlockCarvableGlass>("ice")
+            new ChiselBlockType<BlockCarvableGlass>("ice",
+                    (props, data) -> new BlockCarvableGlass(props, data, "ice"))
                     .addVanillaBlock(Blocks.PACKED_ICE)
-                    .properties(() -> Blocks.PACKED_ICE)
+                    .properties(() -> Blocks.ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.ICE)
                     .defaultModelTemplate(simpleBlockTranslucent())
@@ -567,7 +568,8 @@ public class ChiselBlocks {
     );
 
     public static final ChiselBlockType<BlockCarvableGlass> ICE_PILLAR = registerType(
-            new ChiselBlockType<BlockCarvableGlass>("icepillar")
+            new ChiselBlockType<BlockCarvableGlass>("icepillar",
+                    (props, data) -> new BlockCarvableGlass(props, data, "icepillar"))
                     .addVanillaBlock(Blocks.ICE)
                     .properties(() -> Blocks.ICE)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -930,11 +932,13 @@ public class ChiselBlocks {
                     .build()
     );
 
-    public static final ChiselBlockType<BlockCarvable> WATERSTONE = registerType(
-            new ChiselBlockType<BlockCarvable>("waterstone")
+    public static final ChiselBlockType<BlockCarvableGlass> WATERSTONE = registerType(
+            new ChiselBlockType<BlockCarvableGlass>("waterstone",
+                    (props, data) -> new BlockCarvableGlass(props, data, "waterstone"))
                     .properties(BlockBehaviour.Properties.of()
                             .strength(4.0f, 50.0f)
-                            .sound(SoundType.STONE))
+                            .sound(SoundType.STONE)
+                            .noOcclusion())
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_STONE_TOOL)
                     .variations(VariantTemplates.WATERSTONE)

@@ -64,16 +64,18 @@ public class ChiselBlockStateProvider extends ModelProvider {
             for (DeferredBlock<?> deferredBlock : blockType.getAllBlocks()) {
                 Block block = deferredBlock.get();
                 ChiselModelTemplates.ChiselModelTemplate template = defaultTemplate;
+                boolean variantHadTemplate = false;
                 if (block instanceof ICarvable carvable) {
                     VariationData variation = carvable.getVariation();
                     if (variation.modelTemplate() != null) {
                         template = variation.modelTemplate();
+                        variantHadTemplate = true;
                     }
                 }
                 if (template == null) {
                     template = ChiselModelTemplates.simpleBlock();
                 }
-                if (block instanceof BlockCarvableGlass) {
+                if (block instanceof BlockCarvableGlass && !variantHadTemplate) {
                     template = ChiselModelTemplates.simpleBlockTranslucent();
                 }
                 template.apply(block, blockModels);
