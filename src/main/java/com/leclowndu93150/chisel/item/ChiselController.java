@@ -27,6 +27,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 
 import java.util.Collection;
 import java.util.List;
@@ -207,7 +208,7 @@ public class ChiselController {
     }
 
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+    public static void onBlockBreak(BreakBlockEvent event) {
         ItemStack stack = event.getPlayer().getMainHandItem();
         if (event.getPlayer().getAbilities().instabuild && !stack.isEmpty() && stack.getItem() instanceof IChiselItem) {
             event.setCanceled(true);

@@ -81,8 +81,14 @@ sourceSets.main.java {
 }
 
 dependencies {
-    // CTM - local jar
-    implementation files('libs/CTM.jar')
+    // CTM - resolved from mavenLocal, bundled via JarJar
+    implementation "team.chisel.ctm:CTM:26.1.1-1.2.1+9ec7bcc"
+    jarJar("team.chisel.ctm:CTM") {
+        version {
+            strictly "[26.1.1-1.2.1,)"
+            prefer "26.1.1-1.2.1+9ec7bcc"
+        }
+    }
 
     // JEI
     implementation "curse.maven:jei-238222:7920926"
