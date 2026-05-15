@@ -43,7 +43,7 @@ public class ChiselModelTemplates {
      */
     @FunctionalInterface
     public interface ChiselModelTemplate {
-        void apply(Block block, BlockModelGenerators blockModels);
+        void apply(Block block, Object blockModels);
     }
 
     // =====================================================================
@@ -172,7 +172,8 @@ public class ChiselModelTemplates {
      * Simple cube_all block with the block's own texture.
      */
     public static ChiselModelTemplate simpleBlock() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             Material tex = mat("block/" + texturePath(block));
             Identifier model = cubeAllModel(block, tex, blockModels);
             simpleBlockState(block, model, blockModels);
@@ -184,7 +185,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate simpleBlockTranslucent() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             Material tex = mat("block/" + texturePath(block));
             Identifier model = cubeAllTranslucentModel(block, tex, blockModels);
             simpleBlockState(block, model, blockModels);
@@ -196,7 +198,8 @@ public class ChiselModelTemplates {
      * Uses a custom parent model for the translucent no-cull behavior.
      */
     public static ChiselModelTemplate cloudBlock() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             TextureMapping mapping = new TextureMapping()
                     .put(TextureSlot.ALL, mat("block/" + texturePath(block)));
             Identifier model = parentModel(block, Chisel.id("block/cube_all_translucent"),
@@ -206,7 +209,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cubeBottomTop() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             Identifier model = cubeBottomTopModel(block,
                     mat(texPath + "-side"),
@@ -218,7 +222,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cubeBottomTop(String side, String bottom, String top) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             Identifier model = cubeBottomTopModel(block,
                     mat(replaceVariant(texPath, side)),
@@ -230,7 +235,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cubeAll(String postfix) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             Identifier model = cubeAllModel(block, mat(texPath + postfix), blockModels);
             simpleBlockState(block, model, blockModels);
@@ -238,7 +244,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cubeColumn() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             Identifier model = cubeColumnModel(block,
                     mat(texPath + "-side"),
@@ -253,7 +260,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cubeColumn(String side, String top) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             Identifier model = cubeColumnModel(block,
                     mat(replaceVariant(texPath, side)),
@@ -264,7 +272,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate bookshelf() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot overlay = slot("overlay");
             TextureMapping mapping = new TextureMapping().put(overlay, mat(texPath));
@@ -274,7 +283,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate bookshelf(String woodType) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String variantName = getVariantName(block);
             TextureSlot overlay = slot("overlay");
             TextureMapping mapping = new TextureMapping().put(overlay, mat("block/bookshelf/" + variantName));
@@ -284,7 +294,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate ctm(String variant) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             String texName = replaceVariant(texPath, variant);
             String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
@@ -298,7 +309,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate twoLayerWithTop(String top, boolean shade) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot botSlot = slot("bot");
             TextureSlot topSlot = slot("top");
@@ -310,7 +322,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate axisFaces() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot x = slot("x");
             TextureSlot y = slot("y");
@@ -325,7 +338,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate axisFacesNoTop() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot x = slot("x");
             TextureSlot y = slot("y");
@@ -340,7 +354,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate mossy(String base) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             String texName = replaceBlock(texPath, base);
             TextureSlot bot = slot("bot");
@@ -351,7 +366,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate mossyColumn(String base) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             String texName = replaceBlock(texPath, base);
             TextureSlot side = slot("side");
@@ -365,7 +381,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate mossyCtm(String base, String variant) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             String texName = replaceVariant(replaceBlock(texPath, base), variant);
             String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
@@ -385,7 +402,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate twoLayerTopShaded(String particle, String top, String bottom) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot pSlot = TextureSlot.PARTICLE;
             TextureSlot tSlot = slot("top");
@@ -400,7 +418,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate threeLayerTopShaded(String particle, String top, String mid, String bottom) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot pSlot = TextureSlot.PARTICLE;
             TextureSlot tSlot = slot("top");
@@ -417,7 +436,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cubeCTMTranslucent(String all, String ctm) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             TextureSlot allSlot = TextureSlot.ALL;
             TextureSlot ctmSlot = slot("connected_tex");
             TextureMapping mapping = new TextureMapping().put(allSlot, mat(Identifier.parse(all))).put(ctmSlot, mat(Identifier.parse(ctm))).forceAllTranslucent();
@@ -427,7 +447,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate fluidCube(String fluid) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String variant = getVariantName(block);
             TextureSlot bot = slot("bot");
             TextureSlot top = slot("top");
@@ -442,7 +463,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate fluidCubeCTM(String fluid, String variant) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
             TextureSlot bot = slot("bot");
             TextureSlot top = slot("top");
@@ -459,7 +481,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate fluidPassCube(String fluid) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String variant = getVariantName(block);
             TextureSlot bot = slot("bot");
             TextureSlot top = slot("top");
@@ -474,7 +497,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate fluidPassColumn(String fluid) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String variant = getVariantName(block);
             TextureSlot bot = slot("bot");
             TextureSlot side = slot("side");
@@ -498,7 +522,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cubeEldritch() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureMapping mapping = new TextureMapping().put(TextureSlot.ALL, mat(texPath));
             Identifier model = parentModel(block, Chisel.id("block/cube_eldritch"), mapping, blockModels, TextureSlot.ALL);
@@ -507,7 +532,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate columnEldritch(String top) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot end = slot("end");
             TextureSlot side = slot("side");
@@ -520,7 +546,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate columnPillar() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot top = slot("top");
             TextureSlot pillar = slot("pillar");
@@ -533,7 +560,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate hexPlate(String variant) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             TextureSlot top = slot("top");
             TextureSlot bot = slot("bot");
             TextureMapping mapping = new TextureMapping()
@@ -549,14 +577,16 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate cube(String texture) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             Identifier model = cubeAllModel(block, mat(texture), blockModels);
             simpleBlockState(block, model, blockModels);
         };
     }
 
     public static ChiselModelTemplate paneBlock(String edge) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texture = "block/" + name(block).replace("pane", "");
             Material paneTex = mat(texture);
             Material edgeTex = mat(edge);
@@ -566,7 +596,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate paneBlockSideTop() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String basePath = "block/" + texturePath(block);
             Material paneTex = mat(basePath + "-side");
             Material edgeTex = mat(basePath + "-top");
@@ -641,7 +672,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate bars(String texture, String edge, String side) {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             Material barsTex = mat(texture);
             Material edgeTex = mat(edge);
             Material sideTex = mat(side);
@@ -654,7 +686,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate ironBars() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String basePath = "block/" + texturePath(block);
             Material barsTex = mat(basePath);
             TextureMapping mapping = new TextureMapping()
@@ -715,7 +748,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate woolCtm() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot allSlot = TextureSlot.ALL;
             TextureSlot ctmSlot = slot("connected_tex");
@@ -728,7 +762,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate carpetCtm() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block).replace("carpet/", "wool/");
             TextureSlot allSlot = TextureSlot.ALL;
             TextureSlot ctmSlot = slot("all_ctm");
@@ -741,7 +776,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate mysteriousCube() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot core = slot("core");
             TextureSlot side = slot("side");
@@ -758,7 +794,8 @@ public class ChiselModelTemplates {
     }
 
     public static ChiselModelTemplate ae2Controller() {
-        return (block, blockModels) -> {
+        return (block, blockModelsRaw) -> {
+            BlockModelGenerators blockModels = (BlockModelGenerators) blockModelsRaw;
             String texPath = "block/" + texturePath(block);
             TextureSlot blockTex = slot("block");
             TextureSlot lights = slot("lights");

@@ -97,8 +97,8 @@ dependencies {
     implementation "curse.maven:baguettelib-1264423:7813553"
 
     // FTB Ultimine + Library
-    implementation "dev.ftb.mods:ftb-library-neoforge:26.1.2.1"
-    implementation "dev.ftb.mods:ftb-ultimine-neoforge:26.1.2.2"
+    compileOnly "dev.ftb.mods:ftb-library-neoforge:26.1.2.1"
+    compileOnly "dev.ftb.mods:ftb-ultimine-neoforge:26.1.2.2"
 
     // Commented out - not yet ported to 26.1
     // implementation "curse.maven:jade-324717:6853386"
