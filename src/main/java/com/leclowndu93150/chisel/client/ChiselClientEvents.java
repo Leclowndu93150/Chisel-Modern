@@ -2,7 +2,6 @@ package com.leclowndu93150.chisel.client;
 
 import com.leclowndu93150.chisel.Chisel;
 import com.leclowndu93150.chisel.api.block.ChiselBlockType;
-import com.leclowndu93150.chisel.api.chunkdata.ChunkData;
 import com.leclowndu93150.chisel.block.BlockCarvable;
 import com.leclowndu93150.chisel.client.util.CTMDetection;
 import com.leclowndu93150.chisel.init.ChiselBlocks;
@@ -35,7 +34,7 @@ public class ChiselClientEvents {
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             OffsetProviderRegistry.INSTANCE.registerProvider((world, pos) ->
-                    ChunkData.getOffsetData(world, pos).getOffset(pos));
+                    ChunkDataClient.getOffsetData(world, pos).getOffset(pos));
 
             CTMDetection.init();
         });
