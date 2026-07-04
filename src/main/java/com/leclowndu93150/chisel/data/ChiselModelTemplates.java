@@ -368,6 +368,52 @@ public class ChiselModelTemplates {
     }
 
     /**
+     * Fluid cube using the block type's own texture as the overlay (instead of block/fluid/).
+     */
+    public static ModelTemplate fluidCubeLocal(String fluid) {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/cube_" + fluid))
+                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
+                    .texture("top", Chisel.id(texPath)));
+        };
+    }
+
+    public static ModelTemplate fluidPassCubeLocal(String fluid) {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/cube_pass_" + fluid))
+                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
+                    .texture("top", Chisel.id(texPath)));
+        };
+    }
+
+    public static ModelTemplate fluidCubeCTMLocal(String fluid, String variant) {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            String ctmVariant = variant.endsWith("ct") ? variant.substring(0, variant.length() - 2) : variant;
+            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/cube_ctm_" + fluid))
+                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
+                    .texture("top", Chisel.id(replaceVariant(texPath, variant)))
+                    .texture("connect_top", Chisel.id(replaceVariant(texPath, ctmVariant) + "-ctm")));
+        };
+    }
+
+    public static ModelTemplate fluidPassColumnLocal(String fluid) {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/" + fluid + "stone/column_" + fluid))
+                    .texture("bot", ResourceLocation.withDefaultNamespace("block/" + fluid + "_still"))
+                    .texture("side", Chisel.id(texPath + "-side"))
+                    .texture("top", Chisel.id(texPath + "-top")));
+        };
+    }
+
+    /**
      * Gets the variant name from a block (for fluid textures).
      */
     private static String getVariantName(Block block) {
@@ -404,6 +450,42 @@ public class ChiselModelTemplates {
             prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/column_pillar"))
                     .texture("top", texPath + "-top")
                     .texture("pillar", texPath + "-ctmv"));
+        };
+    }
+
+    public static ModelTemplate glowPlate(String top, String bot) {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            prov.simpleBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/cube_2_layer"))
+                    .texture("top", Chisel.id(top))
+                    .texture("bot", Chisel.id(bot)));
+        };
+    }
+
+    /**
+     * Carved pumpkin model - front face texture from the variation, vanilla pumpkin side/top.
+     */
+    public static ModelTemplate carvedPumpkin() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.horizontalBlock(block, prov.models().orientable(modelName,
+                    ResourceLocation.withDefaultNamespace("block/pumpkin_side"),
+                    Chisel.id(texPath),
+                    ResourceLocation.withDefaultNamespace("block/pumpkin_top")));
+        };
+    }
+
+    /**
+     * Road line model - paper-thin overlay with the line texture on top.
+     */
+    public static ModelTemplate roadLine() {
+        return (prov, block) -> {
+            String modelName = "block/" + name(block);
+            String texPath = "block/" + texturePath(block);
+            prov.horizontalBlock(block, prov.models().withExistingParent(modelName, Chisel.id("block/road_line_base"))
+                    .texture("line", Chisel.id(texPath))
+                    .renderType("cutout"));
         };
     }
 

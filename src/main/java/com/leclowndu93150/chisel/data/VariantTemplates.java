@@ -436,8 +436,8 @@ public class VariantTemplates {
             new VariationData("blocks_rough", "Blocks Rough", simpleBlock()),
             new VariationData("brick", "Brick", simpleBlock()),
             new VariationData("large_bricks", "Large Bricks", simpleBlock()),
-            new VariationData("platform", "Platform", cubeBottomTop("platform_top", "platform_bottom", "platform_side")),
-            new VariationData("platform_tiles", "Platform Tiles", cubeBottomTop("platform_tiles_top", "platform_tiles_bottom", "platform_tiles_side")),
+            new VariationData("platform", "Platform", cubeBottomTop("platform_side", "platform_bottom", "platform_top")),
+            new VariationData("platform_tiles", "Platform Tiles", cubeBottomTop("platform_tiles_side", "platform_tiles_bottom", "platform_tiles_top")),
             new VariationData("construction", "Construction", simpleBlock()),
             new VariationData("fancy_tiles", "Fancy Tiles", simpleBlock()),
             new VariationData("plate", "Plate", simpleBlock()),
@@ -453,5 +453,197 @@ public class VariantTemplates {
             new VariationData("controller_purple", "Controller Purple", simpleBlock()),
             new VariationData("uber_wavy", "Uber Wavy", simpleBlock())
     );
+
+    public static final List<VariationData> GRIMSTONE = List.of(
+            new VariationData("raw", "Grimstone", simpleBlock()),
+            new VariationData("smooth", "Smooth", simpleBlock()),
+            new VariationData("hate", "Hate", simpleBlock()),
+            new VariationData("chiseled", "Chiseled", cubeColumn("chiseled_side", "chiseled_top")),
+            new VariationData("blocks", "Blocks", simpleBlock()),
+            new VariationData("blocks_rough", "Rough Blocks", simpleBlock()),
+            new VariationData("brick", "Brick", simpleBlock()),
+            new VariationData("large_bricks", "Large Bricks", simpleBlock()),
+            new VariationData("platform", "Platform", cubeBottomTop("platform_side", "platform_bottom", "platform_top")),
+            new VariationData("platform_tiles", "Platform Tiles", cubeBottomTop("platform_tiles_side", "platform_tiles_bottom", "platform_tiles_top")),
+            new VariationData("construction", "Construction", simpleBlock()),
+            new VariationData("fancy_tiles", "Fancy Tiles", simpleBlock()),
+            new VariationData("plate", "Plate", simpleBlock()),
+            new VariationData("plate_rough", "Rough Plate", simpleBlock()),
+            new VariationData("flaky", "Flaky", simpleBlock())
+    );
+
+    public static final List<VariationData> SHINGLES = List.of(
+            new VariationData("shingle_1", "Red Diagonal", simpleBlock()),
+            new VariationData("shingle_2", "Red Small Bricks", simpleBlock()),
+            new VariationData("shingle_3", "Red Large Bricks", simpleBlock()),
+            new VariationData("shingle_4", "Black Small Bricks", simpleBlock()),
+            new VariationData("shingle_5", "Black Diagonal", simpleBlock()),
+            new VariationData("shingle_6", "Black Large Bricks", simpleBlock())
+    );
+
+    public static final List<VariationData> BIRDSTONE = List.of(
+            new VariationData("smooth", "Smooth", simpleBlock()),
+            new VariationData("rough", "Rough", simpleBlock()),
+            new VariationData("smallbrick", "Small Brick", simpleBlock()),
+            new VariationData("smalltile", "Small Tile", simpleBlock()),
+            new VariationData("smallbroken", "Small Broken", simpleBlock()),
+            new VariationData("fourtile", "Four Tile", simpleBlock()),
+            new VariationData("marker", "Marker", simpleBlock()),
+            new VariationData("emboss", "Emboss", simpleBlock()),
+            new VariationData("dent", "Dent", simpleBlock()),
+            new VariationData("darkpanel", "Dark Panel", simpleBlock()),
+            new VariationData("french", "French", simpleBlock()),
+            new VariationData("french2", "French Alt", simpleBlock()),
+            new VariationData("french_creep", "French Creeper", simpleBlock()),
+            new VariationData("smooth_creep", "Smooth Creeper", simpleBlock()),
+            new VariationData("ornate1", "Ornate 1", simpleBlock()),
+            new VariationData("ornate2", "Ornate 2", simpleBlock())
+    );
+
+    public static final List<VariationData> MILITARY_IMPERIAL = List.of(
+            new VariationData("imperial_camo", "Camo", simpleBlock()),
+            new VariationData("imperial_camo_secluded", "Secluded Camo", simpleBlock()),
+            new VariationData("imperial_plate", "Plate", simpleBlock()),
+            new VariationData("imperial_caution_white", "White Caution", simpleBlock()),
+            new VariationData("imperial_caution_orange", "Orange Caution", simpleBlock())
+    );
+
+    public static final List<VariationData> MILITARY_REBEL = List.of(
+            new VariationData("rebel_camo", "Camo", simpleBlock()),
+            new VariationData("rebel_camo_secluded", "Secluded Camo", simpleBlock()),
+            new VariationData("rebel_plate", "Plate", simpleBlock()),
+            new VariationData("rebel_caution_white", "White Caution", simpleBlock()),
+            new VariationData("rebel_caution_red", "Red Caution", simpleBlock())
+    );
+
+    public static final List<VariationData> MECHANICAL2 = List.of(
+            new VariationData("gear", "Gear", simpleBlock()),
+            new VariationData("hex", "Hex", simpleBlock()),
+            new VariationData("vent_glow", "Glowing Vent", simpleBlock()),
+            new VariationData("vent2", "Vent", simpleBlock())
+    );
+
+    public static final List<VariationData> LEAVES = List.of(
+            new VariationData("dead", "Dead Leaves", simpleBlockCutout()),
+            new VariationData("fancy", "Fancy Leaves", simpleBlockCutout()),
+            new VariationData("pinkpetal", "Pink Petals", simpleBlockCutout()),
+            new VariationData("red_roses", "Red Rose", simpleBlockCutout()),
+            new VariationData("roses", "White Rose", simpleBlockCutout()),
+            new VariationData("christmas_balls", "Christmas Balls", simpleBlockCutout()),
+            new VariationData("christmas_lights", "Christmas Lights", simpleBlockCutout())
+    );
+
+    public static final List<VariationData> AMBER = List.of(
+            new VariationData("amber", "Amber", cubeColumn("amber", "amber_top"))
+    );
+
+    public static final List<VariationData> THAUMIUM = List.of(
+            new VariationData("raw", "Thaumium", simpleBlock()),
+            new VariationData("ornate", "Ornate Pattern", simpleBlock()),
+            new VariationData("totem", "Totem Faces", simpleBlock()),
+            new VariationData("big_bricks", "Bricks", simpleBlock()),
+            new VariationData("small", "Small Tiles", simpleBlock()),
+            new VariationData("lattice", "Lattice", simpleBlock()),
+            new VariationData("planks", "Bounded Planks", simpleBlock()),
+            new VariationData("chunks", "Chunks", simpleBlock()),
+            new VariationData("bevel", "Bevel", simpleBlock())
+    );
+
+    public static final List<VariationData> TALLOW = List.of(
+            new VariationData("raw", "Tallow", cubeColumn("raw", "raw_top")),
+            new VariationData("smooth", "Smooth Tallow", simpleBlock()),
+            new VariationData("faces", "Ensouled Tallow", simpleBlock())
+    );
+
+    public static final List<VariationData> ARCANE = List.of(
+            new VariationData("moon_engrave", "Engraved Moon", simpleBlock()),
+            new VariationData("moon_glow", "Glowing Moon", simpleBlock()),
+            new VariationData("arcane_tile", "Beveled Tile", simpleBlock()),
+            new VariationData("runes", "Engraved Symbols", simpleBlock()),
+            new VariationData("runes_glow", "Glowing Symbols", simpleBlock()),
+            new VariationData("big_brick", "Bricks", simpleBlock()),
+            new VariationData("conduit_glow", "Temporal Conduit", simpleBlock()),
+            new VariationData("border_brain", "Braaainz", simpleBlock()),
+            new VariationData("arcane_border", "Infernally Arcane", simpleBlock()),
+            new VariationData("arcane_matrix", "Nasty Nazca Lines", simpleBlock()),
+            new VariationData("thaumcraft_logo", "Fine Thaumaturge's Emblem", simpleBlock()),
+            new VariationData("arcane_crack", "Cracked Rock leaking Eldritch Glow", simpleBlock()),
+            new VariationData("single_rune", "Single Rune", simpleBlock())
+    );
+
+    public static final List<VariationData> BLOOD_RUNE = List.of(
+            new VariationData("blankrune", "Blank Rune", simpleBlock()),
+            new VariationData("bloodrunearranged", "Arranged Blood Rune", simpleBlock()),
+            new VariationData("bloodrunebricks", "Blood Rune Bricks", cubeColumn("bloodrunebricks", "bloodrunebrickstop")),
+            new VariationData("bloodrunecarved", "Carved Blood Rune", simpleBlock()),
+            new VariationData("bloodrunecarvedradial", "Radial Carved Blood Rune", simpleBlock()),
+            new VariationData("bloodruneclassicpanel", "Classic Panel Blood Rune", simpleBlock()),
+            new VariationData("bloodrunetiles", "Blood Rune Tiles", simpleBlock())
+    );
+
+    public static final List<VariationData> BRICK_CUSTOM = List.of(
+            new VariationData("large", "Large Bricks", simpleBlock()),
+            new VariationData("mortarless", "Mortarless Bricks", simpleBlock()),
+            new VariationData("varied", "Varied Bricks", simpleBlock()),
+            new VariationData("aged", "Aged Bricks", simpleBlock()),
+            new VariationData("yellow", "Yellow Bricks", simpleBlock())
+    );
+
+    public static final List<VariationData> VOIDSTONE_PILLAR = List.of(
+            new VariationData("pillar", "Striped", columnPillar())
+    );
+
+    public static final List<VariationData> ROAD_LINE = List.of(
+            new VariationData("white", "White Line", roadLine()),
+            new VariationData("double_white", "Double White Line", roadLine()),
+            new VariationData("yellow", "Yellow Line", roadLine()),
+            new VariationData("double_yellow", "Double Yellow Line", roadLine())
+    );
+
+    public static final List<VariationData> MAGMA = List.of(
+            new VariationData("raw", "Raw", fluidCubeLocal("lava")),
+            new VariationData("cracked", "Cracked", fluidCubeLocal("lava")),
+            new VariationData("solid_bricks", "Bricks", fluidCubeLocal("lava")),
+            new VariationData("small_bricks", "Small Bricks", fluidCubeLocal("lava")),
+            new VariationData("soft_bricks", "Weathered Bricks", fluidCubeLocal("lava")),
+            new VariationData("cracked_bricks", "Cracked Bricks", fluidCubeLocal("lava")),
+            new VariationData("triple_bricks", "Wide Bricks", fluidCubeLocal("lava")),
+            new VariationData("encased_bricks", "Encased Bricks", fluidPassCubeLocal("lava")),
+            new VariationData("chaotic_bricks", "Trodden Bricks", fluidPassCubeLocal("lava")),
+            new VariationData("array", "Arrayed Bricks", fluidPassCubeLocal("lava")),
+            new VariationData("tiles_medium", "Tiles", fluidCubeLocal("lava")),
+            new VariationData("tiles_large", "Big Tile", fluidPassCubeLocal("lava")),
+            new VariationData("tiles_small", "Small Tiles", fluidCubeLocal("lava")),
+            new VariationData("chaotic_medium", "Disordered Tiles", fluidCubeLocal("lava")),
+            new VariationData("chaotic_small", "Small Disordered Tiles", fluidCubeLocal("lava")),
+            new VariationData("braid", "Braid", fluidCubeLocal("lava")),
+            new VariationData("dent", "Dent", fluidPassCubeLocal("lava")),
+            new VariationData("french_1", "French 1", fluidCubeLocal("lava")),
+            new VariationData("french_2", "French 2", fluidCubeLocal("lava")),
+            new VariationData("jellybean", "Jellybean", fluidPassCubeLocal("lava")),
+            new VariationData("layers", "Layers", fluidCubeLocal("lava")),
+            new VariationData("mosaic", "Mosaic", fluidPassCubeLocal("lava")),
+            new VariationData("ornate", "Ornate", fluidCubeLocal("lava")),
+            new VariationData("panel", "Panel", fluidCubeLocal("lava")),
+            new VariationData("road", "Road", fluidCubeLocal("lava")),
+            new VariationData("slanted", "Slanted", fluidPassCubeLocal("lava")),
+            new VariationData("zag", "Zag", fluidCubeLocal("lava")),
+            new VariationData("circular", "Circular", fluidCubeLocal("lava")),
+            new VariationData("circularct", "Circular", fluidCubeCTMLocal("lava", "circularct")).withTooltip("Has CTM"),
+            new VariationData("weaver", "Celtic", fluidPassCubeLocal("lava")),
+            new VariationData("pillar", "Pillar", fluidPassColumnLocal("lava")),
+            new VariationData("twisted", "Twisted", fluidPassColumnLocal("lava")),
+            new VariationData("prism", "Prism", fluidCubeLocal("lava")),
+            new VariationData("cuts", "Cuts", fluidPassCubeLocal("lava"))
+    );
+
+    public static final List<VariationData> PUMPKIN;
+    static {
+        List<VariationData> faces = new ArrayList<>();
+        for (int i = 1; i <= 16; i++) {
+            faces.add(new VariationData("face_" + i, "Face " + i, carvedPumpkin()));
+        }
+        PUMPKIN = List.copyOf(faces);
+    }
 
 }

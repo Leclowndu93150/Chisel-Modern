@@ -1,9 +1,9 @@
 {
-    "ctm": {
-        "ctm_version": 1,
-        "type": "ctm",
-        "textures": [
-            "chisel:block/bloodMagic/diagonal/RuneDiagonalBricks_1-ctm"
-        ]
-    }
+  "ctm": {
+    "ctm_version": 1,
+    "type": "ctm",
+    "textures": [
+      "chisel:block/blood_magic/diagonal/runediagonalbricks_1-ctm"
+    ]
+  }
 }

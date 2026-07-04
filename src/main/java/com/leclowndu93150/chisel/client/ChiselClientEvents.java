@@ -49,6 +49,12 @@ public class ChiselClientEvents {
                     tintIndex == 1 ? color.getTextColor() : -1, blocks);
         }
 
+        for (var entry : ChiselBlocks.FUTURA_CIRCUIT.getBlocks().entrySet()) {
+            DyeColor color = DyeColor.byName(entry.getKey(), DyeColor.WHITE);
+            event.register((state, level, pos, tintIndex) ->
+                    tintIndex == 1 ? color.getTextColor() : -1, entry.getValue().get());
+        }
+
         Block[] waterstoneBlocks = ChiselBlocks.WATERSTONE.getAllBlocks().stream()
                 .map(DeferredBlock::get)
                 .toArray(Block[]::new);
@@ -73,6 +79,12 @@ public class ChiselClientEvents {
 
             event.register((stack, tintIndex) ->
                     tintIndex == 1 ? color.getTextColor() : -1, items);
+        }
+
+        for (var entry : ChiselBlocks.FUTURA_CIRCUIT.getItems().entrySet()) {
+            DyeColor color = DyeColor.byName(entry.getKey(), DyeColor.WHITE);
+            event.register((stack, tintIndex) ->
+                    tintIndex == 1 ? color.getTextColor() : -1, entry.getValue().get());
         }
 
         var waterstoneItems = ChiselBlocks.WATERSTONE.getAllBlocks().stream()

@@ -52,7 +52,275 @@ public class ChiselRecipeProvider extends RecipeProvider {
         buildHolystoneRecipes(output);
         buildCarpetRecipes(output);
         buildCubitsRecipes(output);
+        buildPortedBlockRecipes(output);
         buildStonecutterRecipes(output);
+    }
+
+    private void buildPortedBlockRecipes(RecipeOutput output) {
+        if (ChiselBlocks.GRIMSTONE.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.GRIMSTONE.getBlock("raw").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SCS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('C', Items.COAL)
+                    .unlockedBy("has_coal", has(Items.COAL))
+                    .save(output, Chisel.id("grimstone/raw"));
+        }
+
+        if (ChiselBlocks.SHINGLES.getBlock("shingle_1") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.SHINGLES.getBlock("shingle_1").get(), 6)
+                    .pattern("BBB")
+                    .pattern("BBB")
+                    .define('B', Items.BRICK)
+                    .unlockedBy("has_brick", has(Items.BRICK))
+                    .save(output, Chisel.id("shingles/shingle_1"));
+        }
+
+        if (ChiselBlocks.BIRDSTONE.getBlock("smooth") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.BIRDSTONE.getBlock("smooth").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SES")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('E', Items.EGG)
+                    .unlockedBy("has_egg", has(Items.EGG))
+                    .save(output, Chisel.id("birdstone/smooth"));
+        }
+
+        if (ChiselBlocks.MILITARY_REBEL.getBlock("rebel_camo") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.MILITARY_REBEL.getBlock("rebel_camo").get(), 32)
+                    .pattern("SIS")
+                    .pattern("IGI")
+                    .pattern("SIS")
+                    .define('S', Tags.Items.STONES)
+                    .define('I', Tags.Items.INGOTS_IRON)
+                    .define('G', Tags.Items.NUGGETS_GOLD)
+                    .unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON))
+                    .save(output, Chisel.id("military/rebel_camo"));
+        }
+
+        if (ChiselBlocks.MECHANICAL2.getBlock("gear") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.MECHANICAL2.getBlock("gear").get(), 4)
+                    .pattern("IRI")
+                    .pattern("RIR")
+                    .pattern("IRI")
+                    .define('I', Tags.Items.INGOTS_IRON)
+                    .define('R', Tags.Items.DUSTS_REDSTONE)
+                    .unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON))
+                    .save(output, Chisel.id("mechanical2/gear"));
+        }
+
+        if (ChiselBlocks.AMBER.getBlock("amber") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.AMBER.getBlock("amber").get())
+                    .pattern("HHH")
+                    .pattern("HHH")
+                    .pattern("HHH")
+                    .define('H', Items.HONEYCOMB)
+                    .unlockedBy("has_honeycomb", has(Items.HONEYCOMB))
+                    .save(output, Chisel.id("amber/amber"));
+        }
+
+        if (ChiselBlocks.THAUMIUM.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.THAUMIUM.getBlock("raw").get())
+                    .pattern("III")
+                    .pattern("IDI")
+                    .pattern("III")
+                    .define('I', Tags.Items.INGOTS_IRON)
+                    .define('D', Tags.Items.DYES_PURPLE)
+                    .unlockedBy("has_iron", has(Tags.Items.INGOTS_IRON))
+                    .save(output, Chisel.id("thaumium/raw"));
+        }
+
+        if (ChiselBlocks.TALLOW.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.TALLOW.getBlock("raw").get(), 2)
+                    .pattern("FF")
+                    .pattern("FF")
+                    .define('F', Items.SLIME_BALL)
+                    .unlockedBy("has_slime_ball", has(Items.SLIME_BALL))
+                    .save(output, Chisel.id("tallow/raw"));
+        }
+
+        if (ChiselBlocks.ARCANE.getBlock("arcane_border") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.ARCANE.getBlock("arcane_border").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SPS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('P', Tags.Items.DYES_PURPLE)
+                    .unlockedBy("has_purple_dye", has(Tags.Items.DYES_PURPLE))
+                    .save(output, Chisel.id("arcane/arcane_border"));
+        }
+
+        if (ChiselBlocks.BLOOD_RUNE.getBlock("bloodrunecarved") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.BLOOD_RUNE.getBlock("bloodrunecarved").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SRS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('R', Tags.Items.DYES_RED)
+                    .unlockedBy("has_red_dye", has(Tags.Items.DYES_RED))
+                    .save(output, Chisel.id("blood_magic/bloodrunecarved"));
+        }
+
+        if (ChiselBlocks.ANCIENT_STONE.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.ANCIENT_STONE.getBlock("raw").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SBS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('B', Items.BONE)
+                    .unlockedBy("has_bone", has(Items.BONE))
+                    .save(output, Chisel.id("ancient_stone/raw"));
+        }
+
+        if (ChiselBlocks.ARCANE_STONE.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.ARCANE_STONE.getBlock("raw").get(), 8)
+                    .pattern("SSS")
+                    .pattern("SQS")
+                    .pattern("SSS")
+                    .define('S', Tags.Items.STONES)
+                    .define('Q', Items.QUARTZ)
+                    .unlockedBy("has_quartz", has(Items.QUARTZ))
+                    .save(output, Chisel.id("arcane_stone/raw"));
+        }
+
+        if (ChiselBlocks.CERTUS.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.CERTUS.getBlock("raw").get(), 8)
+                    .pattern("QQQ")
+                    .pattern("QDQ")
+                    .pattern("QQQ")
+                    .define('Q', Items.QUARTZ)
+                    .define('D', Tags.Items.DYES_LIGHT_BLUE)
+                    .unlockedBy("has_quartz", has(Items.QUARTZ))
+                    .save(output, Chisel.id("certus/raw"));
+        }
+
+        if (ChiselBlocks.COALCOKE.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.COALCOKE.getBlock("raw").get(), 8)
+                    .pattern("CCC")
+                    .pattern("CGC")
+                    .pattern("CCC")
+                    .define('C', Items.COAL)
+                    .define('G', Items.GUNPOWDER)
+                    .unlockedBy("has_coal", has(Items.COAL))
+                    .save(output, Chisel.id("coalcoke/raw"));
+        }
+
+        if (ChiselBlocks.BRICK_CUSTOM.getBlock("large") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.BRICK_CUSTOM.getBlock("large").get(), 4)
+                    .pattern("BB")
+                    .pattern("BB")
+                    .define('B', Blocks.BRICKS)
+                    .unlockedBy("has_bricks", has(Blocks.BRICKS))
+                    .save(output, Chisel.id("brick_custom/large"));
+        }
+
+        if (ChiselBlocks.VOIDSTONE_PILLAR.getBlock("pillar") != null && ChiselBlocks.VOIDSTONE.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.VOIDSTONE_PILLAR.getBlock("pillar").get(), 4)
+                    .pattern("VV")
+                    .pattern("VV")
+                    .define('V', ChiselBlocks.VOIDSTONE.getBlock("raw").get())
+                    .unlockedBy("has_voidstone", has(ChiselBlocks.VOIDSTONE.getBlock("raw").get()))
+                    .save(output, Chisel.id("voidstone_pillar/pillar"));
+        }
+
+        if (ChiselBlocks.VOIDSTONE_PILLAR_ENERGISED.getBlock("pillar") != null && ChiselBlocks.VOIDSTONE_ENERGISED.getBlock("raw") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.VOIDSTONE_PILLAR_ENERGISED.getBlock("pillar").get(), 4)
+                    .pattern("VV")
+                    .pattern("VV")
+                    .define('V', ChiselBlocks.VOIDSTONE_ENERGISED.getBlock("raw").get())
+                    .unlockedBy("has_voidstone", has(ChiselBlocks.VOIDSTONE_ENERGISED.getBlock("raw").get()))
+                    .save(output, Chisel.id("voidstone_pillar_energised/pillar"));
+        }
+
+        if (ChiselBlocks.ROAD_LINE.getBlock("white") != null) {
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ChiselBlocks.ROAD_LINE.getBlock("white").get(), 8)
+                    .pattern("WRW")
+                    .pattern("WRW")
+                    .pattern("WRW")
+                    .define('W', Tags.Items.DYES_WHITE)
+                    .define('R', Tags.Items.DUSTS_REDSTONE)
+                    .unlockedBy("has_white_dye", has(Tags.Items.DYES_WHITE))
+                    .save(output, Chisel.id("road_line/white"));
+        }
+
+        for (int i = 1; i <= 16; i++) {
+            var pumpkin = ChiselBlocks.PUMPKIN.getBlock("face_" + i);
+            var lantern = ChiselBlocks.JACKOLANTERN.getBlock("face_" + i);
+            if (pumpkin != null && lantern != null) {
+                ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, lantern.get())
+                        .requires(pumpkin.get())
+                        .requires(Blocks.TORCH)
+                        .unlockedBy("has_pumpkin", has(pumpkin.get()))
+                        .save(output, Chisel.id("jackolantern/face_" + i));
+            }
+        }
+
+        for (DyeColor color : DyeColor.values()) {
+            var sand = ChiselBlocks.COLORED_SAND.getBlock(color.getSerializedName());
+            if (sand != null) {
+                ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, sand.get(), 8)
+                        .pattern("SSS")
+                        .pattern("SDS")
+                        .pattern("SSS")
+                        .define('S', Items.SAND)
+                        .define('D', color.getTag())
+                        .unlockedBy("has_sand", has(Items.SAND))
+                        .save(output, Chisel.id("colored_sand/" + color.getSerializedName()));
+            }
+
+            var clay = ChiselBlocks.WOOLEN_CLAY.getBlock(color.getSerializedName());
+            if (clay != null) {
+                ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, clay.get(), 2)
+                        .requires(getWoolBlock(color))
+                        .requires(getTerracottaBlock(color))
+                        .unlockedBy("has_wool", has(getWoolBlock(color)))
+                        .save(output, Chisel.id("woolen_clay/" + color.getSerializedName()));
+            }
+        }
+    }
+
+    private static Block getWoolBlock(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Blocks.WHITE_WOOL;
+            case ORANGE -> Blocks.ORANGE_WOOL;
+            case MAGENTA -> Blocks.MAGENTA_WOOL;
+            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_WOOL;
+            case YELLOW -> Blocks.YELLOW_WOOL;
+            case LIME -> Blocks.LIME_WOOL;
+            case PINK -> Blocks.PINK_WOOL;
+            case GRAY -> Blocks.GRAY_WOOL;
+            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_WOOL;
+            case CYAN -> Blocks.CYAN_WOOL;
+            case PURPLE -> Blocks.PURPLE_WOOL;
+            case BLUE -> Blocks.BLUE_WOOL;
+            case BROWN -> Blocks.BROWN_WOOL;
+            case GREEN -> Blocks.GREEN_WOOL;
+            case RED -> Blocks.RED_WOOL;
+            case BLACK -> Blocks.BLACK_WOOL;
+        };
+    }
+
+    private static Block getTerracottaBlock(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Blocks.WHITE_TERRACOTTA;
+            case ORANGE -> Blocks.ORANGE_TERRACOTTA;
+            case MAGENTA -> Blocks.MAGENTA_TERRACOTTA;
+            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_TERRACOTTA;
+            case YELLOW -> Blocks.YELLOW_TERRACOTTA;
+            case LIME -> Blocks.LIME_TERRACOTTA;
+            case PINK -> Blocks.PINK_TERRACOTTA;
+            case GRAY -> Blocks.GRAY_TERRACOTTA;
+            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_TERRACOTTA;
+            case CYAN -> Blocks.CYAN_TERRACOTTA;
+            case PURPLE -> Blocks.PURPLE_TERRACOTTA;
+            case BLUE -> Blocks.BLUE_TERRACOTTA;
+            case BROWN -> Blocks.BROWN_TERRACOTTA;
+            case GREEN -> Blocks.GREEN_TERRACOTTA;
+            case RED -> Blocks.RED_TERRACOTTA;
+            case BLACK -> Blocks.BLACK_TERRACOTTA;
+        };
     }
 
     private void buildToolRecipes(RecipeOutput output) {

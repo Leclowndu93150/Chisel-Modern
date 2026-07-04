@@ -1,9 +1,9 @@
 {
-    "ctm": {
-        "ctm_version": 1,
-        "type": "ctm",
-        "textures": [
-            "chisel:block/arcane_stone/mosaic-ctm"
-        ]
-    }
+  "ctm": {
+    "ctm_version": 1,
+    "type": "ctm",
+    "textures": [
+      "chisel:block/ancient_stone/mosaic-ctm"
+    ]
+  }
 }

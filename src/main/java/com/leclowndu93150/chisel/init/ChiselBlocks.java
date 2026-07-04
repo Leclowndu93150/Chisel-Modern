@@ -9,6 +9,8 @@ import com.leclowndu93150.chisel.block.BlockCarvableBookshelf;
 import com.leclowndu93150.chisel.block.BlockCarvableCarpet;
 import com.leclowndu93150.chisel.block.BlockCarvableGlass;
 import com.leclowndu93150.chisel.block.BlockCarvablePane;
+import com.leclowndu93150.chisel.block.BlockCarvablePumpkin;
+import com.leclowndu93150.chisel.block.BlockRoadLine;
 import com.leclowndu93150.chisel.block.BlockHolystone;
 import com.leclowndu93150.chisel.client.sound.ChiselSoundTypes;
 import com.leclowndu93150.chisel.data.ChiselModelTemplates;
@@ -676,6 +678,20 @@ public class ChiselBlocks {
                     .build()
     );
 
+    public static final ChiselBlockType<BlockCarvable> FUTURA_CIRCUIT = registerType(
+            new ChiselBlockType<BlockCarvable>("futura")
+                    .groupName("Futura Circuit")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.METAL)
+                            .strength(2.0f, 10.0f)
+                            .lightLevel(state -> 7)
+                            .requiresCorrectToolForDrops())
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.colors(glowPlate("block/futura/circuit", "block/animations/strobe")))
+                    .build()
+    );
+
     public static final ChiselBlockType<BlockCarvable> LABORATORY = registerType(
             new ChiselBlockType<BlockCarvable>("laboratory")
                     .properties(() -> Blocks.STONE)
@@ -936,6 +952,291 @@ public class ChiselBlocks {
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_STONE_TOOL)
                     .variations(VariantTemplates.WATERSTONE)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> GRIMSTONE = registerType(
+            new ChiselBlockType<BlockCarvable>("grimstone")
+                    .groupName("Grimstone")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_BLACK)
+                            .strength(2.0f, 10.0f)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.GRIMSTONE)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> SHINGLES = registerType(
+            new ChiselBlockType<BlockCarvable>("shingles")
+                    .groupName("Shingles")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_BROWN)
+                            .strength(1.5f, 6.0f)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.SHINGLES)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> BIRDSTONE = registerType(
+            new ChiselBlockType<BlockCarvable>("birdstone")
+                    .groupName("Birdstone")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.TERRACOTTA_WHITE)
+                            .strength(2.0f, 10.0f)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.BIRDSTONE)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> MILITARY_IMPERIAL = registerType(
+            new ChiselBlockType<BlockCarvable>("military")
+                    .groupName("Imperialistic Block")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_GRAY)
+                            .strength(2.0f, 10.0f)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.MILITARY_IMPERIAL)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> MILITARY_REBEL = registerType(
+            new ChiselBlockType<BlockCarvable>("military")
+                    .groupName("Rebellious Block")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_RED)
+                            .strength(2.0f, 10.0f)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.MILITARY_REBEL)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> MECHANICAL2 = registerType(
+            new ChiselBlockType<BlockCarvable>("mechanical2")
+                    .groupName("Mechanical Block")
+                    .properties(BlockBehaviour.Properties.of()
+                            .strength(5.0f, 6.0f)
+                            .requiresCorrectToolForDrops())
+                    .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
+                    .sound(ChiselSoundTypes.METAL_SUPPLIER)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .tag(BlockTags.NEEDS_STONE_TOOL)
+                    .variations(VariantTemplates.MECHANICAL2)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> LEAVES = registerType(
+            new ChiselBlockType<BlockCarvable>("leaves")
+                    .groupName("Leaves")
+                    .addVanillaBlock(Blocks.OAK_LEAVES)
+                    .addVanillaBlock(Blocks.SPRUCE_LEAVES)
+                    .addVanillaBlock(Blocks.BIRCH_LEAVES)
+                    .addVanillaBlock(Blocks.JUNGLE_LEAVES)
+                    .addVanillaBlock(Blocks.ACACIA_LEAVES)
+                    .addVanillaBlock(Blocks.DARK_OAK_LEAVES)
+                    .properties(() -> Blocks.OAK_LEAVES)
+                    .mapColor(MapColor.PLANT)
+                    .tag(BlockTags.MINEABLE_WITH_HOE)
+                    .tag(BlockTags.LEAVES)
+                    .variations(VariantTemplates.LEAVES)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> AMBER = registerType(
+            new ChiselBlockType<BlockCarvable>("amber")
+                    .groupName("Amber")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_ORANGE)
+                            .strength(2.0f, 10.0f)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.AMBER)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> THAUMIUM = registerType(
+            new ChiselBlockType<BlockCarvable>("thaumium")
+                    .groupName("Thaumium Block")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.COLOR_PURPLE)
+                            .strength(2.0f, 10.0f)
+                            .sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.THAUMIUM)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> TALLOW = registerType(
+            new ChiselBlockType<BlockCarvable>("tallow")
+                    .groupName("Tallow")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.SAND)
+                            .strength(2.0f, 10.0f)
+                            .sound(SoundType.SNOW)
+                            .requiresCorrectToolForDrops())
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.TALLOW)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> ARCANE = registerType(
+            new ChiselBlockType<BlockCarvable>("arcane")
+                    .groupName("Arcane Stone Block")
+                    .properties(() -> Blocks.STONE)
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.ARCANE)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> BLOOD_RUNE = registerType(
+            new ChiselBlockType<BlockCarvable>("blood_magic")
+                    .groupName("Blood Rune")
+                    .properties(() -> Blocks.STONE)
+                    .mapColor(MapColor.COLOR_RED)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.BLOOD_RUNE)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> ANCIENT_STONE = registerType(
+            new ChiselBlockType<BlockCarvable>("ancient_stone")
+                    .groupName("Ancient Stone")
+                    .properties(() -> Blocks.STONE)
+                    .mapColor(MapColor.STONE)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variation(VariantTemplates.RAW)
+                    .variations(VariantTemplates.ROCK)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> ARCANE_STONE = registerType(
+            new ChiselBlockType<BlockCarvable>("arcane_stone")
+                    .groupName("Arcane Stone")
+                    .properties(() -> Blocks.STONE)
+                    .mapColor(MapColor.QUARTZ)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variation(VariantTemplates.RAW)
+                    .variations(VariantTemplates.ROCK)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> CERTUS = registerType(
+            new ChiselBlockType<BlockCarvable>("certus")
+                    .groupName("Certus Quartz Block")
+                    .properties(() -> Blocks.QUARTZ_BLOCK)
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variation(VariantTemplates.RAW)
+                    .variations(VariantTemplates.ROCK)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> COALCOKE = registerType(
+            new ChiselBlockType<BlockCarvable>("coalcoke")
+                    .groupName("Coal Coke Block")
+                    .properties(() -> Blocks.COAL_BLOCK)
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variation(VariantTemplates.RAW)
+                    .variations(VariantTemplates.ROCK)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> MAGMA = registerType(
+            new ChiselBlockType<BlockCarvable>("magma")
+                    .groupName("Magma Block")
+                    .addVanillaBlock(Blocks.MAGMA_BLOCK)
+                    .properties(() -> Blocks.MAGMA_BLOCK)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.MAGMA)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> COLORED_SAND = registerType(
+            new ChiselBlockType<BlockCarvable>("colored_sand")
+                    .groupName("Colored Sand")
+                    .properties(() -> Blocks.SAND)
+                    .tag(BlockTags.MINEABLE_WITH_SHOVEL)
+                    .tag(BlockTags.SAND)
+                    .variations(VariantTemplates.COLORS)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> WOOLEN_CLAY = registerType(
+            new ChiselBlockType<BlockCarvable>("woolen_clay")
+                    .groupName("Woolen Clay")
+                    .properties(() -> Blocks.TERRACOTTA)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.COLORS)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> BRICK_CUSTOM = registerType(
+            new ChiselBlockType<BlockCarvable>("brick_custom")
+                    .groupName("Custom Brick")
+                    .properties(() -> Blocks.BRICKS)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .variations(VariantTemplates.BRICK_CUSTOM)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> VOIDSTONE_PILLAR = registerType(
+            new ChiselBlockType<BlockCarvable>("voidstone_pillar")
+                    .groupName("Voidstone Pillar")
+                    .properties(() -> Blocks.OBSIDIAN)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .tag(BlockTags.NEEDS_STONE_TOOL)
+                    .variations(VariantTemplates.VOIDSTONE_PILLAR)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvable> VOIDSTONE_PILLAR_ENERGISED = registerType(
+            new ChiselBlockType<BlockCarvable>("voidstone_pillar_energised")
+                    .groupName("Energised Voidstone Pillar")
+                    .properties(() -> Blocks.OBSIDIAN)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .tag(BlockTags.NEEDS_STONE_TOOL)
+                    .variations(VariantTemplates.VOIDSTONE_PILLAR)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockRoadLine> ROAD_LINE = registerType(
+            new ChiselBlockType<BlockRoadLine>("road_line",
+                    (props, data) -> new BlockRoadLine(props, data, "road_line"))
+                    .groupName("Road Line")
+                    .properties(BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.NONE)
+                            .strength(0.01f)
+                            .noCollission()
+                            .sound(SoundType.STONE))
+                    .variations(VariantTemplates.ROAD_LINE)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvablePumpkin> PUMPKIN = registerType(
+            new ChiselBlockType<BlockCarvablePumpkin>("pumpkin",
+                    (props, data) -> new BlockCarvablePumpkin(props, data, "pumpkin"))
+                    .groupName("Pumpkin")
+                    .addVanillaBlock(Blocks.PUMPKIN)
+                    .addVanillaBlock(Blocks.CARVED_PUMPKIN)
+                    .properties(() -> Blocks.CARVED_PUMPKIN)
+                    .variations(VariantTemplates.PUMPKIN)
+                    .build()
+    );
+
+    public static final ChiselBlockType<BlockCarvablePumpkin> JACKOLANTERN = registerType(
+            new ChiselBlockType<BlockCarvablePumpkin>("jackolantern",
+                    (props, data) -> new BlockCarvablePumpkin(props, data, "jackolantern"))
+                    .groupName("Jack o'Lantern")
+                    .addVanillaBlock(Blocks.JACK_O_LANTERN)
+                    .properties(() -> Blocks.JACK_O_LANTERN)
+                    .variations(VariantTemplates.PUMPKIN)
                     .build()
     );
 
@@ -1213,7 +1514,7 @@ public class ChiselBlocks {
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.NEEDS_STONE_TOOL)
                     .variation("hexbase", "Hex Base", hexPlate("hexbase"))
-                    .variation("hexnew", "Hex New", hexPlate("hexbase"))
+                    .variation("hexnew", "Hex New", hexPlate("hexnew"))
                     .build()
     );
 
